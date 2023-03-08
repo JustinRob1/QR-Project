@@ -2,10 +2,13 @@ package com.example.qr_project;
 
 import android.graphics.Bitmap;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class QR_Code {
     // TODO
     // How to hash
-    private String hash; // Stores the hash
+    private Hash hash; // Stores the hash
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
     private Bitmap photo; // Stores the photo taken
@@ -18,7 +21,7 @@ public class QR_Code {
      * @param name
      * @param photo
      */
-    public QR_Code(String hash, int score, String name, Bitmap photo) {
+    public QR_Code(Hash hash, int score, String name, Bitmap photo) {
         this.hash = hash;
         this.score = score;
         this.name = name;
@@ -29,7 +32,7 @@ public class QR_Code {
      * @return
      *      Hash of the QR code
      */
-    public String getHash() {
+    public Hash getHash() {
         return hash;
     }
 
@@ -37,7 +40,7 @@ public class QR_Code {
      * Sets the hash
      * @param hash
      */
-    public void setHash(String hash) {
+    public void setHash(Hash hash) {
         this.hash = hash;
     }
 
@@ -87,5 +90,15 @@ public class QR_Code {
      */
     public void setPhoto(Bitmap photo) {
         this.photo = photo;
+    }
+
+
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("hash", hash);
+        result.put("score", score);
+        result.put("name", name);
+        result.put("photo", photo);
+        return result;
     }
 }
