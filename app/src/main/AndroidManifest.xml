@@ -22,9 +22,7 @@
         </activity>
         <activity
             android:name=".UserHomeActivity"
-            android:screenOrientation="portrait"
-            tools:replace="android:screenOrientation"
-            android:stateNotNeeded="true">
+            android:screenOrientation="fullSensor">
         </activity>
     </application>
 
