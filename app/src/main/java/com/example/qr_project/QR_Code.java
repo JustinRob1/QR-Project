@@ -1,12 +1,14 @@
 package com.example.qr_project;
 
+import android.graphics.Bitmap;
+
 public class QR_Code {
     // TODO
     // How to hash
     private String hash; // Stores the hash
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
-    private Object photo; // Stores the photo taken
+    private Bitmap photo; // Stores the photo taken
 
     /**
      * Constructor for QR Code
@@ -16,7 +18,7 @@ public class QR_Code {
      * @param name
      * @param photo
      */
-    public QR_Code(String hash, int score, String name, Object photo) {
+    public QR_Code(String hash, int score, String name, Bitmap photo) {
         this.hash = hash;
         this.score = score;
         this.name = name;
@@ -75,7 +77,7 @@ public class QR_Code {
      * @return
      *      Photo of QR code
      */
-    public Object getPhoto() {
+    public Bitmap getPhoto() {
         return photo;
     }
 
@@ -83,7 +85,7 @@ public class QR_Code {
      * Sets the photo
      * @param photo
      */
-    public void setPhoto(Object photo) {
+    public void setPhoto(Bitmap photo) {
         this.photo = photo;
     }
 }
