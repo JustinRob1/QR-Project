@@ -3,8 +3,8 @@ package com.example.qr_project;
 import android.graphics.Bitmap;
 
 public class QR_Code {
-    // TODO
     // How to hash
+    // TO DO:
     private String hash; // Stores the hash
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
