@@ -2,7 +2,7 @@ package com.example.qr_project;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,29 +15,35 @@ import com.google.zxing.integration.android.IntentResult;
 //       4) Figure out how Player account interacts with UserHomeActivity
 //            4.1) Stored as a variable of UserHomeActivity?
 public class UserHomeActivity extends AppCompatActivity {
-    private Button addQRCodeButton;
-    private View.OnClickListener addQRCodeButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            addQRCodeButtonClicked();
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user_home_temporary);
-
-        // View initialization
-        addQRCodeButton = findViewById(R.id.add_qrcode_button);
-
-        // Button listener initialization
-        addQRCodeButton.setOnClickListener(addQRCodeButtonOnClickListener);
+        setContentView(R.layout.activity_user_home);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
+    /**
+     * Handles Camera Icon being clicked
+     * @param view
+     */
+    public void onCameraClick(View view) {
+        addQRCodeButtonClicked();
+    }
+
+
+    /**
+     * Dummy method for map button
+     * @param view
+     */
+    public void onMapClick(View view) {
+        Toast.makeText(this, "Map Button Click", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Dummy method for leaderboard button
+     */
+    public void onLeaderboardClick(View view) {
+        Toast.makeText(this, "Leaderboard Button Click", Toast.LENGTH_SHORT).show();
     }
 
     /**
