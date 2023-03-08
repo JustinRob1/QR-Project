@@ -25,8 +25,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 
 public class UserHomeActivity extends AppCompatActivity {
 
-    private QR_Code qrCode = new QR_Code(null, 0, null, null );
-    private Player user = new Player(null, null, null, 0, null);
+    private final QR_Code qrCode = new QR_Code(null, 0, null, null );
+    private final Player user = new Player(null, null, null, 0, null);
 
     private ActivityResultLauncher<Intent> cameraLauncher;
 
@@ -40,6 +40,7 @@ public class UserHomeActivity extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // Get the image data from the camera activity
+                        assert result.getData() != null;
                         Bundle extras = result.getData().getExtras();
                         Bitmap image = (Bitmap) extras.get("data");
 
@@ -52,6 +53,7 @@ public class UserHomeActivity extends AppCompatActivity {
     /**
      * Handles Camera Icon being clicked
      * @param view
+     * The text view which is pressed
      */
     public void onCameraClick(View view) {
         IntentIntegrator integrator = new IntentIntegrator(UserHomeActivity.this);
@@ -80,6 +82,7 @@ public class UserHomeActivity extends AppCompatActivity {
     /**
      * Dummy method for map button
      * @param view
+     * The text view which is pressed
      */
     public void onMapClick(View view) {
         Toast.makeText(this, "Map Button Click", Toast.LENGTH_SHORT).show();
