@@ -117,7 +117,7 @@ public class UserHomeActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == IntentIntegrator.REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            // Scan result is available
+            // Scan Result is available
             assert data != null;
             String scanResult = data.getStringExtra("SCAN_RESULT");
             Hash hash = new Hash(scanResult);
