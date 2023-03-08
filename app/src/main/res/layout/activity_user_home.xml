@@ -30,7 +30,7 @@
             android:background="@drawable/edit_text_background"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Search User"
+            android:hint="Search User"
             android:textColor="#0f0f0f"
             android:textSize="18sp" />
 
