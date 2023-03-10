@@ -1,4 +1,4 @@
-package com.example.qr_project;
+package com.example.qr_project.utils;
 
 import android.util.Log;
 

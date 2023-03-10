@@ -1,9 +1,11 @@
-package com.example.qr_project;
+package com.example.qr_project.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.example.qr_project.R;
 
 public class MainActivity extends AppCompatActivity {
 

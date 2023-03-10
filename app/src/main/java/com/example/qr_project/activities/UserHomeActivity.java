@@ -1,4 +1,4 @@
-package com.example.qr_project;
+package com.example.qr_project.activities;
 
 import static android.content.ContentValues.TAG;
 
@@ -18,6 +18,10 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.qr_project.utils.Hash;
+import com.example.qr_project.utils.Player;
+import com.example.qr_project.utils.QR_Code;
+import com.example.qr_project.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;

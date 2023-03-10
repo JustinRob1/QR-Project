@@ -1,6 +1,8 @@
-package com.example.qr_project;
+package com.example.qr_project.utils;
 
 import android.graphics.Bitmap;
+
+import com.example.qr_project.utils.Hash;
 
 import java.util.HashMap;
 import java.util.Map;

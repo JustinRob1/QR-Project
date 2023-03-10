@@ -1,7 +1,6 @@
-package com.example.qr_project;
+package com.example.qr_project.utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Player {
