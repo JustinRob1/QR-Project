@@ -35,7 +35,7 @@ import java.util.Map;
 //            4.1) Stored as a variable of UserHomeActivity?
 
 public class UserHomeActivity extends AppCompatActivity {
-    private final QR_Code qrCode = new QR_Code(null, 0, "Test", null );
+    private final QR_Code qrCode = new QR_Code(null, "Test", null );
     private final Player user = new Player(null, null, null, 0, null);
 
     FirebaseFirestore db;
@@ -125,9 +125,7 @@ public class UserHomeActivity extends AppCompatActivity {
             assert data != null;
             String scanResult = data.getStringExtra("SCAN_RESULT");
             Hash hash = new Hash(scanResult);
-            int score = hash.getScore();
             qrCode.setHash(hash);
-            qrCode.setScore(score);
 
         }
     }
