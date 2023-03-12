@@ -12,11 +12,12 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.qr_project.R;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LandingPageActivity extends AppCompatActivity {
 
     Button signUpButton;
-    //FirebaseFirestore db;
+    FirebaseFirestore db;
     ActivityResultLauncher<Intent> entryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
