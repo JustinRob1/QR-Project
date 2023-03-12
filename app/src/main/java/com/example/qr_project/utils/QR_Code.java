@@ -19,27 +19,26 @@ public class QR_Code {
      * Constructor for QR Code
      *
      * @param hash
-     * @param score
      * @param name
      * @param photo
      */
-    public QR_Code(Hash hash, int score, String name, Bitmap photo) {
+    public QR_Code(Hash hash, String name, Bitmap photo) {
         this.hash = hash;
-        this.score = score;
+        this.score = (hash == null) ? 0 : hash.getScore();
         this.name = name;
         this.photo = photo;
     }
 
     /**
-     * @return
-     *      Hash of the QR code
+     * @return Hash object of the QR code
      */
     public Hash getHash() {
         return hash;
     }
 
     /**
-     * Sets the hash
+     * Sets the hash object
+     *
      * @param hash
      */
     public void setHash(Hash hash) {
@@ -47,24 +46,14 @@ public class QR_Code {
     }
 
     /**
-     * @return
-     *      Score of the QR Code
+     * @return Score of the QR Code
      */
     public int getScore() {
         return score;
     }
 
     /**
-     * Sets the score of the QR code
-     * @param score
-     */
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    /**
-     * @return
-     *      Name of the QR code
+     * @return Name of the QR code
      */
     public String getName() {
         return name;
@@ -72,6 +61,7 @@ public class QR_Code {
 
     /**
      * Sets the name of the QR code
+     *
      * @param name
      */
     public void setName(String name) {
@@ -79,8 +69,7 @@ public class QR_Code {
     }
 
     /**
-     * @return
-     *      Photo of QR code
+     * @return Photo of QR code
      */
     public Bitmap getPhoto() {
         return photo;
@@ -88,6 +77,7 @@ public class QR_Code {
 
     /**
      * Sets the photo
+     *
      * @param photo
      */
     public void setPhoto(Bitmap photo) {
