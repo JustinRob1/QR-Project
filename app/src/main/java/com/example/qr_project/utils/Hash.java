@@ -23,7 +23,7 @@ public class Hash {
      * @param qrCodeContent a String contained in the QRCode
      */
     public Hash(String qrCodeContent) {
-        this.hash = getHash(qrCodeContent);
+        this.hash = generateHash(qrCodeContent);
         this.score = calculateScore(this.hash);
     }
 
@@ -49,7 +49,7 @@ public class Hash {
      * @param str: A string to be hashed
      * @return
      */
-    private static String getHash(String str){
+    private static String generateHash(String str){
         try {
             /*
              * Comment: The following conversion from str to hash was taken from tutorial
