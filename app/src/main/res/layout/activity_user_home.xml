@@ -29,8 +29,8 @@
             android:layout_height="48dp"
             android:background="@drawable/edit_text_background"
             android:ems="10"
-            android:inputType="textPersonName"
             android:hint="Search User"
+            android:inputType="textPersonName"
             android:textColor="#0f0f0f"
             android:textSize="18sp" />
 
