@@ -70,7 +70,6 @@ public class UserHomeActivity extends AppCompatActivity {
                 HashMap<String, Object> qrCodeDB = new HashMap<>();
                 qrCodeDB.put("id", qrCode.getName());
                 qrCodeDB.put("score", qrCode.getScore());
-                // add more properties as necessary
 
                 db.collection("QR_Codes")
                         .add(qrCodeDB)
@@ -138,7 +137,6 @@ public class UserHomeActivity extends AppCompatActivity {
             } else {
                 // Create a hash object and pass hash into the constructor of QR_Code
                 hash = new Hash(result.getContents());
-                int score = hash.getScore();
                 //String name = hash.generateName(result.getContents()); Fix the name
                 qrCode = new QR_Code(hash, null, null);
 
