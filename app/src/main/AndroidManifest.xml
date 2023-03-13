@@ -12,6 +12,9 @@
         android:theme="@style/Theme.QRProject"
         tools:targetApi="31">
         <activity
+            android:name=".activities.QRCodeActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.UserHomeActivity"
             android:exported="false" />
         <activity
@@ -35,7 +38,7 @@
         </activity>
         <activity
             android:name=".activities.LeaderboardActivity"
-            android:screenOrientation="fullSensor"></activity>
+            android:screenOrientation="fullSensor" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
