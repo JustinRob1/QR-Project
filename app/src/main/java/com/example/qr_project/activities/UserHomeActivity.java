@@ -21,12 +21,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.checkerframework.checker.units.qual.A;
 
 import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -49,8 +53,6 @@ public class UserHomeActivity extends AppCompatActivity {
     TextView qrCode3Name;
     TextView qrCode3Score;
 
-    Button viewAll;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,13 +74,37 @@ public class UserHomeActivity extends AppCompatActivity {
         qrCode2Score = findViewById(R.id.qr_code_score_2);
         qrCode3Score = findViewById(R.id.qr_code_score_3);
 
+        collRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
+                for (QueryDocumentSnapshot doc: value) {
+                    Map<String, Integer> userId_score_pair = new HashMap<>();
+                    userId_score_pair.put(doc.getId().toString(), Math.toIntExact((Long) doc.get("totalScore")));
+                    rankings.add(userId_score_pair);
+                }
+                Collections.sort(rankings, (x, y) -> x.entrySet().iterator().next().getValue().compareTo(y.entrySet().iterator().next().getValue()));
+                String rank;
+                int counter = rankings.size();
+                for (Map<String, Integer> x: rankings) {
+                    if (x.containsKey(userId)) {
+                        rank = "Global Rank: " + String.valueOf(counter);
+                        globalRank.setText(rank);
+                        break;
+                    }
+                    counter--;
+                }
+
+            }
+        });
+
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 totalScore.setText(value.get("totalScore").toString());
 
                 qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
-                ArrayList<Integer> scores = new ArrayList<Integer>();
+                ArrayList<Integer> scores = new ArrayList<>();
                 for (Map<String, Object> qrCode: qrCodes) {
                     scores.add(Math.toIntExact((Long) qrCode.get("score")));
                 }
@@ -105,7 +131,7 @@ public class UserHomeActivity extends AppCompatActivity {
                 } catch (NoSuchElementException e) {
 
                 }
-                
+
                 String totalQr;
                 totalQr = "Total QR Codes: " + String.valueOf(scores.size());
                 totalQrCodes.setText(totalQr);
@@ -148,6 +174,12 @@ public class UserHomeActivity extends AppCompatActivity {
     public void onViewAllClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);
         intent.putExtra("filter", "user");
+        startActivity(intent);
+    }
+
+    public void onViewUserProfile(View view) {
+        Intent intent = new Intent(this, UserProfileActivity.class);
+        intent.putExtra("userId", userId);
         startActivity(intent);
     }
 
