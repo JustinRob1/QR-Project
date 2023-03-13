@@ -44,6 +44,4 @@
             tools:replace="screenOrientation"
             tools:ignore="WrongManifestParent" />
 
-    </manifest>
-
 </manifest>
