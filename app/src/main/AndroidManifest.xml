@@ -12,6 +12,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.QRProject"
+
+        <activity
+            android:name=".activities.QRCodeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.UserHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.UserProfileActivity"
+            android:exported="false" />
+
         tools:targetApi="31"
         tools:ignore="ExtraText">
         <activity
@@ -31,6 +42,8 @@
             </intent-filter>
         </activity>
         <activity
+
+
             android:name=".activities.UserHomeActivity"
             android:screenOrientation="fullSensor">
         </activity>
