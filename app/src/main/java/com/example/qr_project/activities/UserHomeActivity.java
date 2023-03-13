@@ -188,12 +188,6 @@ public class UserHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void onViewUserProfile(View view) {
-        Intent intent = new Intent(this, UserProfileActivity.class);
-        intent.putExtra("userId", userId);
-        startActivity(intent);
-    }
-
     // TODO: putExtra on the actual QRCODE that was clicked
     public void onQRClick(View view){
         Intent intent = new Intent(UserHomeActivity.this, QRCodeActivity.class);
