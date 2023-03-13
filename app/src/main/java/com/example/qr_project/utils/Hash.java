@@ -15,8 +15,10 @@ import java.util.Map;
  */
 public class Hash {
     private String hash;
-    private int score;
     private String name;
+    private String face;
+
+    private int score;
     private final static String TAG = "HASH";
 
     /**
@@ -25,8 +27,9 @@ public class Hash {
      */
     public Hash(String qrCodeContent) {
         this.hash = generateHash(qrCodeContent);
+        this.name = generateName(this.hash);
+        this.face = generateFace(this.hash);
         this.score = calculateScore(this.hash);
-        this.name = generateName(this.getHash());
     }
 
     /**
@@ -38,17 +41,28 @@ public class Hash {
     }
 
     /**
-     * Returns a String hash
+     * Returns a hash string
      * @return: Hash that is stored
      */
     public String getHash() {
         return hash;
     }
 
+    /**
+     * Returns a name string
+     * @return: name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns a face string
+     * @return: face
+     */
+    public String getFace() {
+        return face;
+    }
 
     /**
      * Returns a hash for a given string
@@ -121,7 +135,7 @@ public class Hash {
         return score;
     }
 
-    private static String face(String hashStr) {
+    private static String generateFace(String hashStr) {
         // Convert hash string to binary representation
         String hashBin = new BigInteger(hashStr, 16).toString(2);
         hashBin = String.format("%256s", hashBin).replace(' ', '0');
@@ -251,130 +265,130 @@ public class Hash {
 
     private static String generateName(String hashStr) {
         // Convert hash string to binary representation
-        String hashBin = new BigInteger(hashStr, 16).toString(2);
-        hashBin = String.format("%256s", hashBin).replace(' ', '0');
 
-        // Define dictionaries for each bit
-        Map<Integer, String> bit0Dict = new HashMap<>();
-        bit0Dict.put(0, "ethereal");
-        bit0Dict.put(1, "neon");
-        bit0Dict.put(2, "icy");
-        bit0Dict.put(3, "radiant");
-        bit0Dict.put(4, "obsidian");
-        bit0Dict.put(5, "gossamer");
-        bit0Dict.put(6, "vermilion");
-        bit0Dict.put(7, "mystic");
-        bit0Dict.put(8, "dusky");
-        bit0Dict.put(9, "cobalt");
-        bit0Dict.put(10, "cerulean");
-        bit0Dict.put(11, "crimson");
-        bit0Dict.put(12, "golden");
-        bit0Dict.put(13, "rustic");
-        bit0Dict.put(14, "cosmic");
-        bit0Dict.put(15, "emerald");
+        // Define dictionaries for each hexadecimal
+        Map<Character, String> hex0Dict = new HashMap<>();
+        hex0Dict.put('0', "ethereal");
+        hex0Dict.put('1', "neon");
+        hex0Dict.put('2', "icy");
+        hex0Dict.put('3', "radiant");
+        hex0Dict.put('4', "obsidian");
+        hex0Dict.put('5', "gossamer");
+        hex0Dict.put('6', "vermilion");
+        hex0Dict.put('7', "mystic");
+        hex0Dict.put('8', "dusky");
+        hex0Dict.put('9', "cobalt");
+        hex0Dict.put('a', "cerulean");
+        hex0Dict.put('b', "crimson");
+        hex0Dict.put('c', "golden");
+        hex0Dict.put('d', "rustic");
+        hex0Dict.put('e', "cosmic");
+        hex0Dict.put('f', "emerald");
 
-        Map<Integer, String> bit1Dict = new HashMap<>();
-        bit1Dict.put(0, "Fro");
-        bit1Dict.put(1, "Glo");
-        bit1Dict.put(2, "Blu");
-        bit1Dict.put(3, "Sly");
-        bit1Dict.put(4, "Mau");
-        bit1Dict.put(5, "Fiz");
-        bit1Dict.put(6, "Sky");
-        bit1Dict.put(7, "Dew");
-        bit1Dict.put(8, "Hue");
-        bit1Dict.put(9, "Zap");
-        bit1Dict.put(10, "Jaz");
-        bit1Dict.put(11, "Jem");
-        bit1Dict.put(12, "Lux");
-        bit1Dict.put(13, "Aur");
-        bit1Dict.put(14, "Flu");
-        bit1Dict.put(15, "Nim");
+        Map<Character, String> hex1Dict = new HashMap<>();
+        hex1Dict.put('0', "Fro");
+        hex1Dict.put('1', "Glo");
+        hex1Dict.put('2', "Blu");
+        hex1Dict.put('3', "Sly");
+        hex1Dict.put('4', "Mau");
+        hex1Dict.put('5', "Fiz");
+        hex1Dict.put('6', "Sky");
+        hex1Dict.put('7', "Dew");
+        hex1Dict.put('8', "Hue");
+        hex1Dict.put('9', "Zap");
+        hex1Dict.put('a', "Jaz");
+        hex1Dict.put('b', "Jem");
+        hex1Dict.put('c', "Lux");
+        hex1Dict.put('d', "Aur");
+        hex1Dict.put('e', "Flu");
+        hex1Dict.put('f', "Nim");
 
         // Define dictionary for bit 2
-        Map<Integer, String> bit2Dict = new HashMap<>();
-        bit2Dict.put(0, "Mo");
-        bit2Dict.put(1, "Lyo");
-        bit2Dict.put(2, "Dax");
-        bit2Dict.put(3, "Bix");
-        bit2Dict.put(4, "Jyn");
-        bit2Dict.put(5, "Taz");
-        bit2Dict.put(6, "Nyx");
-        bit2Dict.put(7, "Rex");
-        bit2Dict.put(8, "Giz");
-        bit2Dict.put(9, "Vyn");
-        bit2Dict.put(10, "Pax");
-        bit2Dict.put(11, "Hix");
-        bit2Dict.put(12, "Kaz");
-        bit2Dict.put(13, "Wex");
-        bit2Dict.put(14, "Yon");
-        bit2Dict.put(15, "Zyx");
+        Map<Character, String> hex2Dict = new HashMap<>();
+        hex2Dict.put('0', "Mo");
+        hex2Dict.put('1', "Lyo");
+        hex2Dict.put('2', "Dax");
+        hex2Dict.put('3', "Bix");
+        hex2Dict.put('4', "Jyn");
+        hex2Dict.put('5', "Taz");
+        hex2Dict.put('6', "Nyx");
+        hex2Dict.put('7', "Rex");
+        hex2Dict.put('8', "Giz");
+        hex2Dict.put('9', "Vyn");
+        hex2Dict.put('a', "Pax");
+        hex2Dict.put('b', "Hix");
+        hex2Dict.put('c', "Kaz");
+        hex2Dict.put('d', "Wex");
+        hex2Dict.put('e', "Yon");
+        hex2Dict.put('f', "Zyx");
 
         // Define dictionary for bit 3
-        Map<Integer, String> bit3Dict = new HashMap<>();
-        bit3Dict.put(0, "Omega");
-        bit3Dict.put(1, "Giga");
-        bit3Dict.put(2, "Tera");
-        bit3Dict.put(3, "Eternal");
-        bit3Dict.put(4, "Nova");
-        bit3Dict.put(5, "Hyper");
-        bit3Dict.put(6, "Endless");
-        bit3Dict.put(7, "Epic");
-        bit3Dict.put(8, "Titan");
-        bit3Dict.put(9, "Myriad");
-        bit3Dict.put(10, "Galactic");
-        bit3Dict.put(11, "Supreme");
-        bit3Dict.put(12, "Super");
-        bit3Dict.put(13, "Ultimate");
-        bit3Dict.put(14, "Legendary");
-        bit3Dict.put(15, "Master");
+        Map<Character, String> hex3Dict = new HashMap<>();
+        hex3Dict.put('0', "Omega");
+        hex3Dict.put('1', "Giga");
+        hex3Dict.put('2', "Tera");
+        hex3Dict.put('3', "Eternal");
+        hex3Dict.put('4', "Nova");
+        hex3Dict.put('5', "Hyper");
+        hex3Dict.put('6', "Endless");
+        hex3Dict.put('7', "Epic");
+        hex3Dict.put('8', "Titan");
+        hex3Dict.put('9', "Myriad");
+        hex3Dict.put('a', "Galactic");
+        hex3Dict.put('b', "Supreme");
+        hex3Dict.put('c', "Super");
+        hex3Dict.put('d', "Ultimate");
+        hex3Dict.put('e', "Legendary");
+        hex3Dict.put('f', "Master");
 
         // Define dictionary for bit 4
-        Map<Integer, String> bit4Dict = new HashMap<>();
-        bit4Dict.put(0, "Thunderous");
-        bit4Dict.put(1, "Blazing");
-        bit4Dict.put(2, "Divine");
-        bit4Dict.put(3, "Infernal");
-        bit4Dict.put(4, "Empyreal");
-        bit4Dict.put(5, "Arcane");
-        bit4Dict.put(6, "Exalted");
-        bit4Dict.put(7, "Champion");
-        bit4Dict.put(8, "Seraphic");
-        bit4Dict.put(9, "Electric");
-        bit4Dict.put(10, "Astral");
-        bit4Dict.put(11, "Eclipse");
-        bit4Dict.put(12, "Sonic");
-        bit4Dict.put(13, "Spectral");
-        bit4Dict.put(14, "Vanquished");
-        bit4Dict.put(15, "Celestial");
+        Map<Character, String> hex4Dict = new HashMap<>();
+        hex4Dict.put('0', "Tunderous");
+        hex4Dict.put('1', "Blazing");
+        hex4Dict.put('2', "Divine");
+        hex4Dict.put('3', "Infernal");
+        hex4Dict.put('4', "Empyreal");
+        hex4Dict.put('5', "Arcane");
+        hex4Dict.put('6', "Exalted");
+        hex4Dict.put('7', "Champion");
+        hex4Dict.put('8', "Seraphic");
+        hex4Dict.put('9', "Electric");
+        hex4Dict.put('a', "Astral");
+        hex4Dict.put('b', "Eclipse");
+        hex4Dict.put('c', "Sonic");
+        hex4Dict.put('d', "Spectral");
+        hex4Dict.put('e', "Vanquished");
+        hex4Dict.put('f', "Celestial");
 
-        Map<Integer, String> bit5Dict = new HashMap<>();
-        bit5Dict.put(0, "Golem");
-        bit5Dict.put(1, "Yeti");
-        bit5Dict.put(2, "Gargoyle");
-        bit5Dict.put(3, "Werewolf");
-        bit5Dict.put(4, "Vampire");
-        bit5Dict.put(5, "Gorgon");
-        bit5Dict.put(6, "Chimera");
-        bit5Dict.put(7, "Unicorn");
-        bit5Dict.put(8, "Basilisk");
-        bit5Dict.put(9, "Manticore");
-        bit5Dict.put(10, "Wyvern");
-        bit5Dict.put(11, "Cockatrice");
-        bit5Dict.put(12, "Griffin");
-        bit5Dict.put(13, "Wraith");
-        bit5Dict.put(14, "Hydra");
-        bit5Dict.put(15, "Leviathan");
+        Map<Character, String> hex5Dict = new HashMap<>();
+        hex5Dict.put('0', "Golem");
+        hex5Dict.put('1', "Yeti");
+        hex5Dict.put('2', "Gargoyle");
+        hex5Dict.put('3', "Werewolf");
+        hex5Dict.put('4', "Vampire");
+        hex5Dict.put('5', "Gorgon");
+        hex5Dict.put('6', "Chimera");
+        hex5Dict.put('7', "Unicorn");
+        hex5Dict.put('8', "Basilisk");
+        hex5Dict.put('9', "Manticore");
+        hex5Dict.put('a', "Wyvern");
+        hex5Dict.put('b', "Cockatrice");
+        hex5Dict.put('c', "Griffin");
+        hex5Dict.put('d', "Wraith");
+        hex5Dict.put('e', "Hydra");
+        hex5Dict.put('f', "Leviathan");
 
 
-        // Lookup values in each dictionary based on corresponding bits in the hash
-        int[] bits = new int[6];
+        // Lookup values in each dictionary based on corresponding hexadecimals in the hash
+        Character[] hexaDecimals = new Character[6];
         for (int i = 0; i < 6; i++) {
-            bits[i] = Character.getNumericValue(hashBin.charAt(i));
+            hexaDecimals[i] = hashStr.charAt(i);
         }
-        String name = bit0Dict.get(bits[0]) + " " + bit1Dict.get(bits[1]) + bit2Dict.get(bits[2]) +
-                bit3Dict.get(bits[3]) + bit4Dict.get(bits[4]) + bit5Dict.get(bits[5]);
-
-        return name;
-        }
+        return hex0Dict.get(hexaDecimals[0]) + " " +
+                hex1Dict.get(hexaDecimals[1]) +
+                hex2Dict.get(hexaDecimals[2]) +
+                hex3Dict.get(hexaDecimals[3]) +
+                hex4Dict.get(hexaDecimals[4]) +
+                hex5Dict.get(hexaDecimals[5]);
+    }
 }
