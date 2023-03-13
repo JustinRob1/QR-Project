@@ -26,11 +26,11 @@ public class SignUpActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
 
+    // SignUpActivity when doing testing
     public SignUpActivity(Comparable<String> user_name, String email, String phone) {
     }
 
     public SignUpActivity() {
-
     }
 
     @Override
@@ -108,7 +108,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
 
-    /** 
+    /**
         * Generates a new user ID
         * @return a new user ID
      */
