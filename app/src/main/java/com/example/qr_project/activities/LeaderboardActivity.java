@@ -147,6 +147,10 @@ public class LeaderboardActivity extends AppCompatActivity {
         finish();
     }
 
+    public void onLeaderboardClick(View view){
+        Toast.makeText(this, "Already at leaderboard", Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * Called when the user clicks the QR code button
      * Getting the user's ID and their information about the QR_Codes and their scores
@@ -375,6 +379,15 @@ public class LeaderboardActivity extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
         linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(LeaderboardActivity.this, QRCodeActivity.class);
+                intent.putExtra("qrName", "test");
+                startActivity(intent);
+            }
+        });
+
 
 // Create a new TextView for the TableRow
         TextView rankTextView = new TextView(LeaderboardActivity.this);
@@ -428,4 +441,6 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         return row;
     }
+
+
 }
