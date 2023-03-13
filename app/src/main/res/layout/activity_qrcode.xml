@@ -276,8 +276,9 @@
                 android:layout_marginHorizontal="25dp"
                 android:layout_marginTop="12dp">
                 <TextView
-                    android:text="See On Map"
+                    android:text="DELETE"
                     android:textAlignment="center"
+                    android:onClick="onDeleteClick"
                     android:layout_weight="1"
                     android:textColor="@color/black"
                     android:textSize="15sp"

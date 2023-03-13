@@ -1,6 +1,8 @@
 package com.example.qr_project.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,5 +18,14 @@ public class QRCodeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrcode);
+    }
+
+    /**
+     * When the user clicks the delete button, the QR code will be delete
+     *
+     * @param view The text view which is pressed
+     */
+    public void onDeleteClick(View view) {
+
     }
 }

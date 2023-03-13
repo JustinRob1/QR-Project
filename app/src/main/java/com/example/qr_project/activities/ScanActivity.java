@@ -108,7 +108,6 @@ public class ScanActivity extends AppCompatActivity {
      *
      */
 
-
     // Handle the scanning of the QR code
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
