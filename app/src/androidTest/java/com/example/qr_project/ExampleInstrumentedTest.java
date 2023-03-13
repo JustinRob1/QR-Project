@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.
- *
+ * A test to see if an Android device and app can be executed and built properly (successfully)
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
