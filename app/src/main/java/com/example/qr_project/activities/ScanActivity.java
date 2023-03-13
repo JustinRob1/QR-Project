@@ -161,6 +161,18 @@ public class ScanActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This is to handle the new QRCode being scanned
+     * Then the QRCode will be automatically added to the FireStore database under the user's account
+     * The QR_Code is also attached with the location
+     * If the user wishes to add the location to the database on FireStore, they can do so;
+     * however if they do not wish to add the location to the database on FireStore, they can opt out.
+     * The user will be prompted to decide to add the location or not.
+     * @see FirebaseFirestore
+     * @see com.example.qr_project.FireStore
+     * @see UserProfileActivity
+     * @see UserHomeActivity
+     */
     public void addQR() {
         // Get the current user's ID
         SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);

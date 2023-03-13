@@ -51,6 +51,15 @@ public class UserHomeActivity extends AppCompatActivity {
 
     Button viewAll;
 
+    /**
+     * Displays the total score of the QR_Codes scanned by the user to them
+     * Display the information of the user
+     * Retrieving the data from the FireStore FireBase
+     * Shows the top three users with highest total score
+     * @param savedInstanceState  a package to calculate the total score and display to score to the user
+     * @see FirebaseFirestore
+     * @see com.example.qr_project.FireStore
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +91,8 @@ public class UserHomeActivity extends AppCompatActivity {
                 for (Map<String, Object> qrCode: qrCodes) {
                     scores.add(Math.toIntExact((Long) qrCode.get("score")));
                 }
-
+                // Shows the top three
+                // Intialise the maxScore = 0 and idx = 0
                 int maxScore = 0;
                 int idx = 0;
                 try {

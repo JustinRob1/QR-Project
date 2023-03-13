@@ -359,6 +359,20 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *  Create a new ImageView for the TableRow
+     *  Create a new TableRow
+     *  Create a new LinearLayout for the TableRow
+     *  Create a new TextView for the TableRow
+     *  Create a new TextView for the TableRow
+     *  This creates the table for the leaderboardship
+     *  This shows the data of the leader with the highest score for the QRCode
+     * @param name
+     * @param score
+     * @param rank
+     * @return row
+     */
+
     private TableRow createNewRow(String name, Long score, int rank){
         // Create a new TableRow
         TableRow row = new TableRow(LeaderboardActivity.this);
