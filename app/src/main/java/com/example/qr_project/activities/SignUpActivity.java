@@ -47,10 +47,10 @@ public class SignUpActivity extends AppCompatActivity {
 
         signUpButton.setOnClickListener(v -> {
             // Get the information that the user entered
+            String userID = generateUserID();
             String username = usernameEditText.getText().toString();
             String email = emailEditText.getText().toString();
             String phoneNumber = phoneNumberEditText.getText().toString();
-            String userID = generateUserID();
 
             // TODO
             // Check if that username already exist
@@ -60,7 +60,7 @@ public class SignUpActivity extends AppCompatActivity {
             // Create a new user with the information
             Player user = new Player(username, email, phoneNumber, 0, userID);
 
-            db.collection("users").document(username).set(user);
+            db.collection("users").document(userID).set(user);
 
             // Get the shared preferences object
             SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
@@ -68,12 +68,16 @@ public class SignUpActivity extends AppCompatActivity {
             // Store the user's information
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("user_id", userID);
-            editor.putString("user_name", username);
             editor.apply();
 
-            // Go to the UserHomeActivity
-            Intent intent = new Intent(this, UserHomeActivity.class);
-            startActivity(intent);
+            // Store userID
+            Intent intent = new Intent();
+            intent.putExtra("userId", userID);
+
+            // Result code 0 indicating sign up complete
+            setResult(0, intent);
+
+            finish();
         });
     }
 
