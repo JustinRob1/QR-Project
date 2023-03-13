@@ -155,12 +155,13 @@
 
         <!-- Table Layout for Friends QR Codes  -->
         <TableLayout
-            android:id="@+id/qr_leaderboard_table"
+            android:id="@+id/user_qr_leaderboard_table"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginTop="15dp">
 
+            <!-- Test
             <TableRow
                 android:id="@+id/qr_leaderboard_1_item"
                 android:layout_width="match_parent"
@@ -296,18 +297,37 @@
 
                 </LinearLayout>
 
-            </TableRow>
+            </TableRow> -->
 
         </TableLayout>
 
-        <!-- Table Layout for Friends OVR Scores -->
         <TableLayout
-            android:id="@+id/ovr_leaderboard_table"
+            android:id="@+id/friend_qr_leaderboard_table"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_marginTop="15dp">
 
+        </TableLayout>
+
+        <TableLayout
+            android:id="@+id/global_qr_leaderboard_table"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginTop="15dp">
+
+        </TableLayout>
+
+        <!-- Table Layout for Friends OVR Scores -->
+        <TableLayout
+            android:id="@+id/friend_ovr_leaderboard_table"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginTop="15dp">
+
+            <!-- Dont need dummy data
             <TableRow
                 android:id="@+id/ovr_leaderboard_1_item"
                 android:layout_width="match_parent"
@@ -445,7 +465,16 @@
 
                 </LinearLayout>
 
-            </TableRow>
+            </TableRow> -->
+
+        </TableLayout>
+
+        <TableLayout
+            android:id="@+id/global_ovr_leaderboard_table"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginTop="15dp">
 
         </TableLayout>
 

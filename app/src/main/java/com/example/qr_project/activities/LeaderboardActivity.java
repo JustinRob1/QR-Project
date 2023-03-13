@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,9 +39,12 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
 
-    public TableLayout qr_leaderboard;
+    public TableLayout user_qr_leaderboard;
+    public TableLayout friend_qr_leaderboard;
+    public TableLayout global_qr_leaderboard;
 
-    public TableLayout ovr_leaderboard;
+    public TableLayout friend_ovr_leaderboard;
+    public TableLayout global_ovr_leaderboard;
 
     public TextView user_codes_title;
 
@@ -53,6 +57,13 @@ public class LeaderboardActivity extends AppCompatActivity {
     public AppCompatButton btn_filter_global;
 
     boolean isFilterChanged = false;
+    boolean isUser= false;
+    boolean isFriend = true;
+    boolean isGlobal = false;
+
+    boolean isUserAdded = false;
+    boolean isFriendAdded=false;
+    boolean isGlobalAdded= false;
 
     /**
      * Finds and fetches the right ID's for all the buttons
@@ -67,24 +78,43 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
-        qr_leaderboard = findViewById(R.id.qr_leaderboard_table);
-        ovr_leaderboard= findViewById(R.id.ovr_leaderboard_table);
+        user_qr_leaderboard = findViewById(R.id.user_qr_leaderboard_table);
+        friend_qr_leaderboard = findViewById(R.id.friend_qr_leaderboard_table);
+        global_qr_leaderboard = findViewById(R.id.global_qr_leaderboard_table);
+        friend_ovr_leaderboard= findViewById(R.id.friend_ovr_leaderboard_table);
+        global_ovr_leaderboard= findViewById(R.id.global_ovr_leaderboard_table);
+
         leaderboard_dial_filters = findViewById(R.id.leaderboard_dial_filter_layout);
         user_codes_title = findViewById(R.id.title_user_qr_codes);
-        ovr_leaderboard.setVisibility(View.GONE);
-        user_codes_title.setVisibility(View.GONE);
 
         btn_filter_global = findViewById(R.id.btn_filter_global);
         btn_filter_friends = findViewById(R.id.btn_filter_friends);
         btn_filter_user = findViewById(R.id.btn_filter_you);
 
+
+
+        // Hide all other tables other than friends
+        user_qr_leaderboard.setVisibility(View.GONE);
+        global_qr_leaderboard.setVisibility(View.GONE);
+        friend_ovr_leaderboard.setVisibility(View.GONE);
+        global_ovr_leaderboard.setVisibility(View.GONE);
+        user_codes_title.setVisibility(View.GONE);
+        friend_qr_leaderboard.setVisibility(View.VISIBLE);
+
+
+
+
+
         String filter = intent.getStringExtra("filter");
-        if (filter == "user"){
+        if (filter != null && filter.equals("user")){
             user_codes_title.setVisibility(View.VISIBLE);
             leaderboard_dial_filters.setVisibility(View.GONE);
             btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
             btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
             btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
+            isUser = true;
+            isFriend = false;
+            isGlobal = false;
         }
     }
 
@@ -133,8 +163,20 @@ public class LeaderboardActivity extends AppCompatActivity {
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
         btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
-        ovr_leaderboard.setVisibility(View.GONE);
-        qr_leaderboard.setVisibility(View.VISIBLE);
+
+
+        // Hide all other tables other than friends
+        user_qr_leaderboard.setVisibility(View.VISIBLE);
+        global_qr_leaderboard.setVisibility(View.GONE);
+        friend_ovr_leaderboard.setVisibility(View.GONE);
+        global_ovr_leaderboard.setVisibility(View.GONE);
+        friend_qr_leaderboard.setVisibility(View.GONE);
+        user_codes_title.setVisibility(View.VISIBLE);
+        leaderboard_dial_filters.setVisibility(View.GONE);
+
+        isUser = true;
+        isFriend = false;
+        isGlobal = false;
 
         db = FirebaseFirestore.getInstance();
 
@@ -147,10 +189,11 @@ public class LeaderboardActivity extends AppCompatActivity {
         // Get a reference to the user's document in Firestore
         DocumentReference userRef = db.collection("users").document(userID);
 
-        TableLayout leaderboardTable = findViewById(R.id.qr_leaderboard_table);
+
+        // TODO: Make sure this works with real data
 
         // Populate the leaderboard
-        if (qrCodesBoardFlag == 0) {
+        if (!isUserAdded) {
             // Get the user's document data
             userRef.get().addOnSuccessListener(documentSnapshot -> {
                 // Check if the document exists
@@ -169,56 +212,10 @@ public class LeaderboardActivity extends AppCompatActivity {
                             String name = (String) qrCode.get("name");
                             Long score = (Long) qrCode.get("score");
 
-                            // Create a new row for each QR code
-                            TableRow row = new TableRow(LeaderboardActivity.this); // Change MainActivity to your activity name
-                            // Create and set the layout parameters for the row
-                            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
-                                    TableRow.LayoutParams.MATCH_PARENT,
-                                    TableRow.LayoutParams.WRAP_CONTENT);
-                            row.setLayoutParams(layoutParams);
-
-
-                            TextView rankTextView = new TextView(LeaderboardActivity.this);
-                            rankTextView.setText(String.valueOf(rank));
-                            rankTextView.setTextColor(Color.BLACK);
-                            rankTextView.setTextSize(22);
-                            rankTextView.setGravity(Gravity.CENTER);
-                            rankTextView.setLayoutParams(new TableRow.LayoutParams(50, TableRow.LayoutParams.WRAP_CONTENT));
-
-                            TextView nameTextView = new TextView(LeaderboardActivity.this);
-                            nameTextView.setText(name);
-                            nameTextView.setTextColor(Color.BLACK);
-                            nameTextView.setTextSize(18);
-                            nameTextView.setGravity(Gravity.CENTER);
-                            nameTextView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
-                            nameTextView.setMaxLines(1);
-
-                            TextView scoreTextView = new TextView(LeaderboardActivity.this);
-                            scoreTextView.setText(String.valueOf(score));
-                            scoreTextView.setTextColor(Color.BLACK);
-                            scoreTextView.setTextSize(18);
-                            scoreTextView.setTypeface(null, Typeface.BOLD);
-                            scoreTextView.setGravity(Gravity.CENTER);
-                            TableRow.LayoutParams scoreParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-                            scoreParams.setMargins(30, 0, 10, 0);
-                            scoreTextView.setLayoutParams(scoreParams);
-
-                            ImageView arrowImageView = new ImageView(LeaderboardActivity.this);
-                            arrowImageView.setImageResource(R.drawable.arrow_right_solid);
-                            TableRow.LayoutParams arrowParams = new TableRow.LayoutParams(25, 25);
-                            arrowParams.setMargins(10, 0, 0, 0);
-                            arrowImageView.setLayoutParams(arrowParams);
-
-                            row.addView(rankTextView);
-                            row.addView(nameTextView);
-                            row.addView(scoreTextView);
-                            row.addView(arrowImageView);
-
-                            row.setBackgroundResource(R.drawable.leaderboard_row_item);
+                            user_qr_leaderboard.addView(createNewRow(name, score, rank));
 
                             rank++;
 
-                            leaderboardTable.addView(row);
                             qrCodesBoardFlag = 1;
                         }
 
@@ -227,9 +224,12 @@ public class LeaderboardActivity extends AppCompatActivity {
                     }
 
                 } else {
+
                     Log.d(TAG, "User document does not exist");
                 }
             }).addOnFailureListener(e -> Log.e(TAG, "Error getting user document", e));
+
+            isUserAdded= true;
         }
     }
 
@@ -245,6 +245,37 @@ public class LeaderboardActivity extends AppCompatActivity {
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
+
+        // Hide all other tables other than friends
+        user_qr_leaderboard.setVisibility(View.GONE);
+        global_qr_leaderboard.setVisibility(View.GONE);
+        friend_ovr_leaderboard.setVisibility(View.GONE);
+        global_ovr_leaderboard.setVisibility(View.GONE);
+        friend_qr_leaderboard.setVisibility(View.VISIBLE);
+        user_codes_title.setVisibility(View.GONE);
+        leaderboard_dial_filters.setVisibility(View.VISIBLE);
+
+        isUser = false;
+        isFriend = true;
+        isGlobal = false;
+
+        onFilterChange(view);
+
+        // TODO: TESTING DATA FOR QR CODE
+        if (!isFriendAdded){
+            TableRow testRow = createNewRow("Fmpty", Long.valueOf(1232), 1);
+            TableRow testRow2 = createNewRow("Fmpty2", Long.valueOf(1000), 2);
+
+            TableRow testRow3 = createNewRow("Fmptyy", Long.valueOf(1232), 1);
+            TableRow testRow4 = createNewRow("Fmptyy2", Long.valueOf(1000), 2);
+
+            friend_qr_leaderboard.addView(testRow);
+            friend_qr_leaderboard.addView(testRow2);
+
+            friend_ovr_leaderboard.addView(testRow3);
+            friend_ovr_leaderboard.addView(testRow4);
+            isFriendAdded = true;
+        }
     }
 
     /**
@@ -259,6 +290,38 @@ public class LeaderboardActivity extends AppCompatActivity {
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
+
+        // Hide all other tables other than friends
+        user_qr_leaderboard.setVisibility(View.GONE);
+        global_qr_leaderboard.setVisibility(View.VISIBLE);
+        friend_ovr_leaderboard.setVisibility(View.GONE);
+        global_ovr_leaderboard.setVisibility(View.GONE);
+        friend_qr_leaderboard.setVisibility(View.GONE);
+        user_codes_title.setVisibility(View.GONE);
+        leaderboard_dial_filters.setVisibility(View.VISIBLE);
+
+
+        // TODO: TESTING DATA FOR QR CODE
+        if (!isGlobalAdded){
+            TableRow testRow = createTestRow("Gmpty", Long.valueOf(1232), 1);
+            TableRow testRow2 = createTestRow("Gmpty2", Long.valueOf(1000), 2);
+
+            TableRow testRow3 = createTestRow("Gmptyyy", Long.valueOf(1232), 1);
+            TableRow testRow4 = createTestRow("Gmptyyy2", Long.valueOf(1000), 2);
+
+            global_qr_leaderboard.addView(testRow);
+            global_qr_leaderboard.addView(testRow2);
+
+            global_ovr_leaderboard.addView(testRow3);
+            global_ovr_leaderboard.addView(testRow4);
+
+            isGlobalAdded = true;
+        }
+
+
+        isUser = false;
+        isFriend = false;
+        isGlobal = true;
     }
 
 
@@ -271,16 +334,99 @@ public class LeaderboardActivity extends AppCompatActivity {
         if (isFilterChanged) {
             qr_code_filter.setTypeface(null, Typeface.BOLD);
             ovr_score_filter.setTypeface(null, Typeface.NORMAL);
-            qr_leaderboard.setVisibility(View.VISIBLE);
-            ovr_leaderboard.setVisibility(View.GONE);
+
+            if (isFriend){
+                friend_qr_leaderboard.setVisibility(View.VISIBLE);
+                friend_ovr_leaderboard.setVisibility(View.GONE);
+            } else if(isGlobal){
+                global_qr_leaderboard.setVisibility(View.VISIBLE);
+                global_ovr_leaderboard.setVisibility(View.GONE);
+            }
             isFilterChanged = false;
         } else {
             qr_code_filter.setTypeface(null, Typeface.NORMAL);
             ovr_score_filter.setTypeface(null, Typeface.BOLD);
-            qr_leaderboard.setVisibility(View.GONE);
-            ovr_leaderboard.setVisibility(View.VISIBLE);
+
+            if (isFriend){
+                friend_qr_leaderboard.setVisibility(View.GONE);
+                friend_ovr_leaderboard.setVisibility(View.VISIBLE);
+            } else if(isGlobal){
+                global_qr_leaderboard.setVisibility(View.GONE);
+                global_ovr_leaderboard.setVisibility(View.VISIBLE);
+            }
+
             isFilterChanged = true;
         }
 
+    }
+
+    private TableRow createNewRow(String name, Long score, int rank){
+        // Create a new TableRow
+        TableRow row = new TableRow(LeaderboardActivity.this);
+        row.setBackgroundResource(R.drawable.leaderboard_row_item);
+        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+
+        layoutParams.setMargins(75, 30, 75, 0);
+        row.setLayoutParams(layoutParams);
+
+// Create a new LinearLayout for the TableRow
+        LinearLayout linearLayout = new LinearLayout(LeaderboardActivity.this);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+        linearLayout.setGravity(Gravity.CENTER);
+
+// Create a new TextView for the TableRow
+        TextView rankTextView = new TextView(LeaderboardActivity.this);
+        rankTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        rankTextView.setText(rank+ ".");
+        rankTextView.setTextColor(Color.BLACK);
+        rankTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        rankTextView.setGravity(Gravity.CENTER);
+        rankTextView.setPadding(10, 0, 0, 0);
+
+// Create a new ImageView for the TableRow
+        ImageView qrImageView = new ImageView(LeaderboardActivity.this);
+        qrImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
+        qrImageView.setImageResource(R.drawable.logo);
+
+// Create a new TextView for the TableRow
+        TextView nameTextView = new TextView(LeaderboardActivity.this);
+        nameTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        nameTextView.setText(name);
+        nameTextView.setTextColor(Color.BLACK);
+        nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        nameTextView.setGravity(Gravity.CENTER);
+        nameTextView.setPadding(15, 0, 0, 0);
+
+// Create a new TextView for the TableRow
+        TextView scoreTextView = new TextView(LeaderboardActivity.this);
+        scoreTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        scoreTextView.setText(String.valueOf(score));
+        scoreTextView.setTextColor(Color.BLACK);
+        scoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        scoreTextView.setTypeface(null, Typeface.BOLD);
+        scoreTextView.setGravity(Gravity.CENTER);
+        scoreTextView.setPadding(25, 0, 0, 0);
+
+// Create a new ImageView for the TableRow
+        ImageView arrowImageView = new ImageView(LeaderboardActivity.this);
+        arrowImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
+        arrowImageView.setImageResource(R.drawable.arrow_right_solid);
+        arrowImageView.setPadding(0, 0, 0, 0);
+
+
+        linearLayout.addView(rankTextView);
+        linearLayout.addView(qrImageView);
+        linearLayout.addView(nameTextView);
+        linearLayout.addView(scoreTextView);
+        linearLayout.addView(arrowImageView);
+
+        row.addView(linearLayout);
+
+        row.setBackgroundResource(R.drawable.leaderboard_row_item);
+
+        return row;
     }
 }
