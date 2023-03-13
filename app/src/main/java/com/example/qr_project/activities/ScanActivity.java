@@ -13,7 +13,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.TableLayout;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,12 +21,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -36,6 +34,7 @@ import com.journeyapps.barcodescanner.CaptureActivity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ScanActivity extends AppCompatActivity {
     QR_Code qrCode;
@@ -133,10 +132,14 @@ public class ScanActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         // Get the qrcodes array from the document data
                         List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                        assert qrCodes != null;
                         for (Map<String, Object> qrCode : qrCodes) {
                             String hash = (String) qrCode.get("hash");
-                            if (hash == qrCodeHash) {
-
+                            Log.d("qrCodeHash", qrCodeHash);
+                            Log.d("gash", hash);
+                            if (Objects.equals(hash, qrCodeHash)) {
+                                Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
+                                finish();
                             }
                         }
                     }
