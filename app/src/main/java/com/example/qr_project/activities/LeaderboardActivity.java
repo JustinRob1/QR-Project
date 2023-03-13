@@ -13,22 +13,17 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -42,8 +37,6 @@ public class LeaderboardActivity extends AppCompatActivity {
     public TextView ovr_score_filter;
 
     FirebaseFirestore db;
-
-    public ListView codes_list;
 
     public TableLayout qr_leaderboard;
 
@@ -140,6 +133,8 @@ public class LeaderboardActivity extends AppCompatActivity {
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
         btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
+        ovr_leaderboard.setVisibility(View.GONE);
+        qr_leaderboard.setVisibility(View.VISIBLE);
 
         db = FirebaseFirestore.getInstance();
 
@@ -157,92 +152,84 @@ public class LeaderboardActivity extends AppCompatActivity {
         // Populate the leaderboard
         if (qrCodesBoardFlag == 0) {
             // Get the user's document data
-            userRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    // Check if the document exists
-                    if (documentSnapshot.exists()) {
-                        // Get the qrcodes array from the document data
-                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+            userRef.get().addOnSuccessListener(documentSnapshot -> {
+                // Check if the document exists
+                if (documentSnapshot.exists()) {
+                    // Get the qrcodes array from the document data
+                    List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
 
-                        // Use the qrCodes array to populate the leaderboard
-                        // Check the contents of the qrCodes array
+                    // Use the qrCodes array to populate the leaderboard
+                    // Check the contents of the qrCodes array
 
 
-                        if (qrCodes != null) {
-                            int rank = 1;
-                            // Loop through the array
-                            for (Map<String, Object> qrCode : qrCodes) {
-                                String name = (String) qrCode.get("name");
-                                Long score = (Long) qrCode.get("score");
+                    if (qrCodes != null) {
+                        int rank = 1;
+                        // Loop through the array
+                        for (Map<String, Object> qrCode : qrCodes) {
+                            String name = (String) qrCode.get("name");
+                            Long score = (Long) qrCode.get("score");
 
-                                // Create a new row for each QR code
-                                TableRow row = new TableRow(LeaderboardActivity.this); // Change MainActivity to your activity name
-                                // Create and set the layout parameters for the row
-                                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
-                                        TableRow.LayoutParams.MATCH_PARENT,
-                                        TableRow.LayoutParams.WRAP_CONTENT);
-                                row.setLayoutParams(layoutParams);
+                            // Create a new row for each QR code
+                            TableRow row = new TableRow(LeaderboardActivity.this); // Change MainActivity to your activity name
+                            // Create and set the layout parameters for the row
+                            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
+                                    TableRow.LayoutParams.MATCH_PARENT,
+                                    TableRow.LayoutParams.WRAP_CONTENT);
+                            row.setLayoutParams(layoutParams);
 
 
-                                TextView rankTextView = new TextView(LeaderboardActivity.this);
-                                rankTextView.setText(String.valueOf(rank));
-                                rankTextView.setTextColor(Color.BLACK);
-                                rankTextView.setTextSize(22);
-                                rankTextView.setGravity(Gravity.CENTER);
-                                rankTextView.setLayoutParams(new TableRow.LayoutParams(50, TableRow.LayoutParams.WRAP_CONTENT));
+                            TextView rankTextView = new TextView(LeaderboardActivity.this);
+                            rankTextView.setText(String.valueOf(rank));
+                            rankTextView.setTextColor(Color.BLACK);
+                            rankTextView.setTextSize(22);
+                            rankTextView.setGravity(Gravity.CENTER);
+                            rankTextView.setLayoutParams(new TableRow.LayoutParams(50, TableRow.LayoutParams.WRAP_CONTENT));
 
-                                TextView nameTextView = new TextView(LeaderboardActivity.this);
-                                nameTextView.setText(name);
-                                nameTextView.setTextColor(Color.BLACK);
-                                nameTextView.setTextSize(18);
-                                nameTextView.setGravity(Gravity.CENTER);
-                                nameTextView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
-                                nameTextView.setMaxLines(1);
+                            TextView nameTextView = new TextView(LeaderboardActivity.this);
+                            nameTextView.setText(name);
+                            nameTextView.setTextColor(Color.BLACK);
+                            nameTextView.setTextSize(18);
+                            nameTextView.setGravity(Gravity.CENTER);
+                            nameTextView.setLayoutParams(new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1));
+                            nameTextView.setMaxLines(1);
 
-                                TextView scoreTextView = new TextView(LeaderboardActivity.this);
-                                scoreTextView.setText(String.valueOf(score));
-                                scoreTextView.setTextColor(Color.BLACK);
-                                scoreTextView.setTextSize(18);
-                                scoreTextView.setTypeface(null, Typeface.BOLD);
-                                scoreTextView.setGravity(Gravity.CENTER);
-                                TableRow.LayoutParams scoreParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-                                scoreParams.setMargins(30, 0, 10, 0);
-                                scoreTextView.setLayoutParams(scoreParams);
+                            TextView scoreTextView = new TextView(LeaderboardActivity.this);
+                            scoreTextView.setText(String.valueOf(score));
+                            scoreTextView.setTextColor(Color.BLACK);
+                            scoreTextView.setTextSize(18);
+                            scoreTextView.setTypeface(null, Typeface.BOLD);
+                            scoreTextView.setGravity(Gravity.CENTER);
+                            TableRow.LayoutParams scoreParams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+                            scoreParams.setMargins(30, 0, 10, 0);
+                            scoreTextView.setLayoutParams(scoreParams);
 
-                                ImageView arrowImageView = new ImageView(LeaderboardActivity.this);
-                                arrowImageView.setImageResource(R.drawable.arrow_right_solid);
-                                TableRow.LayoutParams arrowParams = new TableRow.LayoutParams(25, 25);
-                                arrowParams.setMargins(10, 0, 0, 0);
-                                arrowImageView.setLayoutParams(arrowParams);
+                            ImageView arrowImageView = new ImageView(LeaderboardActivity.this);
+                            arrowImageView.setImageResource(R.drawable.arrow_right_solid);
+                            TableRow.LayoutParams arrowParams = new TableRow.LayoutParams(25, 25);
+                            arrowParams.setMargins(10, 0, 0, 0);
+                            arrowImageView.setLayoutParams(arrowParams);
 
-                                row.addView(rankTextView);
-                                row.addView(nameTextView);
-                                row.addView(scoreTextView);
-                                row.addView(arrowImageView);
+                            row.addView(rankTextView);
+                            row.addView(nameTextView);
+                            row.addView(scoreTextView);
+                            row.addView(arrowImageView);
 
-                                row.setBackgroundResource(R.drawable.leaderboard_row_item);
+                            row.setBackgroundResource(R.drawable.leaderboard_row_item);
 
-                                rank++;
+                            rank++;
 
-                                leaderboardTable.addView(row);
-                                qrCodesBoardFlag = 1;
-                            }
-
-                        } else {
-                            Log.d(TAG, "User has no QR codes");
+                            leaderboardTable.addView(row);
+                            qrCodesBoardFlag = 1;
                         }
 
                     } else {
-                        Log.d(TAG, "User document does not exist");
+                        Log.d(TAG, "User has no QR codes");
                     }
+
+                } else {
+                    Log.d(TAG, "User document does not exist");
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "Error getting user document", e);
-                }
-            });
+            }).addOnFailureListener(e -> Log.e(TAG, "Error getting user document", e));
         }
     }
 

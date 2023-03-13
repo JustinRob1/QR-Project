@@ -90,12 +90,13 @@ public class QR_Code {
     }
 
 
-    public Map<String, Object> toMap() {
+    public HashMap<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("hash", hash);
         result.put("score", score);
         result.put("name", name);
         result.put("photo", photo);
+        result.put("Location", location);
         return result;
     }
 }
