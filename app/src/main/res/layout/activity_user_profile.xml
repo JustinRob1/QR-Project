@@ -1,417 +1,420 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activities.UserProfileActivity"
-    android:background="@drawable/background_blue_gradient"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <!-- back btn -->
-    <ImageView
-        android:id="@+id/back_btn"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/circle_left_solid"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:onClick="onClickBack"/>
-
-    <!-- user profile pic -->
-    <ImageView
-        android:id="@+id/user_profile_pic"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_gravity="center"
-        android:translationY="-40dp"
-        android:src="@drawable/avatar" />
-
-    <!-- username -->
-    <TextView
-        android:id="@+id/username_txt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="lwismer"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:layout_marginTop="-25dp"/>
-
-    <!-- email -->
-    <TextView
-        android:id="@+id/user_email_txt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="lwismer@ualberta.ca"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:layout_marginTop="-5dp"/>
-
-    <!-- score header-->
-    <TextView
-        android:id="@+id/score_header_txt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Total Score"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:layout_marginTop="10dp"/>
-
-    <!-- user total score -->
-    <TextView
-        android:id="@+id/user_total_score_txt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="5263"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="45sp"
-        android:textStyle="bold"
-        android:layout_marginTop="-10dp"
-        android:layout_marginBottom="10dp"/>
-
-    <!-- user ranks -->
+    android:background="@drawable/background_blue_gradient">
     <LinearLayout
-        android:id="@+id/user_rank_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
-
-        <TextView
-            android:id="@+id/global_rank_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Global Rank:"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:layout_marginRight="5dp"/>
-
-        <TextView
-            android:id="@+id/global_user_rank"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="148"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_marginRight="25dp"/>
-
-        <TextView
-            android:id="@+id/friend_rank_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Friend Rank:"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:layout_marginRight="5dp"/>
-
-        <TextView
-            android:id="@+id/friend_user_rank"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="8"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- user number of codes -->
-    <LinearLayout
-        android:id="@+id/total_codes_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center" >
-
-        <TextView
-            android:id="@+id/total_codes_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total QR Codes:"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:layout_marginRight="5dp"/>
-
-        <TextView
-            android:id="@+id/user_total_qr_codes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="234"
-            android:textColor="@color/black"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- Table header -->
-    <TextView
-        android:id="@+id/table_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Your Top Codes"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:layout_marginTop="15dp"/>
-
-
-    <!-- Table for top QR Codes -->
-    <TableLayout
-        android:layout_width="270dp"
-        android:layout_height="220dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp"
-        android:background="@drawable/table_background">
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:background="@drawable/table_row_background"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginHorizontal="15dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-
-                <TextView
-                    android:id="@+id/qr_code_rank_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="1."
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-                <ImageView
-                    android:id="@+id/qr_code_img_1"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/avatar"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
-
-                <TextView
-                    android:id="@+id/qr_code_name_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="QRCode1"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp" />
-
-                <TextView
-                    android:id="@+id/qr_code_score_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="1232"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="25dp"/>
-            </LinearLayout>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:background="@drawable/table_row_background"
-            android:layout_marginVertical="10dp"
-            android:layout_marginHorizontal="15dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-
-                <TextView
-                    android:id="@+id/qr_code_rank_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="2."
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-                <ImageView
-                    android:id="@+id/qr_code_img_2"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/avatar"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
-
-                <TextView
-                    android:id="@+id/qr_code_name_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="QRCode2"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp" />
-
-                <TextView
-                    android:id="@+id/qr_code_score_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="898"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="25dp"/>
-            </LinearLayout>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:background="@drawable/table_row_background"
-            android:layout_marginVertical="10dp"
-            android:layout_marginHorizontal="15dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-
-                <TextView
-                    android:id="@+id/qr_code_rank_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="3."
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-                <ImageView
-                    android:id="@+id/qr_code_img_3"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/avatar"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
-
-                <TextView
-                    android:id="@+id/qr_code_name_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="QRCode3"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp" />
-
-                <TextView
-                    android:id="@+id/qr_code_score_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="765"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="25dp"/>
-            </LinearLayout>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:layout_marginVertical="10dp"
-            android:layout_marginHorizontal="15dp">
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/view_all_btn"
-                android:layout_width="130dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"
-                android:background="@drawable/table_button_background"
-                android:text="View All"
-                android:textColor="#000000"
-                android:onClick="onViewAllClick"/>
-        </TableRow>
-    </TableLayout>
-
-    <!-- Button Icons -->
-    <LinearLayout
-        android:id="@+id/icon_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="20dp">
+        android:orientation="vertical">
 
+        <!-- back btn -->
         <ImageView
-            android:id="@+id/map_icon_img"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:onClick="onMapClick"
-            app:srcCompat="@drawable/map_icon"
-            android:contentDescription="Map icon"/>
+            android:id="@+id/back_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/circle_left_solid"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:onClick="onClickBack"/>
 
+        <!-- user profile pic -->
         <ImageView
-            android:id="@+id/camera_icon_img"
-            android:layout_width="62dp"
-            android:layout_height="62dp"
-            android:onClick="onCameraClick"
-            android:layout_weight="1"
+            android:id="@+id/user_profile_pic"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_gravity="center"
-            android:src="@drawable/camera_icon"
-            android:contentDescription="Camera icon: Tap to scan a new QR Code"/>
+            android:translationY="-40dp"
+            android:src="@drawable/avatar" />
 
-        <ImageView
-            android:id="@+id/leaderboard_icon_img"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:onClick="onLeaderboardClick"
-            app:srcCompat="@drawable/leaderboard_icon"
-            android:contentDescription="Leaderboard icon: Tap to view the leaderboard" />
+        <!-- username -->
+        <TextView
+            android:id="@+id/username_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="lwismer"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:layout_marginTop="-25dp"/>
+
+        <!-- email -->
+        <TextView
+            android:id="@+id/user_email_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="lwismer@ualberta.ca"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_marginTop="-5dp"/>
+
+        <!-- score header-->
+        <TextView
+            android:id="@+id/score_header_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total Score"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_marginTop="10dp"/>
+
+        <!-- user total score -->
+        <TextView
+            android:id="@+id/user_total_score_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5263"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="45sp"
+            android:textStyle="bold"
+            android:layout_marginTop="-10dp"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- user ranks -->
+        <LinearLayout
+            android:id="@+id/user_rank_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/global_rank_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Global Rank:"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:layout_marginRight="5dp"/>
+
+            <TextView
+                android:id="@+id/global_user_rank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="148"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_marginRight="25dp"/>
+
+            <TextView
+                android:id="@+id/friend_rank_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Friend Rank:"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:layout_marginRight="5dp"/>
+
+            <TextView
+                android:id="@+id/friend_user_rank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- user number of codes -->
+        <LinearLayout
+            android:id="@+id/total_codes_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center" >
+
+            <TextView
+                android:id="@+id/total_codes_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total QR Codes:"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:layout_marginRight="5dp"/>
+
+            <TextView
+                android:id="@+id/user_total_qr_codes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="234"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Table header -->
+        <TextView
+            android:id="@+id/table_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Top Codes"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_marginTop="15dp"/>
+
+
+        <!-- Table for top QR Codes -->
+        <TableLayout
+            android:layout_width="270dp"
+            android:layout_height="220dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/table_background">
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:background="@drawable/table_row_background"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="15dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:id="@+id/qr_code_rank_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1."
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/qr_code_img_1"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/avatar"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="5dp"/>
+
+                    <TextView
+                        android:id="@+id/qr_code_name_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="QRCode1"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp" />
+
+                    <TextView
+                        android:id="@+id/qr_code_score_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1232"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="25dp"/>
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:background="@drawable/table_row_background"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="15dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:id="@+id/qr_code_rank_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="2."
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/qr_code_img_2"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/avatar"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="5dp"/>
+
+                    <TextView
+                        android:id="@+id/qr_code_name_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="QRCode2"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp" />
+
+                    <TextView
+                        android:id="@+id/qr_code_score_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="898"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="25dp"/>
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:background="@drawable/table_row_background"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="15dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+
+                    <TextView
+                        android:id="@+id/qr_code_rank_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="3."
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/qr_code_img_3"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/avatar"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="5dp"/>
+
+                    <TextView
+                        android:id="@+id/qr_code_name_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="QRCode3"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp" />
+
+                    <TextView
+                        android:id="@+id/qr_code_score_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="765"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="25dp"/>
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="15dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/view_all_btn"
+                    android:layout_width="130dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@drawable/table_button_background"
+                    android:text="View All"
+                    android:textColor="#000000"
+                    android:onClick="onViewAllClick"/>
+            </TableRow>
+        </TableLayout>
+
+        <!-- Button Icons -->
+        <LinearLayout
+            android:id="@+id/icon_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="20dp">
+
+            <ImageView
+                android:id="@+id/map_icon_img"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:onClick="onMapClick"
+                app:srcCompat="@drawable/map_icon"
+                android:contentDescription="Map icon"/>
+
+            <ImageView
+                android:id="@+id/camera_icon_img"
+                android:layout_width="62dp"
+                android:layout_height="62dp"
+                android:onClick="onCameraClick"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:src="@drawable/camera_icon"
+                android:contentDescription="Camera icon: Tap to scan a new QR Code"/>
+
+            <ImageView
+                android:id="@+id/leaderboard_icon_img"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:onClick="onLeaderboardClick"
+                app:srcCompat="@drawable/leaderboard_icon"
+                android:contentDescription="Leaderboard icon: Tap to view the leaderboard" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+</ScrollView>
+

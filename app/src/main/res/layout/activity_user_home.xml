@@ -1,670 +1,676 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_blue_gradient">
-
-    <!-- Header -->
     <LinearLayout
-        android:id="@+id/Header_Layout"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="68dp"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/user_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:onClick="onViewUserProfile"
-            android:src="@drawable/avatar"
+        <!-- Header -->
+        <LinearLayout
+            android:id="@+id/Header_Layout"
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:orientation="horizontal"
+            android:padding="10dp">
 
-            />
-
-        <EditText
-            android:id="@+id/search_bar"
-            android:layout_width="200dp"
-            android:layout_height="48dp"
-            android:background="@drawable/edit_text_background"
-            android:ems="10"
-            android:hint="Search User"
-            android:inputType="textPersonName"
-            android:textColor="#0f0f0f"
-            android:textSize="18sp" />
-
-        <ImageView
-            android:id="@+id/add_friend_btn"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:elevation="8dp"
-            app:srcCompat="@drawable/add_friends_icon" />
-
-    </LinearLayout>
-
-
-    <!--Total Score Header -->
-    <TextView
-        android:id="@+id/score_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Total Score"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="18sp" />
-
-    <!--Total Score -->
-    <TextView
-        android:id="@+id/user_total_score"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="5263"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="45sp"
-        android:textStyle="bold" />
-
-    <!-- User Ranks -->
-    <LinearLayout
-        android:id="@+id/user_ranks"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp">
-
-        <TextView
-            android:id="@+id/global_rank"
-            android:layout_width="125dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Global Rank: 148"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:translationX="25dp" />
-
-        <TextView
-            android:id="@+id/friend_rank"
-            android:layout_width="125dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Friend Rank: 8"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:translationX="-25dp" />
-    </LinearLayout>
-
-    <!-- Total QR Codes -->
-    <TextView
-        android:id="@+id/total_qr_codes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Total QR Codes: 234"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-
-    <!-- Table Header -->
-    <TextView
-        android:id="@+id/top_codes_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Your Top Codes"
-        android:textAlignment="center"
-        android:textSize="18sp"
-        android:textColor="#000000"
-        android:layout_marginTop="15dp"/>
-
-    <!-- Table for top QR Codes -->
-    <TableLayout
-        android:layout_width="270dp"
-        android:layout_height="230dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/table_background">
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:background="@drawable/table_row_background"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginHorizontal="15dp"
-            >
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:onClick="onQRClick">
-
-
-                <TextView
-                    android:id="@+id/qr_code_rank_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="1."
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-                <ImageView
-                    android:id="@+id/qr_code_img_1"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/avatar"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="0dp"/>
-
-                <TextView
-                    android:id="@+id/qr_code_name_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="QRCode1"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:maxLines="1"
-                    android:maxLength="10"
-                    android:ellipsize="marquee"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp" />
-
-                <TextView
-                    android:id="@+id/qr_code_score_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="1232"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="25dp"/>
-            </LinearLayout>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:background="@drawable/table_row_background"
-            android:layout_marginVertical="10dp"
-            android:layout_marginHorizontal="15dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:onClick="onQRClick">
-
-
-                <TextView
-                    android:id="@+id/qr_code_rank_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="2."
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-                <ImageView
-                    android:id="@+id/qr_code_img_2"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/avatar"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="0dp"/>
-
-                <TextView
-                    android:id="@+id/qr_code_name_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="QRCode2"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:maxLines="1"
-                    android:maxLength="10"
-                    android:ellipsize="marquee"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp" />
-
-                <TextView
-                    android:id="@+id/qr_code_score_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="898"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="25dp"/>
-            </LinearLayout>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:background="@drawable/table_row_background"
-            android:layout_marginVertical="10dp"
-            android:layout_marginHorizontal="15dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:onClick="onQRClick">
-
-
-                <TextView
-                    android:id="@+id/qr_code_rank_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="3."
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_gravity="center"/>
-
-                <ImageView
-                    android:id="@+id/qr_code_img_3"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_weight="1"
-                    android:src="@drawable/avatar"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginLeft="0dp"/>
-
-                <TextView
-                    android:id="@+id/qr_code_name_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="QRCode3"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:maxLines="1"
-                    android:maxLength="10"
-                    android:ellipsize="marquee"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginRight="5dp" />
-
-                <TextView
-                    android:id="@+id/qr_code_score_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="765"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="25dp"/>
-            </LinearLayout>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="240dp"
-            android:layout_height="37dp"
-            android:layout_marginVertical="10dp"
-            android:layout_marginHorizontal="15dp">
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/view_all_btn"
-                android:layout_width="130dp"
+            <ImageView
+                android:id="@+id/user_icon"
+                android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:layout_gravity="center"
-                android:background="@drawable/table_button_background"
-                android:text="View All"
-                android:textColor="#000000"
-                android:onClick="onViewAllClick"/>
-        </TableRow>
-    </TableLayout>
+                android:onClick="onViewUserProfile"
+                android:src="@drawable/avatar"
 
-    <!-- Friends Header -->
-    <TextView
-        android:id="@+id/friends_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Your Friends"
-        android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="10dp"/>
+                />
 
-    <!-- Friends Display -->
-    <LinearLayout
-        android:id="@+id/friends_layout"
-        android:layout_width="match_parent"
-        android:layout_height="110dp"
-        android:orientation="horizontal">
+            <EditText
+                android:id="@+id/search_bar"
+                android:layout_width="200dp"
+                android:layout_height="48dp"
+                android:background="@drawable/edit_text_background"
+                android:ems="10"
+                android:hint="Search User"
+                android:inputType="textPersonName"
+                android:textColor="#0f0f0f"
+                android:textSize="18sp" />
 
-        <!-- Left Arrow -->
+            <ImageView
+                android:id="@+id/add_friend_btn"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:elevation="8dp"
+                app:srcCompat="@drawable/add_friends_icon" />
+
+        </LinearLayout>
+
+
+        <!--Total Score Header -->
         <TextView
-            android:id="@+id/friends_left_arrow"
-            android:layout_width="wrap_content"
+            android:id="@+id/score_header"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="&lt;"
+            android:text="Total Score"
+            android:textAlignment="center"
             android:textColor="#000000"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_gravity="center"/>
+            android:textSize="18sp" />
 
+        <!--Total Score -->
+        <TextView
+            android:id="@+id/user_total_score"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5263"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="45sp"
+            android:textStyle="bold" />
 
-        <!-- Individual card -->
+        <!-- User Ranks -->
         <LinearLayout
-            android:layout_width="100dp"
+            android:id="@+id/user_ranks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/global_rank"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Global Rank: 148"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:translationX="25dp" />
+
+            <TextView
+                android:id="@+id/friend_rank"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Friend Rank: 8"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:translationX="-25dp" />
+        </LinearLayout>
+
+        <!-- Total QR Codes -->
+        <TextView
+            android:id="@+id/total_qr_codes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total QR Codes: 234"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <!-- Table Header -->
+        <TextView
+            android:id="@+id/top_codes_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Top Codes"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textColor="#000000"
+            android:layout_marginTop="15dp"/>
+
+        <!-- Table for top QR Codes -->
+        <TableLayout
+            android:layout_width="270dp"
+            android:layout_height="230dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/table_background">
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:background="@drawable/table_row_background"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="15dp"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:onClick="onQRClick">
+
+
+                    <TextView
+                        android:id="@+id/qr_code_rank_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1."
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/qr_code_img_1"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/avatar"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="0dp"/>
+
+                    <TextView
+                        android:id="@+id/qr_code_name_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="QRCode1"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:maxLength="10"
+                        android:ellipsize="marquee"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp" />
+
+                    <TextView
+                        android:id="@+id/qr_code_score_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1232"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="25dp"/>
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:background="@drawable/table_row_background"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="15dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:onClick="onQRClick">
+
+
+                    <TextView
+                        android:id="@+id/qr_code_rank_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="2."
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/qr_code_img_2"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/avatar"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="0dp"/>
+
+                    <TextView
+                        android:id="@+id/qr_code_name_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="QRCode2"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:maxLength="10"
+                        android:ellipsize="marquee"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp" />
+
+                    <TextView
+                        android:id="@+id/qr_code_score_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="898"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="25dp"/>
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:background="@drawable/table_row_background"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="15dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:onClick="onQRClick">
+
+
+                    <TextView
+                        android:id="@+id/qr_code_rank_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="3."
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/qr_code_img_3"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_weight="1"
+                        android:src="@drawable/avatar"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="0dp"/>
+
+                    <TextView
+                        android:id="@+id/qr_code_name_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="QRCode3"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:maxLines="1"
+                        android:maxLength="10"
+                        android:ellipsize="marquee"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginRight="5dp" />
+
+                    <TextView
+                        android:id="@+id/qr_code_score_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="765"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="25dp"/>
+                </LinearLayout>
+            </TableRow>
+
+            <TableRow
+                android:layout_width="240dp"
+                android:layout_height="37dp"
+                android:layout_marginVertical="10dp"
+                android:layout_marginHorizontal="15dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/view_all_btn"
+                    android:layout_width="130dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:background="@drawable/table_button_background"
+                    android:text="View All"
+                    android:textColor="#000000"
+                    android:onClick="onViewAllClick"/>
+            </TableRow>
+        </TableLayout>
+
+        <!-- Friends Header -->
+        <TextView
+            android:id="@+id/friends_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Friends"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- Friends Display -->
+        <LinearLayout
+            android:id="@+id/friends_layout"
+            android:layout_width="match_parent"
             android:layout_height="110dp"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="15dp"
-            android:layout_weight="1"
-            android:background="@drawable/friend_card"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
+            <!-- Left Arrow -->
+            <TextView
+                android:id="@+id/friends_left_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="&lt;"
+                android:textColor="#000000"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"/>
+
+
+            <!-- Individual card -->
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:layout_marginTop="5dp">
+                android:layout_width="100dp"
+                android:layout_height="110dp"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="15dp"
+                android:layout_weight="1"
+                android:background="@drawable/friend_card"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/friend_1_img"
-                    android:layout_width="25dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="25dp"
-                    android:layout_marginLeft="10dp"
-                    android:src="@drawable/avatar" />
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp">
+
+                    <ImageView
+                        android:id="@+id/friend_1_img"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/avatar" />
+
+                    <TextView
+                        android:id="@+id/friend_1_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="10dp"
+                        android:text="John"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/friend_1_name"
+                    android:id="@+id/friend_1_score"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="10dp"
-                    android:text="John"
+                    android:text="8792"
+                    android:textAlignment="center"
                     android:textColor="#000000"
-                    android:textSize="16sp"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="5dp"/>
+
+                <TextView
+                    android:id="@+id/friend_1_rank_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Friend Rank"
+                    android:textAlignment="center"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/friend_1_rank"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1st"
+                    android:textAlignment="center"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Individual card -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:orientation="horizontal">
+
+                <!-- Individual card -->
+                <LinearLayout
+                    android:layout_width="100dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/friend_card"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="5dp">
+
+                        <ImageView
+                            android:id="@+id/friend_2_img"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginStart="10dp"
+                            android:src="@drawable/avatar" />
+
+                        <TextView
+                            android:id="@+id/friend_2_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:text="Grace"
+                            android:textColor="#000000"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/friend_2_score"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="8792"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="5dp"/>
+
+                    <TextView
+                        android:id="@+id/friend_2_rank_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Friend Rank"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/friend_2_rank"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1st"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
 
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/friend_1_score"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="8792"
-                android:textAlignment="center"
-                android:textColor="#000000"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginTop="5dp"/>
+            <!-- Individual card -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/friend_1_rank_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Friend Rank"
-                android:textAlignment="center"
-                android:textColor="#000000"
-                android:textSize="12sp" />
+                <!-- Individual card -->
+                <LinearLayout
+                    android:layout_width="100dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/friend_card"
+                    android:orientation="vertical">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:layout_gravity="center_horizontal"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="5dp">
+
+                        <ImageView
+                            android:id="@+id/friend_3_img"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:layout_marginLeft="10dp"
+                            android:src="@drawable/avatar" />
+
+                        <TextView
+                            android:id="@+id/friend_3_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="10dp"
+                            android:text="Mack"
+                            android:textColor="#000000"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/friend_3_score"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="8792"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="5dp"/>
+
+                    <TextView
+                        android:id="@+id/friend_3_rank_header"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Friend Rank"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/friend_3_rank"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1st"
+                        android:textAlignment="center"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <!-- Right Arrow -->
             <TextView
-                android:id="@+id/friend_1_rank"
-                android:layout_width="match_parent"
+                android:id="@+id/friends_arrow_right"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1st"
-                android:textAlignment="center"
+                android:layout_gravity="center_vertical|end"
+                android:layout_weight="1"
+                android:text=">"
+                android:textAlignment="textEnd"
                 android:textColor="#000000"
-                android:textSize="18sp"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
-        <!-- Individual card -->
+        <!-- Button Icons -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/icon_layout"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="20dp">
 
-            <!-- Individual card -->
-            <LinearLayout
-                android:layout_width="100dp"
-                android:layout_height="110dp"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="15dp"
+            <ImageView
+                android:id="@+id/map_icon_img"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_weight="1"
-                android:background="@drawable/friend_card"
-                android:orientation="vertical">
+                android:layout_gravity="center"
+                android:onClick="onMapClick"
+                app:srcCompat="@drawable/map_icon"
+                android:contentDescription="Map icon"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="5dp">
+            <ImageView
+                android:id="@+id/camera_icon_img"
+                android:layout_width="62dp"
+                android:layout_height="62dp"
+                android:onClick="onCameraClick"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:src="@drawable/camera_icon"
+                android:contentDescription="Camera icon: Tap to scan a new QR Code"/>
 
-                    <ImageView
-                        android:id="@+id/friend_2_img"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginStart="10dp"
-                        android:src="@drawable/avatar" />
-
-                    <TextView
-                        android:id="@+id/friend_2_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:text="Grace"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/friend_2_score"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="8792"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="5dp"/>
-
-                <TextView
-                    android:id="@+id/friend_2_rank_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Friend Rank"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/friend_2_rank"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="1st"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-
+            <ImageView
+                android:id="@+id/leaderboard_icon_img"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:onClick="onLeaderboardClick"
+                app:srcCompat="@drawable/leaderboard_icon"
+                android:contentDescription="Leaderboard icon: Tap to view the leaderboard" />
         </LinearLayout>
 
-        <!-- Individual card -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="0"
-            android:orientation="horizontal">
-
-            <!-- Individual card -->
-            <LinearLayout
-                android:layout_width="100dp"
-                android:layout_height="110dp"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="15dp"
-                android:layout_weight="1"
-                android:background="@drawable/friend_card"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="25dp"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="5dp">
-
-                    <ImageView
-                        android:id="@+id/friend_3_img"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginLeft="10dp"
-                        android:src="@drawable/avatar" />
-
-                    <TextView
-                        android:id="@+id/friend_3_name"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginLeft="10dp"
-                        android:text="Mack"
-                        android:textColor="#000000"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/friend_3_score"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="8792"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="5dp"/>
-
-                <TextView
-                    android:id="@+id/friend_3_rank_header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Friend Rank"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/friend_3_rank"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="1st"
-                    android:textAlignment="center"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-        <!-- Right Arrow -->
-        <TextView
-            android:id="@+id/friends_arrow_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            android:layout_weight="1"
-            android:text=">"
-            android:textAlignment="textEnd"
-            android:textColor="#000000"
-            android:textSize="22sp"
-            android:textStyle="bold" />
 
     </LinearLayout>
 
-    <!-- Button Icons -->
-    <LinearLayout
-        android:id="@+id/icon_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:layout_marginHorizontal="20dp">
-
-        <ImageView
-            android:id="@+id/map_icon_img"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:onClick="onMapClick"
-            app:srcCompat="@drawable/map_icon"
-            android:contentDescription="Map icon"/>
-
-        <ImageView
-            android:id="@+id/camera_icon_img"
-            android:layout_width="62dp"
-            android:layout_height="62dp"
-            android:onClick="onCameraClick"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:src="@drawable/camera_icon"
-            android:contentDescription="Camera icon: Tap to scan a new QR Code"/>
-
-        <ImageView
-            android:id="@+id/leaderboard_icon_img"
-            android:layout_width="65dp"
-            android:layout_height="65dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:onClick="onLeaderboardClick"
-            app:srcCompat="@drawable/leaderboard_icon"
-            android:contentDescription="Leaderboard icon: Tap to view the leaderboard" />
-    </LinearLayout>
-
-
-</LinearLayout>
+</ScrollView>
