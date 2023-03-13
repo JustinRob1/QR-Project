@@ -3,6 +3,7 @@ package com.example.qr_project.utils;
 import android.graphics.Bitmap;
 
 import com.example.qr_project.utils.Hash;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,19 +15,20 @@ public class QR_Code {
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
     private Bitmap photo; // Stores the photo taken
+    private GeoPoint location;
 
     /**
      * Constructor for QR Code
      *
      * @param hash
-     * @param name
      * @param photo
      */
-    public QR_Code(Hash hash, String name, Bitmap photo) {
+    public QR_Code(Hash hash, Bitmap photo, GeoPoint location) {
         this.hash = hash;
         this.score = (hash == null) ? 0 : hash.getScore();
-        this.name = name;
+        this.name = (hash == null) ? "" : hash.getName();
         this.photo = photo;
+        this.location = location;
     }
 
     /**
@@ -52,20 +54,19 @@ public class QR_Code {
         return score;
     }
 
+    public GeoPoint getLocation() {
+        return location;
+    }
+
+    public void setLocation(GeoPoint location) {
+        this.location = location;
+    }
+
     /**
      * @return Name of the QR code
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * Sets the name of the QR code
-     *
-     * @param name
-     */
-    public void setName(String name) {
-        this.name = name;
     }
 
     /**

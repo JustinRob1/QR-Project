@@ -46,7 +46,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> cameraLauncher;
 
-    private final QR_Code qrCode = new QR_Code(null, "Test", null );
+    private final QR_Code qrCode = new QR_Code(null,  null, null );
 
     private final Player user = new Player(null, null, null, 0, null);
 
@@ -84,33 +84,15 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     * Handles Camera Icon being clicked
-     * @param view
-     * The text view which is pressed
+     * When the user clicks the camera button, this method will be called
+     * and will open the camera to scan a QR or barcode
+     *
+     * @param view The text view which is pressed
      */
     public void onCameraClick(View view) {
-        IntentIntegrator integrator = new IntentIntegrator(LeaderboardActivity.this);
-        integrator.setOrientationLocked(false);
-        integrator.setPrompt("Scan a QR code");
-        integrator.initiateScan();
-
-        new Handler().postDelayed(() -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(LeaderboardActivity.this);
-            builder.setMessage("Do you want to take a picture?");
-            builder.setCancelable(false);
-            builder.setPositiveButton("Yes", (dialog, id) -> {
-                // Open the camera app
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                cameraLauncher.launch(takePictureIntent);
-            });
-            builder.setNegativeButton("No", (dialog, id) -> {
-                // Create a new QR_code object with the scanned result and null photo
-                user.addQRCode(qrCode);
-            });
-            AlertDialog alert = builder.create();
-            alert.show();
-        }, 2000);
+        //Toast.makeText(this, "Camera Button Click", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, ScanActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -123,16 +105,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     public void onClickBack(View view){
-        Intent intent = new Intent(LeaderboardActivity.this, UserHomeActivity.class);
-        startActivity(intent);
-    }
-
-    /**
-     * Dummy method for leaderboard button
-     */
-    public void onLeaderboardClick(View view) {
-        Intent intent = new Intent(LeaderboardActivity.this, LeaderboardActivity.class);
-        startActivity(intent);
+        finish();
     }
 
     public void onUserLeaderboardView(View view){
