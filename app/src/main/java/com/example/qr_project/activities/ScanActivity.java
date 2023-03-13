@@ -90,11 +90,17 @@ public class ScanActivity extends AppCompatActivity {
                 // Retrieve the user's information
                 String userID = sharedPref.getString("user_id", null);
 
-                Log.d("MyTag", "userID " + userID);
+                db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the user's current score
+                        int currentScore = documentSnapshot.getLong("totalScore").intValue();
 
-                // Get a reference to the user's document in Firestore
-                DocumentReference userRef = db.collection("users").document(userID);
+                        int newScore = currentScore + qrCode.getScore();
 
+                        // Update the user's score in the database
+                        db.collection("users").document(userID).update("totalScore", newScore);
+                    }
+                });
 
                 // Get the user's current location
                 FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -110,7 +116,7 @@ public class ScanActivity extends AppCompatActivity {
                                 qrCodeDB.put("location", geoPoint);
 
                                 // Update the qrcodes array field with the new QR code
-                                userRef.update("qrcodes", FieldValue.arrayUnion(qrCode))
+                                db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
                                         .addOnSuccessListener(aVoid -> {
                                             Log.d(TAG, "QR code added to user's document in DB");
                                             finish();
@@ -119,7 +125,6 @@ public class ScanActivity extends AppCompatActivity {
                                             Log.w(TAG, "Error adding QR code to user's document in DB", e);
                                             finish();
                                         });
-
                             } else {
                                 Log.w(TAG, "Unable to retrieve location");
                                 finish();
@@ -187,13 +192,22 @@ public class ScanActivity extends AppCompatActivity {
 
                     Log.d("MyTag", "userID " + userID);
 
-                    // Get a reference to the user's document in Firestore
-                    DocumentReference userRef = db.collection("users").document(userID);
-
                     qrCodeDB.put("location", null);
 
+                    db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Get the user's current score
+                            int currentScore = documentSnapshot.getLong("totalScore").intValue();
+
+                            int newScore = currentScore + qrCode.getScore();
+
+                            // Update the user's score in the database
+                            db.collection("users").document(userID).update("totalScore", newScore);
+                        }
+                    });
+
                     // Update the qrcodes array field with the new QR code
-                    userRef.update("qrcodes", FieldValue.arrayUnion(qrCodeDB))
+                    db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
                             .addOnSuccessListener(aVoid -> {
                                 Log.d(TAG, "QR code added to user's document in DB");
                                 finish();
