@@ -32,13 +32,14 @@
         </activity>
         <activity
             android:name=".activities.UserHomeActivity"
-
             android:screenOrientation="fullSensor">
-
         </activity>
 
         <activity android:name=".activities.LeaderboardActivity"
             android:screenOrientation="fullSensor"/>
+
+        <activity android:name=".activities.ScanActivity" />
+
         <activity
         android:name="com.journeyapps.barcodescanner.CaptureActivity"
         android:screenOrientation="portrait"
