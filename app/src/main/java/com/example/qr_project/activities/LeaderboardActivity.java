@@ -135,13 +135,13 @@ public class LeaderboardActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // Get the current user's ID
-        SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
         // Retrieve the user's information
-        String userName = sharedPref.getString("user_name", null);
+        String userID = sharedPref.getString("user_id", null);
 
         // Get a reference to the user's document in Firestore
-        DocumentReference userRef = db.collection("users").document(userName);
+        DocumentReference userRef = db.collection("users").document(userID);
 
         TableLayout leaderboardTable = findViewById(R.id.qr_leaderboard_table);
 

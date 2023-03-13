@@ -1,5 +1,6 @@
 package com.example.qr_project.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,6 +37,7 @@ public class LandingPageActivity extends AppCompatActivity {
                         // Go to the UserHomeActivity and call finish to kill SignUpActivity
                         intent = new Intent(LandingPageActivity.this, UserHomeActivity.class);
                         intent.putExtra("userId", userID);
+
                         startActivity(intent);
                         finish();
                     }
@@ -51,7 +53,7 @@ public class LandingPageActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // Get the shared preferences object
-        SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
         // Retrieve the user's information
         userID = sharedPref.getString("user_id", null);
