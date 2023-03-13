@@ -12,21 +12,22 @@ public class Player {
     private int totalScore; // Stores the total score
 
     /**
-     * Constructor for the player
-     * @param username
-     * @param email
-     * @param phoneNumber
-     * @param totalScore
-     * @param userID
+     * Constructor for the player. Note that the constructor does not check for the right format
+     * of each of the parameters.
+     *
+     * @param username: Player's nickname
+     * @param email: Player's email address
+     * @param phoneNumber: Player's phone number
+     * @param userID: Player's ID generated for DB
      */
-    public Player(String username, String email, String phoneNumber, int totalScore,
-                  String userID) {
+    public Player(String username, String email, String phoneNumber, String userID) {
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        QRCodes = new ArrayList<>();
-        this.totalScore = totalScore;
         this.userID = userID;
+
+        this.QRCodes = new ArrayList<>();
+        this.totalScore = 0;
     }
 
     /**
@@ -77,6 +78,7 @@ public class Player {
         this.phoneNumber = phoneNumber;
     }
 
+    // Note: A reference to the original QRCodes array list is returned.
     /**
      * @return
      *      User's QR codes
@@ -91,14 +93,6 @@ public class Player {
      */
     public int getTotalScore() {
         return totalScore;
-    }
-
-    /**
-     * Sets the total score of the QR codes
-     * @param totalScore
-     */
-    public void setTotalScore(int totalScore) {
-        this.totalScore = totalScore;
     }
 
     /**

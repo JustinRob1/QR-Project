@@ -77,7 +77,7 @@ public class SignUpActivity extends AppCompatActivity {
                 editor.apply();
 
                 // Create a new user with the information
-                Player user = new Player(username, email, phoneNumber, 0, userID);
+                Player user = new Player(username, email, phoneNumber, userID);
                 db.collection("users").document(userID).set(user);
 
                 // Store userID
@@ -96,7 +96,7 @@ public class SignUpActivity extends AppCompatActivity {
                 editor.apply();
 
                 // Create a new user with the information
-                Player user = new Player(username, email, phoneNumber, 0, userID);
+                Player user = new Player(username, email, phoneNumber, userID);
                 db.collection("users").document(userID).set(user);
 
                 // Store userID
