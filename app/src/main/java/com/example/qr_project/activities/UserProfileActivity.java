@@ -34,7 +34,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     /**
-     * Dummy method for map button
+     *
      *
      * @param view The text view which is pressed
      */
