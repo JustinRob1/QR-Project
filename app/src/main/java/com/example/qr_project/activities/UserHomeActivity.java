@@ -105,6 +105,10 @@ public class UserHomeActivity extends AppCompatActivity {
                 } catch (NoSuchElementException e) {
 
                 }
+                
+                String totalQr;
+                totalQr = "Total QR Codes: " + String.valueOf(scores.size());
+                totalQrCodes.setText(totalQr);
             }
         });
 
@@ -143,6 +147,7 @@ public class UserHomeActivity extends AppCompatActivity {
 
     public void onViewAllClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);
+        intent.putExtra("filter", "user");
         startActivity(intent);
     }
 
