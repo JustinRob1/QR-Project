@@ -14,6 +14,7 @@ public class Player {
     /**
      * Constructor for the player. Note that the constructor does not check for the right format
      * of each of the parameters.
+     * Getting and initialising the parameters needede to create an account for the user
      *
      * @param username: Player's nickname
      * @param email: Player's email address
@@ -30,7 +31,8 @@ public class Player {
         this.totalScore = 0;
     }
 
-    /**
+    /** Setting up the username of the user
+     * The username with the type of String
      * @return
      *      Username of the QR code
      */
@@ -38,7 +40,8 @@ public class Player {
         return username;
     }
 
-    /**
+    /** Setting up the username of the user
+     * The user is prompted to type in their
      * Sets the username
      * @param username
      */
@@ -46,7 +49,8 @@ public class Player {
         this.username = username;
     }
 
-    /**
+    /** Setting up the email of the user
+     * The email with the type of String
      * @return
      *      Email of the user
      */
@@ -54,7 +58,7 @@ public class Player {
         return email;
     }
 
-    /**
+    /** The user is prompted to type in their email
      * Sets the email of the user
      * @param email
      */
@@ -63,6 +67,7 @@ public class Player {
     }
 
     /**
+     * Getting the retrieving the user's phone number
      * @return
      *      Phone number of the user
      */
@@ -71,6 +76,8 @@ public class Player {
     }
 
     /**
+     * The phone number has a type of String
+     * The user can enter their phone number
      * Sets the user's phone number
      * @param phoneNumber
      */
@@ -96,6 +103,8 @@ public class Player {
     }
 
     /**
+     * The ID has the type of String
+     * This is to initalise the ID of the user
      * @return
      *      User's ID
      */
@@ -104,6 +113,8 @@ public class Player {
     }
 
     /**
+     * Setting up the email of the user
+     * The user's ID  with the type of String
      * Sets the user's ID
      * @param userID
      */
@@ -113,6 +124,7 @@ public class Player {
 
     /**
      * Adds the qrCode to the array list and adds the QR code's score to total score
+     * This will also re-calculate the total score of the player's
      * @param qrCode
      */
     public void addQRCode(QR_Code qrCode) {
@@ -121,7 +133,9 @@ public class Player {
     }
 
     /**
+     * Allows the user to delete their unwanted QR_Code
      * Deletes the qrCode from the array list and subtracts the QR code's score to total score
+     * This will also re-calculate the total score of the player's
      * @param qrCode
      */
     public void deleteQrCode(QR_Code qrCode) {

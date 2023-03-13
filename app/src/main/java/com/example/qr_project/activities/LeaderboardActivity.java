@@ -261,7 +261,6 @@ public class LeaderboardActivity extends AppCompatActivity {
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
     }
 
-
     /**
      * Called when the user clicks the filter button
      * @param view
