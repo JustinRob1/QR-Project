@@ -28,6 +28,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_9
         targetCompatibility JavaVersion.VERSION_1_9
     }
+
+    testOptions{
+        unitTests.all{
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -50,6 +56,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-firestore:24.4.4'
+
+    // For unit tests
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.2'
 }
 
 
