@@ -10,12 +10,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -169,7 +166,7 @@ public class ScanActivity extends AppCompatActivity {
                 // Create a hash object and pass hash into the constructor of QR_Code
                 hash = new Hash(result.getContents());
                 //String name = hash.generateName(result.getContents()); Fix the name
-                qrCode = new QR_Code(hash, null, null);
+                qrCode = new QR_Code(result.getContents());
                 // Ask the user if they want to take a picture
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Would you like to take a picture?");
