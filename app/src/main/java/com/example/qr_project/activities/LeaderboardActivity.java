@@ -57,6 +57,8 @@ public class LeaderboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
 
+        Intent intent = getIntent();
+
 
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
@@ -66,9 +68,19 @@ public class LeaderboardActivity extends AppCompatActivity {
         user_codes_title = findViewById(R.id.title_user_qr_codes);
         ovr_leaderboard.setVisibility(View.GONE);
         user_codes_title.setVisibility(View.GONE);
+
         btn_filter_global = findViewById(R.id.btn_filter_global);
         btn_filter_friends = findViewById(R.id.btn_filter_friends);
         btn_filter_user = findViewById(R.id.btn_filter_you);
+
+        String filter = intent.getStringExtra("filter");
+        if (filter == "user"){
+            user_codes_title.setVisibility(View.VISIBLE);
+            leaderboard_dial_filters.setVisibility(View.GONE);
+            btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
+            btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
+            btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
+        }
     }
 
     /**
@@ -108,6 +120,11 @@ public class LeaderboardActivity extends AppCompatActivity {
      */
     public void onMapClick(View view) {
         Toast.makeText(this, "Map Button Click", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onClickBack(View view){
+        Intent intent = new Intent(LeaderboardActivity.this, UserHomeActivity.class);
+        startActivity(intent);
     }
 
     /**

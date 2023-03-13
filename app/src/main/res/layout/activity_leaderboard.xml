@@ -16,7 +16,8 @@
         android:paddingLeft="-175dp"
         android:paddingRight="175dp"
         android:layout_marginTop="10dp"
-        app:srcCompat="@drawable/circle_left_solid" />
+        android:onClick="onClickBack"
+        app:srcCompat="@drawable/circle_left_solid"/>
 
     <TextView
         android:id="@+id/leaderboard_title"

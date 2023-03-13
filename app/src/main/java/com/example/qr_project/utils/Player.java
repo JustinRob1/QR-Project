@@ -11,6 +11,8 @@ public class Player {
     private List<QR_Code> QRCodes; // Array list to store the QR codes
     private int totalScore; // Stores the total score
 
+    public Player() {}
+
     /**
      * Constructor for the player
      * @param username
