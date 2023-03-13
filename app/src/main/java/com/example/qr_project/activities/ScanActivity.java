@@ -170,7 +170,6 @@ public class ScanActivity extends AppCompatActivity {
                 hash = new Hash(result.getContents());
                 //String name = hash.generateName(result.getContents()); Fix the name
                 qrCode = new QR_Code(hash, null, null);
-
                 // Ask the user if they want to take a picture
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Would you like to take a picture?");
