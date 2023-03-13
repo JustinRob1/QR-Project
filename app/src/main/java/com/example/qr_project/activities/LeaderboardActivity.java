@@ -324,7 +324,6 @@ public class LeaderboardActivity extends AppCompatActivity {
         isGlobal = true;
     }
 
-
     /**
      * Called when the user clicks the filter button
      * @param view

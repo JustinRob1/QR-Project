@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -20,12 +21,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.example.qr_project.utils.Hash;
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -33,11 +32,12 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
 
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ScanActivity extends AppCompatActivity {
     QR_Code qrCode;
-    Hash hash;
     FirebaseFirestore db;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
@@ -80,56 +80,9 @@ public class ScanActivity extends AppCompatActivity {
                 Intent data = result.getData();
                 assert data != null;
                 Bitmap image = (Bitmap) data.getExtras().get("data");
-
-                // Create a hashmap of the QR_Code properties you want to store
-                HashMap<String, Object> qrCodeDB = qrCode.toMap();
-
-                // Get the current user's ID
-                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
-
-                // Retrieve the user's information
-                String userID = sharedPref.getString("user_id", null);
-
-                Log.d("MyTag", "userID " + userID);
-
-                // Get a reference to the user's document in Firestore
-                DocumentReference userRef = db.collection("users").document(userID);
-
-
-                // Get the user's current location
-                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                fusedLocationClient.getLastLocation()
-                        .addOnSuccessListener(location -> {
-                            if (location != null) {
-                                GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                                qrCode.setLocation(geoPoint);
-                                qrCodeDB.put("location", geoPoint);
-
-                                // Update the qrcodes array field with the new QR code
-                                userRef.update("qrcodes", FieldValue.arrayUnion(qrCode))
-                                        .addOnSuccessListener(aVoid -> {
-                                            Log.d(TAG, "QR code added to user's document in DB");
-                                            finish();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.w(TAG, "Error adding QR code to user's document in DB", e);
-                                            finish();
-                                        });
-
-                            } else {
-                                Log.w(TAG, "Unable to retrieve location");
-                                finish();
-                            }
-                        });
-            } else {
-                Log.d("MyTag", "Failed");
+                addQR();
             }
         });
-
     }
 
     /**
@@ -163,10 +116,35 @@ public class ScanActivity extends AppCompatActivity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() != null) {
-                // Create a hash object and pass hash into the constructor of QR_Code
-                hash = new Hash(result.getContents());
                 //String name = hash.generateName(result.getContents()); Fix the name
                 qrCode = new QR_Code(result.getContents());
+
+                // Get the current user's ID
+                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+
+                String qrCodeHash = qrCode.getHash();
+                // Retrieve the user's information
+                String userID = sharedPref.getString("user_id", null);
+
+
+                db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
+                    // Check if the document exists
+                    if (documentSnapshot.exists()) {
+                        // Get the qrcodes array from the document data
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                        assert qrCodes != null;
+                        for (Map<String, Object> qrCode : qrCodes) {
+                            String hash = (String) qrCode.get("hash");
+                            Log.d("qrCodeHash", qrCodeHash);
+                            Log.d("gash", hash);
+                            if (Objects.equals(hash, qrCodeHash)) {
+                                Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }
+                    }
+                });
+
                 // Ask the user if they want to take a picture
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Would you like to take a picture?");
@@ -176,36 +154,75 @@ public class ScanActivity extends AppCompatActivity {
                     cameraLauncher.launch(takePictureIntent);
                 });
                 builder.setNegativeButton("No", (dialog, which) -> {
-                    // Create a hashmap of the QR_Code properties you want to store
-                    HashMap<String, Object> qrCodeDB = qrCode.toMap();
-
-                    // Get the current user's ID
-                    SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
-
-                    // Retrieve the user's information
-                    String userID = sharedPref.getString("user_id", null);
-
-                    Log.d("MyTag", "userID " + userID);
-
-                    // Get a reference to the user's document in Firestore
-                    DocumentReference userRef = db.collection("users").document(userID);
-
-                    qrCodeDB.put("location", null);
-
-                    // Update the qrcodes array field with the new QR code
-                    userRef.update("qrcodes", FieldValue.arrayUnion(qrCodeDB))
-                            .addOnSuccessListener(aVoid -> {
-                                Log.d(TAG, "QR code added to user's document in DB");
-                                finish();
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.w(TAG, "Error adding QR code to user's document in DB", e);
-                                finish();
-                            });
+                    addQR();
                 });
                 builder.show();
             }
         }
     }
+
+    public void addQR() {
+        // Get the current user's ID
+        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+
+        // Retrieve the user's information
+        String userID = sharedPref.getString("user_id", null);
+        boolean location_pref = sharedPref.getBoolean("location_pref", false);
+
+        db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                // Get the user's current score
+                int currentScore = documentSnapshot.getLong("totalScore").intValue();
+
+                int newScore = currentScore + qrCode.getScore();
+
+                // Update the user's score in the database
+                db.collection("users").document(userID).update("totalScore", newScore);
+            }
+        });
+
+        if (location_pref) {
+            // Get the user's current location
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(location -> {
+                        if (location != null) {
+                            GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                            qrCode.setLocation(geoPoint);
+
+                            // Update the qrcodes array field with the new QR code
+                            db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d(TAG, "QR code added to user's document in DB");
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w(TAG, "Error adding QR code to user's document in DB", e);
+                                        finish();
+                                    });
+                        } else {
+                            Log.w(TAG, "Unable to retrieve location");
+                            finish();
+                        }
+                    });
+        } else {
+            // Update the qrcodes array field with the new QR code
+            db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "QR code added to user's document in DB");
+                        finish();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "Error adding QR code to user's document in DB", e);
+                        finish();
+                    });
+        }
+    }
 }
+
+
 
