@@ -33,7 +33,6 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
 
-
     /**
      * Dummy method for map button
      *

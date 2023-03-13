@@ -1,5 +1,6 @@
 package com.example.qr_project.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,7 +15,6 @@ import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.List;
 import java.util.UUID;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -51,28 +51,59 @@ public class SignUpActivity extends AppCompatActivity {
             String email = emailEditText.getText().toString();
             String phoneNumber = phoneNumberEditText.getText().toString();
 
-            // Create a new user with the information
-            Player user = new Player(username, email, phoneNumber, 0, userID);
+            // Ask if the user wants to share their location
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Share Location");
+            builder.setMessage("Would you like to share your location?");
+            builder.setPositiveButton("Yes", (dialog, which) -> {
+                // Store the user's location preference
+                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("location_pref", true);
+                editor.apply();
 
-            db.collection("users").document(userID).set(user);
+                // Create a new user with the information
+                Player user = new Player(username, email, phoneNumber, 0, userID);
+                db.collection("users").document(userID).set(user);
+
+                // Store userID
+                Intent intent = new Intent();
+                intent.putExtra("userId", userID);
+
+                // Result code 0 indicating sign up complete
+                setResult(0, intent);
+                finish();
+            });
+            builder.setNegativeButton("No", (dialog, which) -> {
+                // Store the user's location preference
+                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putBoolean("location_pref", false);
+                editor.apply();
+
+                // Create a new user with the information
+                Player user = new Player(username, email, phoneNumber, 0, userID);
+                db.collection("users").document(userID).set(user);
+
+                // Store userID
+                Intent intent = new Intent();
+                intent.putExtra("userId", userID);
+
+                // Result code 0 indicating sign up complete
+                setResult(0, intent);
+                finish();
+            });
+            builder.show();
 
             // Get the shared preferences object
-            SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
+            SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
             // Store the user's information
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putString("user_id", userID);
             editor.apply();
-
-            // Store userID
-            Intent intent = new Intent();
-            intent.putExtra("userId", userID);
-
-            // Result code 0 indicating sign up complete
-            setResult(0, intent);
-
-            finish();
         });
+
     }
 
 
@@ -86,6 +117,7 @@ public class SignUpActivity extends AppCompatActivity {
         // Convert the UUID to a string and return it
         return uuid.toString();
     }
+
     // Everything below this line could be deleted if necessary
     public void SignUpClick(View view) {
         Intent intent = new Intent(SignUpActivity.this, UserHomeActivity.class);

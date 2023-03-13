@@ -74,53 +74,73 @@ public class ScanActivity extends AppCompatActivity {
                 qrCodeDB.put("score", qrCode.getScore());
 
                 // Get the current user's ID
-                SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
+                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
                 // Retrieve the user's information
-                String userId = sharedPref.getString("user_id", null);
-                String userName = sharedPref.getString("user_name", null);
+                String userID = sharedPref.getString("user_id", null);
+                Boolean location_pref = sharedPref.getBoolean("location_pref", true);
 
                 // Get a reference to the user's document in Firestore
-                DocumentReference userRef = db.collection("users").document(userName);
-                
-                // Get the user's current location
-                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                fusedLocationClient.getLastLocation()
-                        .addOnSuccessListener(new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                                    qrCode.setLocation(geoPoint);
-                                    qrCodeDB.put("location", geoPoint);
+                DocumentReference userRef = db.collection("users").document(userID);
 
-                                    // Update the qrcodes array field with the new QR code
-                                    userRef.update("qrcodes", FieldValue.arrayUnion(qrCodeDB))
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d(TAG, "QR code added to user's document in DB");
-                                                    finish();
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.w(TAG, "Error adding QR code to user's document in DB", e);
-                                                    finish();
-                                                }
-                                            });
 
-                                } else {
-                                    Log.w(TAG, "Unable to retrieve location");
+                if (location_pref) {
+                    // Get the user's current location
+                    FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    fusedLocationClient.getLastLocation()
+                            .addOnSuccessListener(new OnSuccessListener<Location>() {
+                                @Override
+                                public void onSuccess(Location location) {
+                                    if (location != null) {
+                                        GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                                        qrCode.setLocation(geoPoint);
+                                        qrCodeDB.put("location", geoPoint);
+
+                                        // Update the qrcodes array field with the new QR code
+                                        userRef.update("qrcodes", FieldValue.arrayUnion(qrCodeDB))
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        Log.d(TAG, "QR code added to user's document in DB");
+                                                        finish();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception e) {
+                                                        Log.w(TAG, "Error adding QR code to user's document in DB", e);
+                                                        finish();
+                                                    }
+                                                });
+
+                                    } else {
+                                        Log.w(TAG, "Unable to retrieve location");
+                                        finish();
+                                    }
+                                }
+                            });
+                } else {
+                    // Update the qrcodes array field with the new QR code
+                    userRef.update("qrcodes", FieldValue.arrayUnion(qrCodeDB))
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "QR code added to user's document in DB");
                                     finish();
                                 }
-                            }
-                        });
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error adding QR code to user's document in DB", e);
+                                    finish();
+                                }
+                            });
+                }
             }
         });
 
@@ -163,14 +183,13 @@ public class ScanActivity extends AppCompatActivity {
                         qrCodeDB.put("score", qrCode.getScore());
 
                         // Get the current user's ID
-                        SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
+                        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
                         // Retrieve the user's information
-                        String userId = sharedPref.getString("user_id", null);
-                        String userName = sharedPref.getString("user_name", null);
+                        String userID = sharedPref.getString("user_id", null);
 
                         // Get a reference to the user's document in Firestore
-                        DocumentReference userRef = db.collection("users").document(userName);
+                        DocumentReference userRef = db.collection("users").document(userID);
 
                         qrCodeDB.put("location", null);
 
