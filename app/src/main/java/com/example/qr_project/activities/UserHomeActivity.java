@@ -19,13 +19,18 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.text.CollationElementIterator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class UserHomeActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String userId;
-    List<QR_Code> QRCodes;
+    List<Map<String, Object>> qrCodes;
 
     TextView totalScore;
 
@@ -61,6 +66,27 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 totalScore.setText(value.get("totalScore").toString());
+                qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
+                ArrayList<Integer> scores = new ArrayList<Integer>();
+                for (Map<String, Object> qrCode: qrCodes) {
+                    scores.add((Integer) qrCode.get("score"));
+                }
+                int maxScore = Collections.max(scores);
+                int idx = scores.indexOf(maxScore);
+                qrCode1Score.setText(maxScore);
+                qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
+                scores.remove(idx);
+
+                maxScore = Collections.max(scores);
+                idx = scores.indexOf(maxScore);
+                qrCode2Score.setText(maxScore);
+                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
+                scores.remove(idx);
+
+                maxScore = Collections.max(scores);
+                idx = scores.indexOf(maxScore);
+                qrCode2Score.setText(maxScore);
+                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
             }
         });
 
