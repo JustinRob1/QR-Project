@@ -125,6 +125,11 @@ public class UserHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void onViewUserProfile(View view){
+        Intent intent = new Intent(UserHomeActivity.this, UserProfileActivity.class);
+        startActivity(intent);
+    }
+
 
     /**
      * For the use and the feature of the map button

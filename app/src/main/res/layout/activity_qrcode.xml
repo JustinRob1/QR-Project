@@ -45,7 +45,7 @@
         android:layout_gravity="center"
         android:translationX="110dp"
         android:translationY="-85dp"
-        tools:srcCompat="@tools:sample/avatars" />
+        android:src="@drawable/avatar" />
 
     <LinearLayout
         android:id="@+id/qr_code_details_border"
