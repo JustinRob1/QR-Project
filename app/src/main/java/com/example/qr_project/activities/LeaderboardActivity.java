@@ -61,6 +61,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     boolean isFilterChanged = false;
 
+    /**
+     * Finds and fetches the right ID's for all the buttons
+     * @param savedInstanceState   Fetching the ID's of the button and their function
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +126,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     /**
      * Called when the user clicks the QR code button
+     * Getting the user's ID and their information about the QR_Codes and their scores
+     * Fetching the information stored on the FireBase FireStore Cloud
+     *
+     * After getting all the needed information, the code can now calculate
+     * the points of the user's and also their friends' to populate the leaderboard.
      * @param view
      * The text view which is pressed
      */
@@ -239,6 +248,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     /**
      * Called when the user clicks the friends button
+     * Allows the user to see their friends' profile(s)
      * @param view
      * The text view which is pressed
      */
@@ -252,6 +262,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     /**
      * Called when the user clicks the global button
+     * Moving on the global leaderboard afterward
      * @param view
      * The text view which is pressed
      */

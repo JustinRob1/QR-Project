@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.utils.Hash;
+import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -46,6 +47,25 @@ public class ScanActivity extends AppCompatActivity {
 
     private ActivityResultLauncher<Intent> cameraLauncher;
 
+    /**
+     * Defining the cameralauncher ready to scan the QR_Code
+     * The camera can scan and take a photo of the QR_Code being presented to it
+     * Getting the image presented to the camera
+     *
+     * Here, it also creates a hashmap of the QR_Code properties you want to store
+     * Also updates the location of the QR_Code being scanned
+     * Connecting with the FireStore FireBase,
+     * this is to fetch the user's id/ account to store it on the FireBase Cloud
+     * under their account.
+     *
+     * Then, the code will update the qrcodes array field with the new QR code
+     * The scanned QR_Code will then be stored to the FireBase Cloud under the user's account/id
+     * @param savedInstanceState a package to execute the scanning job of the app
+     * @see FirebaseFirestore
+     * @see QRCodeActivity
+     * @see Player
+     *
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +165,30 @@ public class ScanActivity extends AppCompatActivity {
         });
 
     }
+
+    /**
+     * After defining the cameraLauncher and the functionality of its
+     * The ability of taking the phot and scanning an image as the QR_Code
+     * The camera can scan and take a photo of the QR_Code being presented to it
+     * Getting the image presented to the camera
+     *
+     * Here, it also creates a hashmap of the QR_Code properties you want to store
+     * Also updates the location of the QR_Code being scanned
+     * Connecting with the FireStore FireBase,
+     * this is to fetch the user's id/ account to store it on the FireBase Cloud
+     * under their account.
+     *
+     * Then, the code will update the qrcodes array field with the new QR code
+     * The scanned QR_Code will then be stored to the FireBase Cloud under the user's account/id
+     * @param resultCode   displays the result
+     * @param requestCode   taking the code
+     * @param data    the data of the QR_Code
+     * @see FirebaseFirestore
+     * @see QRCodeActivity
+     * @see Player
+     *
+     */
+
 
     // Handle the scanning of the QR code
     @Override

@@ -23,6 +23,22 @@ public class LandingPageActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String userID;
 
+    /**
+     * A Landing Page when an user opens an app
+     * The entryLauncher allows the user to move on the sign up him/herself
+     * The code also checks the results and userId (giving out the unique userId)
+     * This allows the app to go to the UserHomeActivity and call finish to kill SignUpActivity
+     * Also retrieving the unique userId
+     * @param entryLauncher  a registration for the user
+     * @param Intent  a package to go to the UserHomeActivity and call finish to kill SignUpActivity
+     * @param userID  an unique ID to identify the user
+     * @return        the userID if the user wants to know on their profile
+     * @see           LeaderboardActivity
+     * @see           SignUpActivity
+     * @see           UserHomeActivity
+     * @see           UserProfileActivity
+     */
+
     ActivityResultLauncher<Intent> entryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -44,6 +60,22 @@ public class LandingPageActivity extends AppCompatActivity {
                 }
             }
     );
+
+    /**
+     * Connecting to the FireBase FireStore cloud to store the data
+     * This code allows the app to get the shared object and retrieve the user's information stored on FireBase
+     * At this, the app knows where to take the user to the next step.
+     * If the user is already signed in, the app will take the user go to UserHomeActivity
+     * If the user is not signed in, the app will take the user go to SignUpActivity
+     * Checking the condition if the user already has an account or not
+     * @param    savedInstanceState
+     * @param    sharedPref
+     * @see           LeaderboardActivity
+     * @see           SignUpActivity
+     * @see           UserHomeActivity
+     * @see           UserProfileActivity
+     * @see           FirebaseFirestore
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

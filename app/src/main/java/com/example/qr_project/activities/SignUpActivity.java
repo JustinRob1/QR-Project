@@ -119,6 +119,9 @@ public class SignUpActivity extends AppCompatActivity {
         return uuid.toString();
     }
 
+
+
+
     // Everything below this line could be deleted if necessary
     public void SignUpClick(View view) {
         Intent intent = new Intent(SignUpActivity.this, UserHomeActivity.class);
