@@ -31,7 +31,7 @@ public class UserHomeActivity extends AppCompatActivity {
 
 
     /**
-     * Dummy method for map button
+     * For the use and the feature of the map button
      *
      * @param view The text view which is pressed
      */
