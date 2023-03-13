@@ -9,12 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.qr_project.R;
 
-// TODO: 1) Change layout from temporary once it's done
-//       2) Implement add QRCode
-//       3) Implement remove QRCode
-//       4) Figure out how Player account interacts with UserHomeActivity
-//            4.1) Stored as a variable of UserHomeActivity?
-
 public class UserHomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +40,8 @@ public class UserHomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Dummy method for leaderboard button
+     * Starts the LeaderboardActivity
+     * @param view The text view which is pressed
      */
     public void onLeaderboardClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);

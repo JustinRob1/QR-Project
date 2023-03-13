@@ -1,21 +1,19 @@
 package com.example.qr_project.activities;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-
 import com.example.qr_project.R;
-import com.example.qr_project.utils.Player;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LandingPageActivity extends AppCompatActivity {
@@ -64,6 +62,7 @@ public class LandingPageActivity extends AppCompatActivity {
             intent.putExtra("userId", userID);
             startActivity(intent);
             finish();
+        // If the user is not signed in, go to SignUpActivity
         } else {
             signUpButton = findViewById(R.id.sign_up_button);
             signUpButton.setOnClickListener(new View.OnClickListener() {

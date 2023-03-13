@@ -23,7 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.example.qr_project.R;
 import com.example.qr_project.utils.Hash;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -83,17 +82,11 @@ public class ScanActivity extends AppCompatActivity {
 
                 // Get a reference to the user's document in Firestore
                 DocumentReference userRef = db.collection("users").document(userName);
-
+                
+                // Get the user's current location
                 FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
                 fusedLocationClient.getLastLocation()
@@ -162,9 +155,6 @@ public class ScanActivity extends AppCompatActivity {
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // If the user doesn't want to take a picture, then just add the QR code
-                        // to the user's document in Firestore
-
                         // Create a hashmap of the QR_Code properties you want to store
                         HashMap<String, Object> qrCodeDB = new HashMap<>();
                         qrCodeDB.put("id", qrCode.getHash());
@@ -205,12 +195,6 @@ public class ScanActivity extends AppCompatActivity {
                 builder.show();
             }
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        setResult(RESULT_CANCELED);
-        super.onBackPressed();
     }
 }
 

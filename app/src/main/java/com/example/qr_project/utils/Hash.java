@@ -135,6 +135,11 @@ public class Hash {
         return score;
     }
 
+    /**
+     * Generates a face based on the hash
+     * @param hashStr
+     * @return
+     */
     private static String generateFace(String hashStr) {
         // Convert hash string to binary representation
         String hashBin = new BigInteger(hashStr, 16).toString(2);
@@ -263,9 +268,12 @@ public class Hash {
 
     }
 
+    /**
+        * Generates a name for the QR Code based on the hash
+        * @param hashStr the hash of the QR Code
+        * @return the name of the QR Code
+     */
     private static String generateName(String hashStr) {
-        // Convert hash string to binary representation
-
         // Define dictionaries for each hexadecimal
         Map<Character, String> hex0Dict = new HashMap<>();
         hex0Dict.put('0', "ethereal");

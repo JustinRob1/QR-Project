@@ -198,12 +198,12 @@
                     <TextView
                         android:id="@+id/qr_table_1_element_name"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginLeft="15dp"
                         android:text="QRCode1"
                         android:textColor="@color/black"
-                        android:textSize="18sp"
-                        android:layout_marginLeft="15dp"
-                        android:layout_gravity="center"/>
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/qr_table_1_element_score"
