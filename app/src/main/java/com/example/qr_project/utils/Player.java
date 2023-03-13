@@ -11,24 +11,21 @@ public class Player {
     private List<QR_Code> QRCodes; // Array list to store the QR codes
     private int totalScore; // Stores the total score
 
-    public Player() {}
-
     /**
      * Constructor for the player
      * @param username
      * @param email
      * @param phoneNumber
-     * @param totalScore
      * @param userID
      */
-    public Player(String username, String email, String phoneNumber, int totalScore,
-                  String userID) {
+    public Player(String username, String email, String phoneNumber, String userID) {
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        QRCodes = new ArrayList<>();
-        this.totalScore = totalScore;
         this.userID = userID;
+
+        this.QRCodes = new ArrayList<>();
+        this.totalScore = 0;
     }
 
     /**
@@ -79,6 +76,7 @@ public class Player {
         this.phoneNumber = phoneNumber;
     }
 
+    // Note: A reference to the original QRCodes array list is returned.
     /**
      * @return
      *      User's QR codes
@@ -93,14 +91,6 @@ public class Player {
      */
     public int getTotalScore() {
         return totalScore;
-    }
-
-    /**
-     * Sets the total score of the QR codes
-     * @param totalScore
-     */
-    public void setTotalScore(int totalScore) {
-        this.totalScore = totalScore;
     }
 
     /**
