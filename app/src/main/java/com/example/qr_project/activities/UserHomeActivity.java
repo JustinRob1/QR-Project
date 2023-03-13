@@ -122,7 +122,8 @@ public class UserHomeActivity extends AppCompatActivity {
      * Dummy method for leaderboard button
      */
     public void onLeaderboardClick(View view) {
-        Toast.makeText(this, "Leaderboard Button Click", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(UserHomeActivity.this, LeaderboardActivity.class);
+        startActivity(intent);
     }
 
     // Handle the scanning of the QR code

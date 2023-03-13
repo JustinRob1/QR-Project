@@ -1,5 +1,10 @@
 package com.example.qr_project.activities;
 
+
+
+import android.view.View;
+
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -10,6 +15,7 @@ import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.telephony.PhoneNumberUtils;
 import android.widget.Button;
 import android.widget.EditText;
+
 
 import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
@@ -78,4 +84,12 @@ public class SignUpActivity extends AppCompatActivity {
         // Convert the UUID to a string and return it
         return uuid.toString();
     }
+
+    public void SignUpClick(View view) {
+        Intent intent = new Intent(SignUpActivity.this, UserHomeActivity.class);
+        startActivity(intent);
+    }
+
+
+
 }
