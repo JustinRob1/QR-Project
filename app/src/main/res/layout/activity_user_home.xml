@@ -137,12 +137,14 @@
             android:background="@drawable/table_row_background"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginHorizontal="15dp">
+            android:layout_marginHorizontal="15dp"
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:onClick="onQRClick">
 
 
                 <TextView
@@ -207,7 +209,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:onClick="onQRClick">
 
 
                 <TextView
@@ -272,7 +275,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:onClick="onQRClick">
 
 
                 <TextView
