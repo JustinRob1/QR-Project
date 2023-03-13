@@ -2,11 +2,16 @@ package com.example.qr_project.activities;
 
 import static android.content.ContentValues.TAG;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -18,11 +23,17 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.R;
 import com.example.qr_project.utils.Hash;
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.GeoPoint;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,6 +47,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.auth.User;
+
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
@@ -53,7 +65,6 @@ import java.util.HashMap;
 
 public class UserHomeActivity extends AppCompatActivity {
     QR_Code qrCode;
-    Player user;
     Hash hash;
     FirebaseFirestore db;
     String userID;
@@ -79,31 +90,67 @@ public class UserHomeActivity extends AppCompatActivity {
                 Intent data = result.getData();
                 Bitmap image = (Bitmap) data.getExtras().get("data");
 
-                // Add the image to the QRCode
-                qrCode.setPhoto(image);
-                qrCode.setName("Test name");
-
                 // Create a hashmap of the QR_Code properties you want to store
                 HashMap<String, Object> qrCodeDB = new HashMap<>();
-                qrCodeDB.put("id", qrCode.getName());
+                qrCodeDB.put("id", qrCode.getHash());
+                qrCodeDB.put("name", qrCode.getName());
+                qrCodeDB.put("photo", qrCode.getPhoto());
                 qrCodeDB.put("score", qrCode.getScore());
 
-                db.collection("QR_Codes")
-                        .add(qrCodeDB)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error adding document", e);
-                            }
-                        });
+                // Get the current user's ID
+                SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
+
+                // Retrieve the user's information
+                String userId = sharedPref.getString("user_id", null);
+                String userName = sharedPref.getString("user_name", null);
+
+                // Get a reference to the user's document in Firestore
+                DocumentReference userRef = db.collection("users").document(userName);
+
+                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
+                fusedLocationClient.getLastLocation()
+                                .addOnSuccessListener(new OnSuccessListener<Location>() {
+                                    @Override
+                                    public void onSuccess(Location location) {
+                                        if (location != null) {
+                                            GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                                            qrCode.setLocation(geoPoint);
+                                            qrCodeDB.put("location", geoPoint);
+
+                                            // Update the qrcodes array field with the new QR code
+                                            userRef.update("qrcodes", FieldValue.arrayUnion(qrCodeDB))
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            Log.d(TAG, "QR code added to user's document in DB");
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception e) {
+                                                            Log.w(TAG, "Error adding QR code to user's document in DB", e);
+                                                        }
+                                                    });
+
+                                        } else {
+                                            Log.w(TAG, "Unable to retrieve location");
+                                        }
+                                    }
+                                });
             }
         });
+
 
         // Get userID
         userID = getIntent().getStringExtra("userId");
@@ -132,7 +179,7 @@ public class UserHomeActivity extends AppCompatActivity {
         integrator.setCaptureActivity(CaptureActivity.class);
         integrator.setOrientationLocked(false);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrator.setPrompt("Scan a QR code");
+        integrator.setPrompt("Scan a QR/Barcode");
         integrator.initiateScan();
     }
 
@@ -206,4 +253,3 @@ public class UserHomeActivity extends AppCompatActivity {
         }
     }
 }
-

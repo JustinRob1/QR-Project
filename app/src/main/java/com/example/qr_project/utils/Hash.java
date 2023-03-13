@@ -16,6 +16,7 @@ import java.util.Map;
 public class Hash {
     private String hash;
     private int score;
+    private String name;
     private final static String TAG = "HASH";
 
     /**
@@ -25,6 +26,7 @@ public class Hash {
     public Hash(String qrCodeContent) {
         this.hash = generateHash(qrCodeContent);
         this.score = calculateScore(this.hash);
+        this.name = generateName(this.getHash());
     }
 
     /**
@@ -41,6 +43,10 @@ public class Hash {
      */
     public String getHash() {
         return hash;
+    }
+
+    public String getName() {
+        return name;
     }
 
 
@@ -115,7 +121,7 @@ public class Hash {
         return score;
     }
 
-    public static String face(String hashStr) {
+    private static String face(String hashStr) {
         // Convert hash string to binary representation
         String hashBin = new BigInteger(hashStr, 16).toString(2);
         hashBin = String.format("%256s", hashBin).replace(' ', '0');
@@ -243,7 +249,7 @@ public class Hash {
 
     }
 
-    public static String generateName(String hashStr) {
+    private static String generateName(String hashStr) {
         // Convert hash string to binary representation
         String hashBin = new BigInteger(hashStr, 16).toString(2);
         hashBin = String.format("%256s", hashBin).replace(' ', '0');

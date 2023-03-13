@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -31,11 +33,11 @@
         <activity
             android:name=".activities.UserHomeActivity"
 
-            android:screenOrientation="fullSensor"></activity>
+            android:screenOrientation="fullSensor">
 
-        <activity android:name=".activities.LeaderboardActivity"></activity>
+        </activity>
 
-
+        <activity android:name=".activities.LeaderboardActivity"
             android:screenOrientation="fullSensor">
         </application>
         <activity

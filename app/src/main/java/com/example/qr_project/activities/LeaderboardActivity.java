@@ -46,7 +46,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> cameraLauncher;
 
-    private final QR_Code qrCode = new QR_Code(null, "Test", null );
+    private final QR_Code qrCode = new QR_Code(null,  null, null );
 
     private final Player user = new Player(null, null, null, 0, null);
 
