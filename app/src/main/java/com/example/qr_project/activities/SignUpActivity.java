@@ -1,25 +1,17 @@
 package com.example.qr_project.activities;
 
-
-
-import android.view.View;
-
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.telephony.PhoneNumberFormattingTextWatcher;
-import android.telephony.PhoneNumberUtils;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
-import com.example.qr_project.utils.QR_Code;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
@@ -59,11 +51,6 @@ public class SignUpActivity extends AppCompatActivity {
             String email = emailEditText.getText().toString();
             String phoneNumber = phoneNumberEditText.getText().toString();
 
-            // TODO
-            // Check if that username already exist
-            // Check for valid input (valid characters)
-            // Fix the phone number input
-
             // Create a new user with the information
             Player user = new Player(username, email, phoneNumber, 0, userID);
 
@@ -89,27 +76,19 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
 
+    /** 
+        * Generates a new user ID
+        * @return a new user ID
+     */
     public String generateUserID() {
         // Generate a new UUID
         UUID uuid = UUID.randomUUID();
         // Convert the UUID to a string and return it
         return uuid.toString();
     }
-// Everything below this line could be deleted if necessary
+    // Everything below this line could be deleted if necessary
     public void SignUpClick(View view) {
         Intent intent = new Intent(SignUpActivity.this, UserHomeActivity.class);
         startActivity(intent);
-    }
-
-
-    public void add(SignUpActivity mockUserList) {
-    }
-
-    public List<Object> getString() {
-        return null;
-    }
-
-    public char compareTo(Object o) {
-        return 0;
     }
 }

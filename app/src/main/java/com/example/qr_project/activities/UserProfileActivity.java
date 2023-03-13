@@ -43,8 +43,10 @@ public class UserProfileActivity extends AppCompatActivity {
         Toast.makeText(this, "Map Button Click", Toast.LENGTH_SHORT).show();
     }
 
+
     /**
-     * Dummy method for leaderboard button
+     * Starts the LeaderboardActivity
+     * @param view The text view which is pressed
      */
     public void onLeaderboardClick(View view) {
         Intent intent = new Intent(UserProfileActivity.this, LeaderboardActivity.class);

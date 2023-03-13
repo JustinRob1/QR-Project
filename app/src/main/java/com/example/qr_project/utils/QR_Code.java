@@ -2,15 +2,12 @@ package com.example.qr_project.utils;
 
 import android.graphics.Bitmap;
 
-import com.example.qr_project.utils.Hash;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class QR_Code {
-    // TODO
-    // How to hash
     private Hash hash; // Stores the hash
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
@@ -54,10 +51,17 @@ public class QR_Code {
         return score;
     }
 
+    /**
+     * @return score
+     */
     public GeoPoint getLocation() {
         return location;
     }
 
+    /** 
+        * Sets the location
+        * @param location
+     */
     public void setLocation(GeoPoint location) {
         this.location = location;
     }
