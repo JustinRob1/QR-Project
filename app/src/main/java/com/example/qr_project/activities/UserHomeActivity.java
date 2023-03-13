@@ -12,7 +12,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -156,6 +155,18 @@ public class UserHomeActivity extends AppCompatActivity {
         Intent intent = new Intent(UserHomeActivity.this, LeaderboardActivity.class);
         startActivity(intent);
     }
+
+    public void onViewUserProfile(View view){
+        Intent intent = new Intent(UserHomeActivity.this, UserProfileActivity.class);
+        startActivity(intent);
+    }
+
+    public void onViewAllClick(View view) {
+        Intent intent = new Intent(UserHomeActivity.this, LeaderboardActivity.class);
+        intent.putExtra("filter", "user");
+        startActivity(intent);
+    }
+
 
     // Handle the scanning of the QR code
     // ERROR: The user is not being prompted to take a picture
