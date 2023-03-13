@@ -28,7 +28,7 @@
         android:layout_height="150dp"
         android:layout_gravity="center"
         android:translationY="-40dp"
-        tools:src="@tools:sample/avatars" />
+        android:src="@drawable/avatar" />
 
     <!-- username -->
     <TextView
@@ -201,7 +201,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_weight="1"
-                    tools:srcCompat="@tools:sample/avatars"
+                    android:src="@drawable/avatar"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
@@ -263,7 +263,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_weight="1"
-                    tools:srcCompat="@tools:sample/avatars"
+                    android:src="@drawable/avatar"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>
@@ -325,7 +325,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_weight="1"
-                    tools:srcCompat="@tools:sample/avatars"
+                    android:src="@drawable/avatar"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="5dp"/>

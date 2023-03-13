@@ -21,7 +21,7 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:onClick="onViewUserProfile"
-            tools:srcCompat="@tools:sample/avatars"
+            android:src="@drawable/avatar"
 
             />
 
@@ -164,7 +164,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_weight="1"
-                    tools:srcCompat="@tools:sample/avatars"
+                    android:src="@drawable/avatar"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="0dp"/>
@@ -230,7 +230,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_weight="1"
-                    tools:srcCompat="@tools:sample/avatars"
+                    android:src="@drawable/avatar"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="0dp"/>
@@ -296,7 +296,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_weight="1"
-                    tools:srcCompat="@tools:sample/avatars"
+                    android:src="@drawable/avatar"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
                     android:layout_marginLeft="0dp"/>
@@ -404,7 +404,7 @@
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:layout_marginLeft="10dp"
-                    tools:srcCompat="@tools:sample/avatars" />
+                    android:src="@drawable/avatar" />
 
                 <TextView
                     android:id="@+id/friend_1_name"
@@ -481,7 +481,7 @@
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:layout_marginStart="10dp"
-                        tools:srcCompat="@tools:sample/avatars" />
+                        android:src="@drawable/avatar" />
 
                     <TextView
                         android:id="@+id/friend_2_name"
@@ -561,7 +561,7 @@
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:layout_marginLeft="10dp"
-                        tools:srcCompat="@tools:sample/avatars" />
+                        android:src="@drawable/avatar" />
 
                     <TextView
                         android:id="@+id/friend_3_name"
