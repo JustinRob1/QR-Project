@@ -39,11 +39,10 @@
 
         <activity android:name=".activities.LeaderboardActivity"
             android:screenOrientation="fullSensor"/>
-        </application>
         <activity
-            android:name="com.journeyapps.barcodescanner.CaptureActivity"
-            android:screenOrientation="portrait"
-            tools:replace="screenOrientation"
-            tools:ignore="WrongManifestParent" />
-
+        android:name="com.journeyapps.barcodescanner.CaptureActivity"
+        android:screenOrientation="portrait"
+        tools:replace="screenOrientation"
+        tools:ignore="MissingClass,WrongManifestParent" />
+        </application>
 </manifest>

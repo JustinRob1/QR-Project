@@ -33,6 +33,13 @@ public class SignUpActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
 
+    public SignUpActivity(Comparable<String> user_name, String email, String phone) {
+    }
+
+    public SignUpActivity() {
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,12 +95,21 @@ public class SignUpActivity extends AppCompatActivity {
         // Convert the UUID to a string and return it
         return uuid.toString();
     }
-
+// Everything below this line could be deleted if necessary
     public void SignUpClick(View view) {
         Intent intent = new Intent(SignUpActivity.this, UserHomeActivity.class);
         startActivity(intent);
     }
 
 
+    public void add(SignUpActivity mockUserList) {
+    }
 
+    public List<Object> getString() {
+        return null;
+    }
+
+    public char compareTo(Object o) {
+        return 0;
+    }
 }

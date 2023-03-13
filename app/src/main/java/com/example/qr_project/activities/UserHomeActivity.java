@@ -160,7 +160,7 @@ public class UserHomeActivity extends AppCompatActivity {
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
-                user = documentSnapshot.toObject(Player.class);
+                Player user = documentSnapshot.toObject(Player.class);
                 totalScore.setText(String.valueOf(user.getTotalScore()));
             }
         });
