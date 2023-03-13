@@ -303,11 +303,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         // TODO: TESTING DATA FOR QR CODE
         if (!isGlobalAdded){
-            TableRow testRow = createTestRow("Gmpty", Long.valueOf(1232), 1);
-            TableRow testRow2 = createTestRow("Gmpty2", Long.valueOf(1000), 2);
+            TableRow testRow = createNewRow("Gmpty", Long.valueOf(1232), 1);
+            TableRow testRow2 = createNewRow("Gmpty2", Long.valueOf(1000), 2);
 
-            TableRow testRow3 = createTestRow("Gmptyyy", Long.valueOf(1232), 1);
-            TableRow testRow4 = createTestRow("Gmptyyy2", Long.valueOf(1000), 2);
+            TableRow testRow3 = createNewRow("Gmptyyy", Long.valueOf(1232), 1);
+            TableRow testRow4 = createNewRow("Gmptyyy2", Long.valueOf(1000), 2);
 
             global_qr_leaderboard.addView(testRow);
             global_qr_leaderboard.addView(testRow2);
