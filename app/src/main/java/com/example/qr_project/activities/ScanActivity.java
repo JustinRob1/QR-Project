@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.TableLayout;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -20,17 +21,21 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.example.qr_project.utils.Hash;
+import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
+
+import java.util.List;
+import java.util.Map;
 
 public class ScanActivity extends AppCompatActivity {
     QR_Code qrCode;
@@ -77,7 +82,6 @@ public class ScanActivity extends AppCompatActivity {
                 assert data != null;
                 Bitmap image = (Bitmap) data.getExtras().get("data");
                 addQR();
-
             }
         });
     }
@@ -115,6 +119,29 @@ public class ScanActivity extends AppCompatActivity {
             if (result.getContents() != null) {
                 //String name = hash.generateName(result.getContents()); Fix the name
                 qrCode = new QR_Code(result.getContents());
+
+                // Get the current user's ID
+                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+
+                String qrCodeHash = qrCode.getHash();
+                // Retrieve the user's information
+                String userID = sharedPref.getString("user_id", null);
+
+
+                db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
+                    // Check if the document exists
+                    if (documentSnapshot.exists()) {
+                        // Get the qrcodes array from the document data
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                        for (Map<String, Object> qrCode : qrCodes) {
+                            String hash = (String) qrCode.get("hash");
+                            if (hash == qrCodeHash) {
+
+                            }
+                        }
+                    }
+                });
+
                 // Ask the user if they want to take a picture
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage("Would you like to take a picture?");
@@ -130,7 +157,6 @@ public class ScanActivity extends AppCompatActivity {
             }
         }
     }
-
 
     public void addQR() {
         // Get the current user's ID
