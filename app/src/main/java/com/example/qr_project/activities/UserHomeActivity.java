@@ -141,4 +141,9 @@ public class UserHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void onViewAllClick(View view) {
+        Intent intent = new Intent(this, LeaderboardActivity.class);
+        startActivity(intent);
+    }
+
 }
