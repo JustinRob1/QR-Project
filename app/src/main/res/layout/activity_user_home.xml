@@ -20,7 +20,9 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:onClick="onViewUserProfile"
             tools:srcCompat="@tools:sample/avatars"
+
             />
 
         <EditText
@@ -330,7 +332,8 @@
                 android:layout_gravity="center"
                 android:background="@drawable/table_button_background"
                 android:text="View All"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:onClick="onViewAllClick"/>
         </TableRow>
     </TableLayout>
 

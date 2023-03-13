@@ -49,7 +49,7 @@
         android:id="@+id/sign_up_button"
         android:layout_width="271dp"
         android:layout_height="51dp"
-        android:background="@drawable/sign_up_btn"
+        android:background="@drawable/black_round_btn"
         android:textColor="@color/white"
         android:text="SIGN UP"
         android:layout_gravity="center"
