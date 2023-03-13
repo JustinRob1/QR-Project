@@ -165,7 +165,7 @@
                     tools:srcCompat="@tools:sample/avatars"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
+                    android:layout_marginLeft="0dp"/>
 
                 <TextView
                     android:id="@+id/qr_code_name_1"
@@ -175,6 +175,9 @@
                     android:text="QRCode1"
                     android:textColor="#000000"
                     android:textSize="18sp"
+                    android:maxLines="1"
+                    android:maxLength="10"
+                    android:ellipsize="marquee"
                     android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp" />
@@ -227,7 +230,7 @@
                     tools:srcCompat="@tools:sample/avatars"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
+                    android:layout_marginLeft="0dp"/>
 
                 <TextView
                     android:id="@+id/qr_code_name_2"
@@ -237,6 +240,9 @@
                     android:text="QRCode2"
                     android:textColor="#000000"
                     android:textSize="18sp"
+                    android:maxLines="1"
+                    android:maxLength="10"
+                    android:ellipsize="marquee"
                     android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp" />
@@ -289,7 +295,7 @@
                     tools:srcCompat="@tools:sample/avatars"
                     android:layout_gravity="center"
                     android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp"/>
+                    android:layout_marginLeft="0dp"/>
 
                 <TextView
                     android:id="@+id/qr_code_name_3"
@@ -299,8 +305,11 @@
                     android:text="QRCode3"
                     android:textColor="#000000"
                     android:textSize="18sp"
+                    android:maxLines="1"
+                    android:maxLength="10"
+                    android:ellipsize="marquee"
                     android:layout_gravity="center"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="2dp"
                     android:layout_marginRight="5dp" />
 
                 <TextView
