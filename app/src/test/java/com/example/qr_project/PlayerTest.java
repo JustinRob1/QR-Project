@@ -20,15 +20,52 @@ public class PlayerTest {
     @Test
     void TestAddQrCode(){
         QR_Code[] qrCodes = {
-                new QR_Code()
-        }
+                new QR_Code("1"),
+                new QR_Code("2"),
+                new QR_Code("3")
+        };
         Player player = mockPlayer();
+
+        int oldTotalScore = player.getTotalScore();
+        int newTotalScore = oldTotalScore;
+
+        // Zero score when player was just created
+        assertEquals(newTotalScore, oldTotalScore);
+
+        // Score increases with each added QR Code
+        for (QR_Code qrCode : qrCodes) {
+            player.addQRCode(qrCode);
+            oldTotalScore = newTotalScore;
+            newTotalScore = player.getTotalScore();
+            assertTrue(newTotalScore > oldTotalScore);
+        }
 
     }
 
     @Test
     void TestDeleteQrCode(){
+        QR_Code[] qrCodes = {
+                new QR_Code("4"),
+                new QR_Code("5"),
+                new QR_Code("6")
+        };
 
+        Player player = mockPlayer();
+
+        for (QR_Code qrCode : qrCodes) {
+            player.addQRCode(qrCode);
+        }
+
+        int oldTotalScore = player.getTotalScore();
+        int newTotalScore = oldTotalScore;
+
+        // Score decreases with each deleted QR Code
+        for (QR_Code qrCode : qrCodes) {
+            player.deleteQrCode(qrCode);
+            oldTotalScore = newTotalScore;
+            newTotalScore = player.getTotalScore();
+            assertTrue(newTotalScore < oldTotalScore);
+        }
     }
 
 

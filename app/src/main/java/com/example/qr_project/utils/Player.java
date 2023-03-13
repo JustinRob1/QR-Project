@@ -12,11 +12,13 @@ public class Player {
     private int totalScore; // Stores the total score
 
     /**
-     * Constructor for the player
-     * @param username
-     * @param email
-     * @param phoneNumber
-     * @param userID
+     * Constructor for the player. Note that the constructor does not check for the right format
+     * of each of the parameters.
+     *
+     * @param username: Player's nickname
+     * @param email: Player's email address
+     * @param phoneNumber: Player's phone number
+     * @param userID: Player's ID generated for DB
      */
     public Player(String username, String email, String phoneNumber, String userID) {
         this.username = username;
