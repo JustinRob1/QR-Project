@@ -22,6 +22,7 @@ public class LandingPageActivity extends AppCompatActivity {
 
     Button signUpButton;
     FirebaseFirestore db;
+    String userID;
 
     ActivityResultLauncher<Intent> entryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -29,8 +30,14 @@ public class LandingPageActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == 0) {
+                        Intent intent = result.getData();
+                        if (intent != null) {
+                            userID = intent.getStringExtra("userId");
+                        }
+
                         // Go to the UserHomeActivity and call finish to kill SignUpActivity
-                        Intent intent = new Intent(LandingPageActivity.this, UserHomeActivity.class);
+                        intent = new Intent(LandingPageActivity.this, UserHomeActivity.class);
+                        intent.putExtra("userId", userID);
                         startActivity(intent);
                         finish();
                     }
@@ -49,11 +56,12 @@ public class LandingPageActivity extends AppCompatActivity {
         SharedPreferences sharedPref = getSharedPreferences("my_app_pref", Context.MODE_PRIVATE);
 
         // Retrieve the user's information
-        String userId = sharedPref.getString("user_id", null);
+        userID = sharedPref.getString("user_id", null);
 
         // If the user is already signed in, go to UserHomeActivity
-        if (userId != null) {
+        if (userID != null) {
             Intent intent = new Intent(LandingPageActivity.this, UserHomeActivity.class);
+            intent.putExtra("userId", userID);
             startActivity(intent);
             finish();
         } else {

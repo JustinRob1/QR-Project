@@ -24,10 +24,19 @@ import com.example.qr_project.R;
 import com.example.qr_project.utils.Hash;
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.auth.User;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.CaptureActivity;
@@ -40,11 +49,17 @@ import java.util.HashMap;
 //       4) Figure out how Player account interacts with UserHomeActivity
 //            4.1) Stored as a variable of UserHomeActivity?
 
+// TODO akhadeli
+// Get scores linked
+
 public class UserHomeActivity extends AppCompatActivity {
     QR_Code qrCode;
     Player user;
     Hash hash;
     FirebaseFirestore db;
+    String userID;
+
+    TextView totalScore;
 
     private ActivityResultLauncher<Intent> cameraLauncher;
 
@@ -53,7 +68,10 @@ public class UserHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home);
 
+        totalScore = findViewById(R.id.user_total_score);
+
         db = FirebaseFirestore.getInstance();
+
 
         // Define cameraLauncher
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -85,6 +103,19 @@ public class UserHomeActivity extends AppCompatActivity {
                                 Log.w(TAG, "Error adding document", e);
                             }
                         });
+            }
+        });
+
+        // Get userID
+        userID = getIntent().getStringExtra("userId");
+
+        //final CollectionReference collectionReference = db.collection("users");
+        final DocumentReference docRef = db.collection("users").document(userID);
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                user = documentSnapshot.toObject(Player.class);
+                totalScore.setText(String.valueOf(user.getTotalScore()));
             }
         });
 

@@ -64,8 +64,12 @@ public class SignUpActivity extends AppCompatActivity {
             editor.putString("user_id", userID);
             editor.apply();
 
+            // Store userID
+            Intent intent = new Intent();
+            intent.putExtra("userId", userID);
+
             // Result code 0 indicating sign up complete
-            setResult(0);
+            setResult(0, intent);
 
             finish();
         });
