@@ -15,7 +15,6 @@ import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.List;
 import java.util.UUID;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -133,9 +132,6 @@ public class SignUpActivity extends AppCompatActivity {
         return uuid.toString();
     }
 
-
-
-
     // Everything below this line could be deleted if necessary
     // They are meant for testing
     public void SignUpClick(View view) {
@@ -143,14 +139,4 @@ public class SignUpActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void add(SignUpActivity mockUserList) {
-    }
-
-    public List<Object> getString() {
-        return null;
-    }
-
-    public char compareTo(Object o) {
-        return 0;
-    }
 }

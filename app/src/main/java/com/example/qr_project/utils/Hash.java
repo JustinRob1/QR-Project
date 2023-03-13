@@ -33,32 +33,28 @@ public class Hash {
     }
 
     /**
-     * Returns score of the hash
-     * @return: Score that
+     * @return The score of the hash
      */
     public int getScore() {
         return score;
     }
 
     /**
-     * Returns a hash string
-     * @return: Hash that is stored
+     * @return Hash that is stored
      */
     public String getHash() {
         return hash;
     }
 
     /**
-     * Returns a name string
-     * @return: name
+     * @return name generated from hash
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns a face string
-     * @return: face
+     * @return face generated from hash
      */
     public String getFace() {
         return face;
@@ -66,8 +62,8 @@ public class Hash {
 
     /**
      * Returns a hash for a given string
-     * @param str: A string to be hashed
-     * @return
+     * @param str A string to be hashed
+     * @return A hash of the string
      */
     private static String generateHash(String str){
         try {
@@ -104,7 +100,7 @@ public class Hash {
 
     /**
      * Calculates scores of the hash
-     * @param hash
+     * @param hash a hash string
      * @return integer value of score
      */
     private static int calculateScore(String hash){
@@ -137,8 +133,8 @@ public class Hash {
 
     /**
      * Generates a face based on the hash
-     * @param hashStr
-     * @return
+     * @param hashStr a hash string
+     * @return a face
      */
     private static String generateFace(String hashStr) {
         // Convert hash string to binary representation
@@ -351,7 +347,7 @@ public class Hash {
 
         // Define dictionary for bit 4
         Map<Character, String> hex4Dict = new HashMap<>();
-        hex4Dict.put('0', "Tunderous");
+        hex4Dict.put('0', "Thunderous");
         hex4Dict.put('1', "Blazing");
         hex4Dict.put('2', "Divine");
         hex4Dict.put('3', "Infernal");

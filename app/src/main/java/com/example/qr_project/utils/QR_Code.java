@@ -102,6 +102,7 @@ public class QR_Code {
         result.put("score", score);
         result.put("name", name);
         result.put("photo", photo);
+        result.put("Location", location);
         return result;
     }
 }

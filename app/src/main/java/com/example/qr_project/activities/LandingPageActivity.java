@@ -1,11 +1,9 @@
 package com.example.qr_project.activities;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.activity.result.ActivityResult;
@@ -29,10 +27,6 @@ public class LandingPageActivity extends AppCompatActivity {
      * The code also checks the results and userId (giving out the unique userId)
      * This allows the app to go to the UserHomeActivity and call finish to kill SignUpActivity
      * Also retrieving the unique userId
-     * @param entryLauncher  a registration for the user
-     * @param Intent  a package to go to the UserHomeActivity and call finish to kill SignUpActivity
-     * @param userID  an unique ID to identify the user
-     * @return        the userID if the user wants to know on their profile
      * @see           LeaderboardActivity
      * @see           SignUpActivity
      * @see           UserHomeActivity
@@ -53,7 +47,6 @@ public class LandingPageActivity extends AppCompatActivity {
                         // Go to the UserHomeActivity and call finish to kill SignUpActivity
                         intent = new Intent(LandingPageActivity.this, UserHomeActivity.class);
                         intent.putExtra("userId", userID);
-
                         startActivity(intent);
                         finish();
                     }
@@ -69,7 +62,7 @@ public class LandingPageActivity extends AppCompatActivity {
      * If the user is not signed in, the app will take the user go to SignUpActivity
      * Checking the condition if the user already has an account or not
      * @param    savedInstanceState
-     * @param    sharedPref
+     *        contains the state of the activity when it was last stopped or paused
      * @see           LeaderboardActivity
      * @see           SignUpActivity
      * @see           UserHomeActivity
@@ -96,15 +89,12 @@ public class LandingPageActivity extends AppCompatActivity {
             intent.putExtra("userId", userID);
             startActivity(intent);
             finish();
-        // If the user is not signed in, go to SignUpActivity
+            // If the user is not signed in, go to SignUpActivity
         } else {
             signUpButton = findViewById(R.id.sign_up_button);
-            signUpButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(LandingPageActivity.this, SignUpActivity.class);
-                    entryLauncher.launch(intent);
-                }
+            signUpButton.setOnClickListener(view -> {
+                Intent intent = new Intent(LandingPageActivity.this, SignUpActivity.class);
+                entryLauncher.launch(intent);
             });
         }
 
