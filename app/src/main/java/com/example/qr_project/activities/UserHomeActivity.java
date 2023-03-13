@@ -1,7 +1,10 @@
 package com.example.qr_project.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class UserHomeActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -61,32 +65,46 @@ public class UserHomeActivity extends AppCompatActivity {
         globalRank = findViewById(R.id.global_rank);
         friendRank = findViewById(R.id.friend_rank);
         totalQrCodes = findViewById(R.id.total_qr_codes);
+        qrCode1Name = findViewById(R.id.qr_code_name_1);
+        qrCode2Name = findViewById(R.id.qr_code_name_2);
+        qrCode3Name = findViewById(R.id.qr_code_name_3);
+        qrCode1Score = findViewById(R.id.qr_code_score_1);
+        qrCode2Score = findViewById(R.id.qr_code_score_2);
+        qrCode3Score = findViewById(R.id.qr_code_score_3);
 
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 totalScore.setText(value.get("totalScore").toString());
+
                 qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
                 ArrayList<Integer> scores = new ArrayList<Integer>();
                 for (Map<String, Object> qrCode: qrCodes) {
-                    scores.add((Integer) qrCode.get("score"));
+                    scores.add(Math.toIntExact((Long) qrCode.get("score")));
                 }
-                int maxScore = Collections.max(scores);
-                int idx = scores.indexOf(maxScore);
-                qrCode1Score.setText(maxScore);
-                qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
-                scores.remove(idx);
 
-                maxScore = Collections.max(scores);
-                idx = scores.indexOf(maxScore);
-                qrCode2Score.setText(maxScore);
-                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
-                scores.remove(idx);
+                int maxScore = 0;
+                int idx = 0;
+                try {
+                    maxScore = Collections.max(scores);
+                    idx = scores.indexOf(maxScore);
+                    qrCode1Score.setText(String.valueOf(maxScore));
+                    qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
+                    scores.remove(idx);
 
-                maxScore = Collections.max(scores);
-                idx = scores.indexOf(maxScore);
-                qrCode2Score.setText(maxScore);
-                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
+                    maxScore = Collections.max(scores);
+                    idx = scores.indexOf(maxScore);
+                    qrCode2Score.setText(String.valueOf(maxScore));
+                    qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
+                    scores.remove(idx);
+
+                    maxScore = Collections.max(scores);
+                    idx = scores.indexOf(maxScore);
+                    qrCode3Score.setText(String.valueOf(maxScore));
+                    qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
+                } catch (NoSuchElementException e) {
+
+                }
             }
         });
 
