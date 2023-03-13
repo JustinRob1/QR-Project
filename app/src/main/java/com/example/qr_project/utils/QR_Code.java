@@ -15,33 +15,31 @@ public class QR_Code {
     private GeoPoint location;
 
     /**
-     * Constructor for QR Code
+     * Constructor for QR Code without photo and location.
      *
-     * @param hash
-     * @param photo
+     * @param qrCodeContent: String contained in physical QRCode. It's used for generating hash only
      */
-    public QR_Code(Hash hash, Bitmap photo, GeoPoint location) {
-        this.hash = hash;
-        this.score = (hash == null) ? 0 : hash.getScore();
-        this.name = (hash == null) ? "" : hash.getName();
+    public QR_Code(String qrCodeContent){
+        this.hash = new Hash(qrCodeContent);
+        this.score = hash.getScore();
+        this.name = hash.getName();
+        this.photo = null;
+        this.location = null;
+    }
+
+    /**
+     * Constructor for QR Code with photo and location.
+     *
+     * @param qrCodeContent: String contained in physical QRCode. It's used for generating hash only
+     * @param photo: Bitmap of the whereabouts of the physical QRCode
+     * @param location: Location of the photo
+     */
+    public QR_Code(String qrCodeContent, Bitmap photo, GeoPoint location) {
+        this.hash = new Hash(qrCodeContent);
+        this.score = hash.getScore();
+        this.name = hash.getName();
         this.photo = photo;
         this.location = location;
-    }
-
-    /**
-     * @return Hash object of the QR code
-     */
-    public Hash getHash() {
-        return hash;
-    }
-
-    /**
-     * Sets the hash object
-     *
-     * @param hash
-     */
-    public void setHash(Hash hash) {
-        this.hash = hash;
     }
 
     /**
@@ -49,6 +47,14 @@ public class QR_Code {
      */
     public int getScore() {
         return score;
+    }
+
+    /**
+     *
+     * @return generated hash string from QRCode content.
+     */
+    public String getHash(){
+        return this.hash.getHash();
     }
 
     /**
@@ -90,9 +96,9 @@ public class QR_Code {
     }
 
 
-    public Map<String, Object> toMap() {
+    public HashMap<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("hash", hash);
+        result.put("id", hash.getHash());
         result.put("score", score);
         result.put("name", name);
         result.put("photo", photo);

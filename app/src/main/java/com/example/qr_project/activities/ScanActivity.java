@@ -199,10 +199,7 @@ public class ScanActivity extends AppCompatActivity {
             if (result.getContents() == null) {
                 return;
             } else {
-                // Create a hash object and pass hash into the constructor of QR_Code
-                hash = new Hash(result.getContents());
-                //String name = hash.generateName(result.getContents()); Fix the name
-                qrCode = new QR_Code(hash, null, null);
+                qrCode = new QR_Code(result.getContents());
 
                 // Ask the user if they want to take a picture
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -220,11 +217,7 @@ public class ScanActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Create a hashmap of the QR_Code properties you want to store
-                        HashMap<String, Object> qrCodeDB = new HashMap<>();
-                        qrCodeDB.put("id", qrCode.getHash());
-                        qrCodeDB.put("name", qrCode.getName());
-                        qrCodeDB.put("photo", qrCode.getPhoto());
-                        qrCodeDB.put("score", qrCode.getScore());
+                        HashMap<String, Object> qrCodeDB = qrCode.toMap();
 
                         // Get the current user's ID
                         SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
