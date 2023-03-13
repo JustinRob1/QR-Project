@@ -6,3 +6,11 @@ Name: Abdullah Khadeli                CCID: akhadeli
       Paul Startsev                         pstartse
 
 
+Backlog Updates:                                                            
+     We have closed 14 User Stories.
+
+CRC Cards Updates:
+     The CRC Cards have been updated to match with our actual codes and app.
+ 
+ UML Updates:
+     The UML Diagram has ben updated to match with our acutal codes and app.
