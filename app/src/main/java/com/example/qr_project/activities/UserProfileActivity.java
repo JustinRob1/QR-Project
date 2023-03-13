@@ -29,7 +29,6 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
 
-
     /**
      *For the use and feature of the map button
      *
