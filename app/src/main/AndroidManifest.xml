@@ -30,6 +30,9 @@
         <activity
             android:name=".activities.UserHomeActivity"
             android:screenOrientation="fullSensor"></activity>
+
+        <activity android:name=".activities.LeaderboardActivity"></activity>
+
     </application>
 
 </manifest>

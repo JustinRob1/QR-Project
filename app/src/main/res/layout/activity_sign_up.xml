@@ -71,6 +71,7 @@
         android:textSize="20sp"
         android:text="SIGN UP"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:onClick="SignUpClick"/>
 
 </LinearLayout>
