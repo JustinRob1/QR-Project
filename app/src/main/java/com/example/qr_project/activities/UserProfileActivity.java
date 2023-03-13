@@ -25,8 +25,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     public void onClickBack(View view){
-        Intent intent = new Intent(UserProfileActivity.this, UserHomeActivity.class);
-        startActivity(intent);
+        finish();
     }
 
 

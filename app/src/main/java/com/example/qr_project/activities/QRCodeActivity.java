@@ -21,11 +21,11 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     /**
-     * When the user clicks the delete button, the QR code will be delete
-     *
-     * @param view The text view which is pressed
+     * Called when the user clicks the back button
+     * @param view
+     * The text view which is pressed
      */
-    public void onDeleteClick(View view) {
-
+    public void onClickBack(View view){
+        finish();
     }
 }

@@ -149,6 +149,10 @@ public class LeaderboardActivity extends AppCompatActivity {
         finish();
     }
 
+    public void onLeaderboardClick(View view){
+        Toast.makeText(this, "Already at leaderboard", Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * Called when the user clicks the QR code button
      * Getting the user's ID and their information about the QR_Codes and their scores
@@ -413,6 +417,20 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *  Create a new ImageView for the TableRow
+     *  Create a new TableRow
+     *  Create a new LinearLayout for the TableRow
+     *  Create a new TextView for the TableRow
+     *  Create a new TextView for the TableRow
+     *  This creates the table for the leaderboardship
+     *  This shows the data of the leader with the highest score for the QRCode
+     * @param name
+     * @param score
+     * @param rank
+     * @return row
+     */
+
     private TableRow createNewRow(String name, Long score, int rank){
         // Create a new TableRow
         TableRow row = new TableRow(LeaderboardActivity.this);
@@ -429,6 +447,15 @@ public class LeaderboardActivity extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
         linearLayout.setGravity(Gravity.CENTER);
+        linearLayout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                Intent intent = new Intent(LeaderboardActivity.this, QRCodeActivity.class);
+                intent.putExtra("qrName", "test");
+                startActivity(intent);
+            }
+        });
+
 
         // Create a new TextView for the TableRow
         TextView rankTextView = new TextView(LeaderboardActivity.this);
@@ -482,4 +509,6 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         return row;
     }
+
+
 }

@@ -1,10 +1,7 @@
 package com.example.qr_project.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -14,7 +11,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.qr_project.R;
-import com.example.qr_project.utils.QR_Code;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -22,9 +18,6 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
-import org.checkerframework.checker.units.qual.A;
-
-import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +44,15 @@ public class UserHomeActivity extends AppCompatActivity {
 
     Button viewAll;
 
+    /**
+     * Displays the total score of the QR_Codes scanned by the user to them
+     * Display the information of the user
+     * Retrieving the data from the FireStore FireBase
+     * Shows the top three users with highest total score
+     * @param savedInstanceState  a package to calculate the total score and display to score to the user
+     * @see FirebaseFirestore
+     * @see com.example.qr_project.FireStore
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +84,8 @@ public class UserHomeActivity extends AppCompatActivity {
                 for (Map<String, Object> qrCode: qrCodes) {
                     scores.add(Math.toIntExact((Long) qrCode.get("score")));
                 }
-
+                // Shows the top three
+                // Intialise the maxScore = 0 and idx = 0
                 int maxScore = 0;
                 int idx = 0;
                 try {
@@ -122,6 +125,11 @@ public class UserHomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void onViewUserProfile(View view){
+        Intent intent = new Intent(UserHomeActivity.this, UserProfileActivity.class);
+        startActivity(intent);
+    }
+
 
     /**
      * For the use and the feature of the map button
@@ -145,5 +153,13 @@ public class UserHomeActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LeaderboardActivity.class);
         startActivity(intent);
     }
+
+    // TODO: putExtra on the actual QRCODE that was clicked
+    public void onQRClick(View view){
+        Intent intent = new Intent(UserHomeActivity.this, QRCodeActivity.class);
+        intent.putExtra("qrName", "test");
+        startActivity(intent);
+    }
+
 
 }
