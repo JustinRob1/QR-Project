@@ -87,6 +87,9 @@ public class Player {
 
     // Note: A reference to the original QRCodes array list is returned.
     /**
+     * The QRCodes displaying in List
+     * The QRCodes can scanned when the player wishes to do so
+     * Sets the QR_CODES
      * @return
      *      User's QR codes
      */
@@ -95,6 +98,8 @@ public class Player {
     }
 
     /**
+     * Calculate the total score of all the QR_Codes that the player has
+     * Re-Calculate the total score when a QR_Codes is added or removed
      * @return
      *      Total score of all QR codes
      */
