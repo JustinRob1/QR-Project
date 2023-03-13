@@ -231,10 +231,16 @@ public class Hash {
         for (int i = 0; i < 6; i++) {
             bits[i] = Character.getNumericValue(hashBin.charAt(i));
         }
-        String name = bit0Dict.get(bits[0]) + " " + bit1Dict.get(bits[1]) + bit2Dict.get(bits[2]) +
+
+        String forehead = "    ___ \n   /   \\\\  ";
+        String chin = "  \\___/";
+
+        // Use the java replace function to get the character for the rest of the face
+        // construct the string with | first and then replace it after
+
+        return bit0Dict.get(bits[0]) + " " + bit1Dict.get(bits[1]) + bit2Dict.get(bits[2]) +
                 bit3Dict.get(bits[3]) + bit4Dict.get(bits[4]) + bit5Dict.get(bits[5]);
 
-        return name;
     }
 
     public static String generateName(String hashStr) {

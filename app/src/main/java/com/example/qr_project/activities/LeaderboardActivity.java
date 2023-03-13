@@ -57,6 +57,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_leaderboard);
 
+
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
         qr_leaderboard = findViewById(R.id.qr_leaderboard_table);
@@ -156,5 +157,6 @@ public class LeaderboardActivity extends AppCompatActivity {
             ovr_leaderboard.setVisibility(View.VISIBLE);
             isFilterChanged = true;
         }
+
     }
 }
