@@ -134,8 +134,6 @@ public class ScanActivity extends AppCompatActivity {
                         assert qrCodes != null;
                         for (Map<String, Object> qrCode : qrCodes) {
                             String hash = (String) qrCode.get("hash");
-                            Log.d("qrCodeHash", qrCodeHash);
-                            Log.d("gash", hash);
                             if (Objects.equals(hash, qrCodeHash)) {
                                 Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
                                 finish();
@@ -178,7 +176,6 @@ public class ScanActivity extends AppCompatActivity {
 
         // Retrieve the user's information
         String userID = sharedPref.getString("user_id", null);
-        boolean location_pref = sharedPref.getBoolean("location_pref", false);
 
         db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
@@ -192,46 +189,44 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
 
-        if (location_pref) {
-            // Get the user's current location
-            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(location -> {
-                        if (location != null) {
-                            GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                            qrCode.setLocation(geoPoint);
+        // Update the qrcodes array field with the new QR code
+        db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "QR code added to user's document in DB");
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Log.w(TAG, "Error adding QR code to user's document in DB", e);
+                    finish();
+                });
 
-                            // Update the qrcodes array field with the new QR code
-                            db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d(TAG, "QR code added to user's document in DB");
-                                        finish();
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Log.w(TAG, "Error adding QR code to user's document in DB", e);
-                                        finish();
-                                    });
-                        } else {
-                            Log.w(TAG, "Unable to retrieve location");
-                            finish();
-                        }
-                    });
-        } else {
-            // Update the qrcodes array field with the new QR code
-            db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d(TAG, "QR code added to user's document in DB");
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w(TAG, "Error adding QR code to user's document in DB", e);
-                        finish();
-                    });
-        }
+//        // Get the user's current location
+//        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+//                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        fusedLocationClient.getLastLocation()
+//                .addOnSuccessListener(location -> {
+//                    if (location != null) {
+//                        GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+//                        qrCode.setLocation(geoPoint);
+//
+//                        // Update the qrcodes array field with the new QR code
+//                        db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
+//                                .addOnSuccessListener(aVoid -> {
+//                                    Log.d(TAG, "QR code added to user's document in DB");
+//                                    finish();
+//                                })
+//                                .addOnFailureListener(e -> {
+//                                    Log.w(TAG, "Error adding QR code to user's document in DB", e);
+//                                    finish();
+//                                });
+//                    } else {
+//                        Log.w(TAG, "Unable to retrieve location");
+//                        finish();
+//                        }
+//                    });
     }
 }
 

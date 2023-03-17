@@ -7,58 +7,58 @@
     android:background="@drawable/background_blue_gradient">
 
     <LinearLayout
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-<TextView
-    android:id="@+id/Title"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_marginTop="55dp"
-    android:text="QR Hunter."
-    android:textColor="@color/black"
-    android:textSize="55sp"
-    android:textStyle="bold" />
+        <TextView
+            android:id="@+id/Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="55dp"
+            android:text="QR Hunter."
+            android:textColor="@color/black"
+            android:textSize="55sp"
+            android:textStyle="bold" />
 
-<TextView
-    android:id="@+id/textView2"
-    android:layout_width="224dp"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_marginTop="25dp"
-    android:text="Compete with friends for the highest score!"
-    android:textAlignment="center"
-    android:textColor="@color/black"
-    android:textSize="20sp" />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="224dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="25dp"
+            android:text="Compete with friends for the highest score!"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
 
-<ImageView
-    android:id="@+id/imageView"
-    android:layout_width="210dp"
-    android:layout_height="207dp"
-    android:src="@drawable/logo"
-    android:layout_gravity="center"
-    android:layout_marginTop="45dp"/>
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="210dp"
+            android:layout_height="207dp"
+            android:src="@drawable/logo"
+            android:layout_gravity="center"
+            android:layout_marginTop="45dp"/>
 
-<View
-    android:id="@+id/divider"
-    android:layout_width="165dp"
-    android:layout_height="1dp"
-    android:background="?android:attr/listDivider"
-    android:layout_gravity="center"
-    android:layout_marginTop="65dp"/>
+        <View
+            android:id="@+id/divider"
+            android:layout_width="165dp"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider"
+            android:layout_gravity="center"
+            android:layout_marginTop="65dp"/>
 
-<androidx.appcompat.widget.AppCompatButton
-    android:id="@+id/sign_up_button"
-    android:layout_width="271dp"
-    android:layout_height="51dp"
-    android:background="@drawable/black_round_btn"
-    android:textColor="@color/white"
-    android:text="SIGN UP"
-    android:layout_gravity="center"
-    android:layout_marginTop="65dp"/>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/sign_up_button"
+            android:layout_width="271dp"
+            android:layout_height="51dp"
+            android:background="@drawable/black_round_btn"
+            android:textColor="@color/white"
+            android:text="SIGN UP"
+            android:layout_gravity="center"
+            android:layout_marginTop="65dp"/>
 
 
-</LinearLayout>
+    </LinearLayout>
 </ScrollView>
