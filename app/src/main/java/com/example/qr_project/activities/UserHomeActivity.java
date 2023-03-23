@@ -1,8 +1,10 @@
 package com.example.qr_project.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.R;
 import com.example.qr_project.utils.QR_Code;
@@ -29,6 +33,7 @@ import org.checkerframework.checker.units.qual.A;
 import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collections;
+import android.Manifest;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +41,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class UserHomeActivity extends AppCompatActivity {
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 100;
     FirebaseFirestore db;
     String userId;
     List<Map<String, Object>> qrCodes;
@@ -58,6 +64,20 @@ public class UserHomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home);
 
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+            } else {
+                // request the permission
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            }
+        }
+
         userId = getIntent().getStringExtra("userId");
         db = FirebaseFirestore.getInstance();
         CollectionReference collRef = db.collection("users");
@@ -74,68 +94,66 @@ public class UserHomeActivity extends AppCompatActivity {
         qrCode2Score = findViewById(R.id.qr_code_score_2);
         qrCode3Score = findViewById(R.id.qr_code_score_3);
 
-        collRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
-                for (QueryDocumentSnapshot doc: value) {
-                    Map<String, Integer> userId_score_pair = new HashMap<>();
-                    userId_score_pair.put(doc.getId().toString(), Math.toIntExact((Long) doc.get("totalScore")));
+        collRef.addSnapshotListener((value, error) -> {
+            ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
+            for (QueryDocumentSnapshot doc : value) {
+                Map<String, Integer> userId_score_pair = new HashMap<>();
+                Object totalScoreObj = doc.get("totalScore");
+                if (totalScoreObj != null) {
+                    Long totalScoreLong = (Long) totalScoreObj;
+                    userId_score_pair.put(doc.getId(), Math.toIntExact(totalScoreLong));
                     rankings.add(userId_score_pair);
                 }
-                Collections.sort(rankings, (x, y) -> x.entrySet().iterator().next().getValue().compareTo(y.entrySet().iterator().next().getValue()));
-                String rank;
-                int counter = rankings.size();
-                for (Map<String, Integer> x: rankings) {
-                    if (x.containsKey(userId)) {
-                        rank = "Global Rank: " + String.valueOf(counter);
-                        globalRank.setText(rank);
-                        break;
-                    }
-                    counter--;
-                }
-
             }
+            Collections.sort(rankings, Comparator.comparing(x -> x.entrySet().iterator().next().getValue()));
+            String rank;
+            int counter = rankings.size();
+            for (Map<String, Integer> x : rankings) {
+                if (x.containsKey(userId)) {
+                    rank = "Global Rank: " + counter;
+                    globalRank.setText(rank);
+                    break;
+                }
+                counter--;
+            }
+
         });
 
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                totalScore.setText(value.get("totalScore").toString());
+        docRef.addSnapshotListener((value, error) -> {
+            totalScore.setText(value.get("totalScore").toString());
 
-                qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
-                ArrayList<Integer> scores = new ArrayList<>();
-                for (Map<String, Object> qrCode: qrCodes) {
-                    scores.add(Math.toIntExact((Long) qrCode.get("score")));
-                }
-
-                int maxScore = 0;
-                int idx = 0;
-                try {
-                    maxScore = Collections.max(scores);
-                    idx = scores.indexOf(maxScore);
-                    qrCode1Score.setText(String.valueOf(maxScore));
-                    qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
-                    scores.remove(idx);
-
-                    maxScore = Collections.max(scores);
-                    idx = scores.indexOf(maxScore);
-                    qrCode2Score.setText(String.valueOf(maxScore));
-                    qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
-                    scores.remove(idx);
-
-                    maxScore = Collections.max(scores);
-                    idx = scores.indexOf(maxScore);
-                    qrCode3Score.setText(String.valueOf(maxScore));
-                    qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
-                } catch (NoSuchElementException e) {
-
-                }
-
-                String totalQr;
-                totalQr = "Total QR Codes: " + String.valueOf(scores.size());
-                totalQrCodes.setText(totalQr);
+            qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
+            ArrayList<Integer> scores = new ArrayList<>();
+            for (Map<String, Object> qrCode: qrCodes) {
+                scores.add(Math.toIntExact((Long) qrCode.get("score")));
             }
+
+            int maxScore = 0;
+            int idx = 0;
+            try {
+                maxScore = Collections.max(scores);
+                idx = scores.indexOf(maxScore);
+                qrCode1Score.setText(String.valueOf(maxScore));
+                qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
+                scores.remove(idx);
+
+                maxScore = Collections.max(scores);
+                idx = scores.indexOf(maxScore);
+                qrCode2Score.setText(String.valueOf(maxScore));
+                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
+                scores.remove(idx);
+
+                maxScore = Collections.max(scores);
+                idx = scores.indexOf(maxScore);
+                qrCode3Score.setText(String.valueOf(maxScore));
+                qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
+            } catch (NoSuchElementException e) {
+
+            }
+
+            String totalQr;
+            totalQr = "Total QR Codes: " + scores.size();
+            totalQrCodes.setText(totalQr);
         });
 
     }

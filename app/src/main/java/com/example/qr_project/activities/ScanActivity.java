@@ -10,6 +10,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -17,9 +20,11 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
@@ -37,9 +42,9 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ScanActivity extends AppCompatActivity {
+    private static final int MY_CAMERA_REQUEST_CODE = 100;
     QR_Code qrCode;
     FirebaseFirestore db;
-
     private ActivityResultLauncher<Intent> cameraLauncher;
 
 
@@ -65,6 +70,10 @@ public class ScanActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
+        }
 
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.setCaptureActivity(CaptureActivity.class);
@@ -115,7 +124,7 @@ public class ScanActivity extends AppCompatActivity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() != null) {
-                //String name = hash.generateName(result.getContents()); Fix the name
+                // String name = hash.generateName(result.getContents()); Fix the name
                 qrCode = new QR_Code(result.getContents());
 
                 // Get the current user's ID
@@ -124,7 +133,6 @@ public class ScanActivity extends AppCompatActivity {
                 String qrCodeHash = qrCode.getHash();
                 // Retrieve the user's information
                 String userID = sharedPref.getString("user_id", null);
-
 
                 db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
                     // Check if the document exists
@@ -142,18 +150,9 @@ public class ScanActivity extends AppCompatActivity {
                     }
                 });
 
-                // Ask the user if they want to take a picture
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Would you like to take a picture?");
-                builder.setPositiveButton("Yes", (dialog, which) -> {
-                    // Open the camera
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    cameraLauncher.launch(takePictureIntent);
-                });
-                builder.setNegativeButton("No", (dialog, which) -> {
-                    addQR();
-                });
-                builder.show();
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                cameraLauncher.launch(takePictureIntent);
+
             }
         }
     }
@@ -188,6 +187,22 @@ public class ScanActivity extends AppCompatActivity {
                 db.collection("users").document(userID).update("totalScore", newScore);
             }
         });
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            // Permission is granted
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            LocationListener locationListener = location -> {
+                GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                Log.d(TAG, "Geopoint" + geoPoint);
+                qrCode.setLocation(geoPoint);
+            };
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        } else {
+            // Permission is not granted, set location to null
+            qrCode.setLocation(null);
+        }
 
         // Update the qrcodes array field with the new QR code
         db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
