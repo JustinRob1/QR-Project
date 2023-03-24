@@ -11,6 +11,7 @@ public class QR_Code {
     private Hash hash; // Stores the hash
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
+    private String face; // Stores the QR code face
     private Bitmap photo; // Stores the photo taken
     private GeoPoint location;
 
@@ -23,6 +24,7 @@ public class QR_Code {
         this.hash = new Hash(qrCodeContent);
         this.score = hash.getScore();
         this.name = hash.getName();
+        this.face = hash.getFace();
         this.photo = null;
         this.location = null;
     }
@@ -38,6 +40,7 @@ public class QR_Code {
         this.hash = new Hash(qrCodeContent);
         this.score = hash.getScore();
         this.name = hash.getName();
+        this.face = hash.getFace();
         this.photo = photo;
         this.location = location;
     }
@@ -56,6 +59,15 @@ public class QR_Code {
     public String getHash(){
         return this.hash.getHash();
     }
+
+    /**
+     *
+     * @return generated face string from generated hash
+     */
+    public String getFace() {
+        return face;
+    }
+
 
     /**
      * @return score
