@@ -88,7 +88,7 @@ public class SignUpActivityTest {
         ActivityScenario<Activity> activityScenario = ActivityScenario.launch(intent);
 
         boolean[][] tests = {
-                {false, false, false}
+                {false, false, false},
                 {true, false, false},
                 {false, true, false},
                 {false, false, true},
