@@ -88,6 +88,7 @@ public class SignUpActivityTest {
         ActivityScenario<Activity> activityScenario = ActivityScenario.launch(intent);
 
         boolean[][] tests = {
+                {false, false, false},
                 {true, false, false},
                 {false, true, false},
                 {false, false, true},
@@ -102,8 +103,6 @@ public class SignUpActivityTest {
             fillEntries(test[0], test[1], test[2]);
             onView(withId(R.id.submit_sign_up_button)).perform(click());
             // Check SignUpActivity is still active
-            // FIXME: This dialog should be changed later.
-            onView(withText("Yes")).perform(click());
             activityScenario.onActivity(activity -> {
                 assertTrue(activity instanceof SignUpActivity);
             });
