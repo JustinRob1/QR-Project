@@ -169,6 +169,102 @@ public class HashTest {
                 hex5Dict.get(hexaDecimals[5]);
     }
 
+    // Added for the same reasons as above functions
+    private static String generateFace(String hashStr) {
+        // Choose eyes
+        Map<Character, String> hex2Eyes = new HashMap<>();
+        hex2Eyes.put('0', "$ $");
+        hex2Eyes.put('1', "* *");
+        hex2Eyes.put('2', "O O");
+        hex2Eyes.put('3', "^ ^");
+        hex2Eyes.put('4', "~ ~");
+        hex2Eyes.put('5', "U U");
+        hex2Eyes.put('6', "' '");
+        hex2Eyes.put('7', "X X");
+        hex2Eyes.put('8', "> <");
+        hex2Eyes.put('9', "# #");
+        hex2Eyes.put('a', "- -");
+        hex2Eyes.put('b', ". .");
+        hex2Eyes.put('c', "F U");
+        hex2Eyes.put('d', "= =");
+        hex2Eyes.put('e', "$ $");
+        hex2Eyes.put('f', "♥ ♥");
+
+
+        // Choose ears
+        Map<Character, String> hex2Ears = new HashMap<>();
+        hex2Ears.put('0', "$$");      // dollar ears (high score)
+        hex2Ears.put('1', "oo");   // round ears
+        hex2Ears.put('2', "||");   // long ears
+        hex2Ears.put('3', "[]");   // bat ears
+        hex2Ears.put('4', "/\\");   // pointy ears
+        hex2Ears.put('5', "()");   // elf ears
+        hex2Ears.put('6', "!!");   // floppy ears
+        hex2Ears.put('7', "@@");   // antenna ears
+        hex2Ears.put('8', "\\/");   // wing ears
+        hex2Ears.put('9', "~~");   // cat ears
+        hex2Ears.put('a', "><");  // robot ears
+        hex2Ears.put('b', "**");  // elephant ears
+        hex2Ears.put('c', "<>");  // arrow ears
+        hex2Ears.put('d', "==");  // rabbit ears
+        hex2Ears.put('e', "__");  // devil ears
+        hex2Ears.put('f', "##");  // short ears
+
+
+        // Choose nose
+        Map<Character, String> hex2Nose = new HashMap<>();
+        hex2Nose.put('0', " $ ");    // dollar nose (high score)
+        hex2Nose.put('1', " , ");   // small nose
+        hex2Nose.put('2', " | ");   // straight nose
+        hex2Nose.put('3', " /\\");   // curved nose
+        hex2Nose.put('4', " | ");    // button nose
+        hex2Nose.put('5', ". .");   // pig nose
+        hex2Nose.put('6', "\\/ ");   // flared nostrils
+        hex2Nose.put('7', "/\\_");   // hawk nose
+        hex2Nose.put('8', "\\__");  // upturned nose
+        hex2Nose.put('9', "\\\\\\");  // pointed nose
+        hex2Nose.put('a', "<=>");   // wide nose
+        hex2Nose.put('b', "(((");   // bulbous nose
+        hex2Nose.put('c', " 0 ");   // Circle nose
+        hex2Nose.put('d', "(_)");   // pudgy nose
+        hex2Nose.put('e', " V ");  // ski slope nose
+        hex2Nose.put('f', " + ");   // cleft nose
+
+
+        // Choose mouth
+        Map<Character, String> hex2Mouth = new HashMap<>();
+        hex2Mouth.put('0', "$$$");      // dollar mouth (high score)
+        hex2Mouth.put('1', " o ");   // small mouth
+        hex2Mouth.put('2', " O ");   // oval mouth
+        hex2Mouth.put('3', " ^ ");   // triangle mouth
+        hex2Mouth.put('4', " U ");   // square mouth
+        hex2Mouth.put('5', " V ");   // trapezoid mouth
+        hex2Mouth.put('6', " | ");   // vertical line mouth
+        hex2Mouth.put('7', "---");   // horizontal line mouth
+        hex2Mouth.put('8', " S ");   // smile mouth
+        hex2Mouth.put('9', " D ");   // frown mouth
+        hex2Mouth.put('a', " 3 ");  // surprised mouth
+        hex2Mouth.put('b', " P ");  // puckered mouth
+        hex2Mouth.put('c', "___");  // neutral mouth
+        hex2Mouth.put('d', " @ ");  // kissing mouth
+        hex2Mouth.put('e', " X ");  // lips together mouth
+        hex2Mouth.put('f', " + ");  // smirk mouth
+
+
+        // Build head
+        String eyes = hex2Eyes.get(hashStr.charAt(0));
+        String ears = hex2Ears.get(hashStr.charAt(1));
+        String nose = hex2Nose.get(hashStr.charAt(2));
+        String mouth = hex2Mouth.get(hashStr.charAt(3));
+        String head =
+                " /‾‾‾‾‾\\ \n" +
+                ears.charAt(0) + "| " + eyes + " |" + ears.charAt(1) + " \n" +
+                " | " + nose + " | \n" +
+                "|  " + mouth + "  |\n" +
+                " \\_____/ ";
+        return head;
+    }
+
     /*
     The calculateScore can be used within the class only and assumes all strings are of hash
     type already. That is, it can have characters from 0 to 9 and from a to f. One exception is
@@ -243,4 +339,20 @@ public class HashTest {
 
     }
 
+    @Test
+    void testGenerateFace(){
+        // Testing a few faces
+        String hash1 = "0123";
+        String hash2 = "4567";
+        String hash3 = "abcd";
+        String hash4 = "fffff";
+        String hash5 = "111c";
+        String hash6 = "abab";
+        String hash7 = "f9e7";
+        String[] hashes = {hash1, hash2, hash3, hash4, hash5, hash6, hash7};
+        for (String hash:hashes) {
+            System.out.println(generateFace(hash));
+        }
+
+    }
 }
