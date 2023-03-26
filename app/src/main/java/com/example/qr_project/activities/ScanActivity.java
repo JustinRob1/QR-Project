@@ -38,7 +38,6 @@ import java.util.Objects;
 
 public class ScanActivity extends AppCompatActivity {
     private static final int MY_CAMERA_REQUEST_CODE = 100;
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     QR_Code qrCode;
     FirebaseFirestore db;
     private ActivityResultLauncher<Intent> cameraLauncher;
@@ -68,10 +67,11 @@ public class ScanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setCaptureActivity(CaptureActivity.class);
-        integrator.setOrientationLocked(false);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrator.setPrompt("Scan a QR/Barcode");
+        integrator.setPrompt("Scan a QR code");
+        integrator.setCameraId(0);  // Use a specific camera of the device
+        integrator.setBeepEnabled(false);
+        integrator.setBarcodeImageEnabled(true);
         integrator.initiateScan();
 
         db = FirebaseFirestore.getInstance();
@@ -84,6 +84,7 @@ public class ScanActivity extends AppCompatActivity {
                 addQR();
             }
         });
+
     }
 
     /**
@@ -144,10 +145,6 @@ public class ScanActivity extends AppCompatActivity {
                             }
                         }
                     });
-
-                    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    cameraLauncher.launch(takePictureIntent);
-
                 }
             }
         }
@@ -211,17 +208,14 @@ public class ScanActivity extends AppCompatActivity {
             }
         }
 
-
         Log.d(TAG, "QR code location: " + qrCode.getLocation());
         // Update the qrcodes array field with the new QR code
         db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "QR code added to user's document in DB");
-                    finish();
                 })
                 .addOnFailureListener(e -> {
                     Log.w(TAG, "Error adding QR code to user's document in DB", e);
-                    finish();
                 });
     }
 }
