@@ -79,6 +79,21 @@ public class QR_CodeTest {
 
     }
 
+    @Test
+    void testGetters(){
+        QR_Code qrCode1 = mockQR_Code1();
+        QR_Code qrCode2 = mockQR_Code2();
+
+        System.out.println(qrCode1.getFace());
+        System.out.println(qrCode2.getFace());
+
+        System.out.println(qrCode1.getName());
+        System.out.println(qrCode2.getName());
+
+        System.out.println(qrCode1.getHash());
+        System.out.println(qrCode2.getHash());
+    }
+
 
 }
 

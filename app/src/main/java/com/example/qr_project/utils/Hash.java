@@ -137,131 +137,98 @@ public class Hash {
      * @return a face
      */
     private static String generateFace(String hashStr) {
-        // Convert hash string to binary representation
-        String hashBin = new BigInteger(hashStr, 16).toString(2);
-        hashBin = String.format("%256s", hashBin).replace(' ', '0');
-
-        Map<Integer, String> bit0Dict = new HashMap<>();
-        bit0Dict.put(0, "  ___\n /   \\\n|     |\n \\___/");
-        bit0Dict.put(1, "  ___\n /   \\\n|  *  |\n \\___/");
-        bit0Dict.put(2, "  ___\n /   \\\n|  ^  |\n \\___/");
-        bit0Dict.put(3, "  ___\n /   \\\n|  o  |\n \\___/");
-        bit0Dict.put(4, "  ___\n /   \\\n| \\ / |\n \\___/");
-        bit0Dict.put(5, "  ___\n /   \\\n| / \\ |\n \\___/");
-        bit0Dict.put(6, "  ___\n /   \\\n|  -  |\n \\___/");
-        bit0Dict.put(7, "  ___\n /   \\\n|  =  |\n \\___/");
-        bit0Dict.put(8, "  ___\n /   \\\n|  _  |\n \\___/");
-        bit0Dict.put(9, "  ___\n /   \\\n|  .  |\n \\___/");
-        bit0Dict.put(10, "  ___\n /   \\\n| /\\  |\n \\___/");
-        bit0Dict.put(11, "  ___\n /   \\\n| \\/  |\n \\___/");
-        bit0Dict.put(12, "  ___\n /   \\\n| o o |\n \\___/");
-        bit0Dict.put(13, "  ___\n /   \\\n| ^ ^ |\n \\___/");
-        bit0Dict.put(14, "  ___\n /   \\\n| /o\\ |\n \\___/");
-        bit0Dict.put(15, "  ___\n /   \\\n| \\o/ |\n \\___/");
-
-        Map<Integer, String> bit1Dict = new HashMap<>();
-        bit1Dict.put(0, " /\\  /\\");
-        bit1Dict.put(1, "  /__\\");
-        bit1Dict.put(2, " |  --|");
-        bit1Dict.put(3, "  |  |");
-        bit1Dict.put(4, " |    |");
-        bit1Dict.put(5, " |^   |");
-        bit1Dict.put(6, " | v  |");
-        bit1Dict.put(7, " | |  |");
-        bit1Dict.put(8, " |..  |");
-        bit1Dict.put(9, "  |__-|");
-        bit1Dict.put(10, "  |~~~|");
-        bit1Dict.put(11, "  |_ _|");
-        bit1Dict.put(12, "  | ^ |");
-        bit1Dict.put(13, "  | v |");
-        bit1Dict.put(14, "  | o |");
-        bit1Dict.put(15, "  | x |");
-
-        Map<Integer, String> bit2Dict = new HashMap<>();
-        bit2Dict.put(0, "  ____\n /    \\\n|  ()  |\n \\____/");
-        bit2Dict.put(1, "  ____\n /    \\\n|  --  |\n \\____/");
-        bit2Dict.put(2, "  ____\n /    \\\n|  <>  |\n \\____/");
-        bit2Dict.put(3, "  ____\n /    \\\n|  ^^  |\n \\____/");
-        bit2Dict.put(4, "  ____\n /    \\\n|  ><  |\n \\____/");
-        bit2Dict.put(5, "  ____\n /    \\\n|  ..  |\n \\____/");
-        bit2Dict.put(6, "  ____\n /    \\\n|  --  |\n \\__/\\/");
-        bit2Dict.put(7, "  ____\n /    \\\n|  oo  |\n \\__/\\/");
-        bit2Dict.put(8, "  ____\n /    \\\n|  ^^  |\n \\__--/");
-        bit2Dict.put(9, "  ____\n /    \\\n|  ||  |\n \\__/\\/");
-        bit2Dict.put(10, "  ____\n /    \\\n|  XX  |\n \\__/\\/");
-        bit2Dict.put(11, "  ____\n /    \\\n|  **  |\n \\__--/");
-        bit2Dict.put(12, "  ____\n /    \\\n|  ##  |\n \\__--/");
-
-        Map<Integer, String> bit3Dict = new HashMap<>();
-        bit3Dict.put(0, "");    // no nose
-        bit3Dict.put(1, "  ,  ");   // small nose
-        bit3Dict.put(2, "  |  ");   // straight nose
-        bit3Dict.put(3, " /\\ ");   // curved nose
-        bit3Dict.put(4, " || ");    // button nose
-        bit3Dict.put(5, "(_|_)");   // pig nose
-        bit3Dict.put(6, " \\/ ");   // flared nostrils
-        bit3Dict.put(7, " /\\_");   // hawk nose
-        bit3Dict.put(8, " \\__/");  // upturned nose
-        bit3Dict.put(9, "  \\\\ ");  // pointed nose
-        bit3Dict.put(10, "<=>");   // wide nose
-        bit3Dict.put(11, "(((");   // bulbous nose
-        bit3Dict.put(12, " 0  ");   // Circle nose
-        bit3Dict.put(13, "(_) ");   // pudgy nose
-        bit3Dict.put(14, "  V  ");  // ski slope nose
-        bit3Dict.put(15, " +  ");   // cleft nose
-
-        Map<Integer, String> bit4Dict = new HashMap<>();
-        bit4Dict.put(0, "  ");      // no mouth
-        bit4Dict.put(1, "  o  ");   // small mouth
-        bit4Dict.put(2, "  O  ");   // oval mouth
-        bit4Dict.put(3, "  ^  ");   // triangle mouth
-        bit4Dict.put(4, "  U  ");   // square mouth
-        bit4Dict.put(5, "  V  ");   // trapezoid mouth
-        bit4Dict.put(6, "  |  ");   // vertical line mouth
-        bit4Dict.put(7, "  -  ");   // horizontal line mouth
-        bit4Dict.put(8, "  S  ");   // smile mouth
-        bit4Dict.put(9, "  D  ");   // frown mouth
-        bit4Dict.put(10, "  3  ");  // surprised mouth
-        bit4Dict.put(11, "  P  ");  // puckered mouth
-        bit4Dict.put(12, "  _  ");  // neutral mouth
-        bit4Dict.put(13, "  @  ");  // kissing mouth
-        bit4Dict.put(14, "  X  ");  // lips together mouth
-        bit4Dict.put(15, "  +  ");  // smirk mouth
-
-        Map<Integer, String> bit5Dict = new HashMap<>();
-        bit5Dict.put(0, "");      // no ears
-        bit5Dict.put(1, " oo");   // round ears
-        bit5Dict.put(2, " ||");   // long ears
-        bit5Dict.put(3, " []");   // bat ears
-        bit5Dict.put(4, " /\\");   // pointy ears
-        bit5Dict.put(5, " ()");   // elf ears
-        bit5Dict.put(6, " !!");   // floppy ears
-        bit5Dict.put(7, " @ ");   // antenna ears
-        bit5Dict.put(8, " \\/");   // wing ears
-        bit5Dict.put(9, " ~ ");   // cat ears
-        bit5Dict.put(10, " >>");  // robot ears
-        bit5Dict.put(11, " **");  // elephant ears
-        bit5Dict.put(12, " <<");  // arrow ears
-        bit5Dict.put(13, " = ");  // rabbit ears
-        bit5Dict.put(14, " __");  // devil ears
-        bit5Dict.put(15, " ## ");  // short ears
+        // Choose eyes
+        Map<Character, String> hex2Eyes = new HashMap<>();
+        hex2Eyes.put('0', "$ $");
+        hex2Eyes.put('1', "* *");
+        hex2Eyes.put('2', "O O");
+        hex2Eyes.put('3', "^ ^");
+        hex2Eyes.put('4', "~ ~");
+        hex2Eyes.put('5', "U U");
+        hex2Eyes.put('6', "' '");
+        hex2Eyes.put('7', "X X");
+        hex2Eyes.put('8', "> <");
+        hex2Eyes.put('9', "# #");
+        hex2Eyes.put('a', "- -");
+        hex2Eyes.put('b', ". .");
+        hex2Eyes.put('c', "F U");
+        hex2Eyes.put('d', "= =");
+        hex2Eyes.put('e', "$ $");
+        hex2Eyes.put('f', "♥ ♥");
 
 
-        // Lookup values in each dictionary based on corresponding bits in the hash
-        int[] bits = new int[6];
-        for (int i = 0; i < 6; i++) {
-            bits[i] = Character.getNumericValue(hashBin.charAt(i));
-        }
 
-        String forehead = "    ___ \n   /   \\\\  ";
-        String chin = "  \\___/";
+        // Choose ears
+        Map<Character, String> hex2Ears = new HashMap<>();
+        hex2Ears.put('0', "$$");      // dollar ears (high score)
+        hex2Ears.put('1', "oo");   // round ears
+        hex2Ears.put('2', "||");   // long ears
+        hex2Ears.put('3', "[]");   // bat ears
+        hex2Ears.put('4', "/\\");   // pointy ears
+        hex2Ears.put('5', "()");   // elf ears
+        hex2Ears.put('6', "!!");   // floppy ears
+        hex2Ears.put('7', "@@");   // antenna ears
+        hex2Ears.put('8', "\\/");   // wing ears
+        hex2Ears.put('9', "~~");   // cat ears
+        hex2Ears.put('a', "><");  // robot ears
+        hex2Ears.put('b', "**");  // elephant ears
+        hex2Ears.put('c', "<>");  // arrow ears
+        hex2Ears.put('d', "==");  // rabbit ears
+        hex2Ears.put('e', "__");  // devil ears
+        hex2Ears.put('f', "##");  // short ears
 
-        // Use the java replace function to get the character for the rest of the face
-        // construct the string with | first and then replace it after
 
-        return bit0Dict.get(bits[0]) + " " + bit1Dict.get(bits[1]) + bit2Dict.get(bits[2]) +
-                bit3Dict.get(bits[3]) + bit4Dict.get(bits[4]) + bit5Dict.get(bits[5]);
+        // Choose nose
+        Map<Character, String> hex2Nose = new HashMap<>();
+        hex2Nose.put('0', " $ ");    // dollar nose (high score)
+        hex2Nose.put('1', " , ");   // small nose
+        hex2Nose.put('2', " | ");   // straight nose
+        hex2Nose.put('3', " /\\");   // curved nose
+        hex2Nose.put('4', " | ");    // button nose
+        hex2Nose.put('5', ". .");   // pig nose
+        hex2Nose.put('6', "\\/ ");   // flared nostrils
+        hex2Nose.put('7', "/\\_");   // hawk nose
+        hex2Nose.put('8', "\\__");  // upturned nose
+        hex2Nose.put('9', "\\\\\\");  // pointed nose
+        hex2Nose.put('a', "<=>");   // wide nose
+        hex2Nose.put('b', "(((");   // bulbous nose
+        hex2Nose.put('c', " 0 ");   // Circle nose
+        hex2Nose.put('d', "(_)");   // pudgy nose
+        hex2Nose.put('e', " V ");  // ski slope nose
+        hex2Nose.put('f', " + ");   // cleft nose
 
+        // Choose mouth
+        Map<Character, String> hex2Mouth = new HashMap<>();
+        hex2Mouth.put('0', "$$$");      // dollar mouth (high score)
+        hex2Mouth.put('1', " o ");   // small mouth
+        hex2Mouth.put('2', " O ");   // oval mouth
+        hex2Mouth.put('3', " ^ ");   // triangle mouth
+        hex2Mouth.put('4', " U ");   // square mouth
+        hex2Mouth.put('5', " V ");   // trapezoid mouth
+        hex2Mouth.put('6', " | ");   // vertical line mouth
+        hex2Mouth.put('7', "---");   // horizontal line mouth
+        hex2Mouth.put('8', " S ");   // smile mouth
+        hex2Mouth.put('9', " D ");   // frown mouth
+        hex2Mouth.put('a', " 3 ");  // surprised mouth
+        hex2Mouth.put('b', " P ");  // puckered mouth
+        hex2Mouth.put('c', "___");  // neutral mouth
+        hex2Mouth.put('d', " @ ");  // kissing mouth
+        hex2Mouth.put('e', " X ");  // lips together mouth
+        hex2Mouth.put('f', " + ");  // smirk mouth
+
+
+        // Build head
+        String eyes = hex2Eyes.get(hashStr.charAt(0));
+        String ears = hex2Ears.get(hashStr.charAt(1));
+        String nose = hex2Nose.get(hashStr.charAt(2));
+        String mouth = hex2Mouth.get(hashStr.charAt(3));
+        String head =
+                " /‾‾‾‾‾\\ \n" +
+                        ears.charAt(0) + "| " + eyes + " |" + ears.charAt(1) + " \n" +
+                        " | " + nose + " | \n" +
+                        "|  " + mouth + "  |\n" +
+                        " \\_____/ ";
+        return head;
     }
 
     /**
