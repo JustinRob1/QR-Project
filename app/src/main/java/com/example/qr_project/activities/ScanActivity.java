@@ -1,6 +1,5 @@
 package com.example.qr_project.activities;
 
-import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.app.Activity;
@@ -30,7 +29,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.journeyapps.barcodescanner.CaptureActivity;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +39,6 @@ public class ScanActivity extends AppCompatActivity {
     QR_Code qrCode;
     FirebaseFirestore db;
     private ActivityResultLauncher<Intent> cameraLauncher;
-
 
     /**
      * Defining the cameralauncher ready to scan the QR_Code
@@ -82,6 +79,7 @@ public class ScanActivity extends AppCompatActivity {
                 assert data != null;
                 Bitmap image = (Bitmap) data.getExtras().get("data");
                 addQR();
+                finish();
             }
         });
 
@@ -141,10 +139,15 @@ public class ScanActivity extends AppCompatActivity {
                                 if (Objects.equals(hash, qrCodeHash)) {
                                     Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
                                     finish();
+                                    return;
                                 }
                             }
+                            // If the QR code hasn't been scanned before, launch the camera intent
+                            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                            cameraLauncher.launch(takePictureIntent);
                         }
                     });
+
                 }
             }
         }
@@ -208,17 +211,16 @@ public class ScanActivity extends AppCompatActivity {
             }
         }
 
-        Log.d(TAG, "QR code location: " + qrCode.getLocation());
+        Log.d("MY TAG", "QR code location: " + qrCode.getLocation());
         // Update the qrcodes array field with the new QR code
         db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
                 .addOnSuccessListener(aVoid -> {
-                    Log.d(TAG, "QR code added to user's document in DB");
+                    Log.d("MY TAG", "QR code added to user's document in DB");
                 })
                 .addOnFailureListener(e -> {
-                    Log.w(TAG, "Error adding QR code to user's document in DB", e);
+                    Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
                 });
     }
 }
-
 
 
