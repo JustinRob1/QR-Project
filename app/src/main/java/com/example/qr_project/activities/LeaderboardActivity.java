@@ -33,7 +33,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -186,21 +185,23 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        // Get the current user's ID
+    // Get the current user's ID
         SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
-        // Retrieve the user's information
+    // Retrieve the user's information
         String userID = sharedPref.getString("user_id", null);
 
-        // Get a reference to the user's document in Firestore
+    // Get a reference to the user's document in Firestore
         DocumentReference userRef = db.collection("users").document(userID);
 
-        // TODO: Make sure this works with real data
-
-        // Populate the leaderboard
+    // Populate the leaderboard
         if (!isUserAdded) {
-            // Get the user's document data
-            userRef.get().addOnSuccessListener(documentSnapshot -> {
+            userRef.addSnapshotListener((documentSnapshot, e) -> {
+                if (e != null) {
+                    Log.e(TAG, "Error getting user document", e);
+                    return;
+                }
+
                 // Check if the document exists
                 if (documentSnapshot.exists()) {
                     // Get the qrcodes array from the document data
@@ -209,15 +210,16 @@ public class LeaderboardActivity extends AppCompatActivity {
                     // Use the qrCodes array to populate the leaderboard
                     // Check the contents of the qrCodes array
 
-
                     if (qrCodes != null) {
+                        user_qr_leaderboard.removeAllViews(); // Clear the current leaderboard
                         int rank = 1;
                         // Loop through the array
                         for (Map<String, Object> qrCode : qrCodes) {
                             String name = (String) qrCode.get("name");
                             Long score = (Long) qrCode.get("score");
+                            String hash = (String) qrCode.get("hash");
 
-                            user_qr_leaderboard.addView(createNewRow(name, score, rank));
+                            user_qr_leaderboard.addView(createNewRow(name, score, rank, hash));
 
                             rank++;
                         }
@@ -227,14 +229,13 @@ public class LeaderboardActivity extends AppCompatActivity {
                     }
 
                 } else {
-
                     Log.d(TAG, "User document does not exist");
                 }
-            }).addOnFailureListener(e -> Log.e(TAG, "Error getting user document", e));
-
-            isUserAdded= true;
+            });
+            isUserAdded = true;
         }
     }
+
 
     /**
      * Called when the user clicks the friends button
@@ -266,11 +267,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         // TODO: TESTING DATA FOR QR CODE
         if (!isFriendAdded){
-            TableRow testRow = createNewRow("Fmpty", Long.valueOf(1232), 1);
-            TableRow testRow2 = createNewRow("Fmpty2", Long.valueOf(1000), 2);
+            TableRow testRow = createNewRow("Fmpty", Long.valueOf(1232), 1, null);
+            TableRow testRow2 = createNewRow("Fmpty2", Long.valueOf(1000), 2, null);
 
-            TableRow testRow3 = createNewRow("Fmptyy", Long.valueOf(1232), 1);
-            TableRow testRow4 = createNewRow("Fmptyy2", Long.valueOf(1000), 2);
+            TableRow testRow3 = createNewRow("Fmptyy", Long.valueOf(1232), 1, null);
+            TableRow testRow4 = createNewRow("Fmptyy2", Long.valueOf(1000), 2, null);
 
             friend_qr_leaderboard.addView(testRow);
             friend_qr_leaderboard.addView(testRow2);
@@ -288,6 +289,7 @@ public class LeaderboardActivity extends AppCompatActivity {
      * The text view which is pressed
      */
     public void onGlobalLeaderboardView(View view) {
+        Log.d(TAG, "onGlobalLeaderboardView() called with: view = [" + view + "]");
         user_codes_title.setVisibility(View.GONE);
         leaderboard_dial_filters.setVisibility(View.VISIBLE);
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
@@ -320,13 +322,16 @@ public class LeaderboardActivity extends AppCompatActivity {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Map<String, Object> data = document.getData();
                         List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
-                        for (Map<String, Object> qrCode : qrCodes) {
-                            String username = (String) data.get("username");
-                            Integer score = ((Long) qrCode.get("score")).intValue();
-                            Pair<String, Integer> scorePair = new Pair<>(username, score);
-                            scores.add(scorePair);
+                        if (qrCodes != null) {
+                            for (Map<String, Object> qrCode : qrCodes) {
+                                String username = (String) data.get("username");
+                                Integer score = ((Long) qrCode.get("score")).intValue();
+                                Pair<String, Integer> scorePair = new Pair<>(username, score);
+                                scores.add(scorePair);
+                            }
                         }
                     }
+
 
                     Collections.sort(scores, new Comparator<Pair<String, Integer>>() {
                         @Override
@@ -337,7 +342,8 @@ public class LeaderboardActivity extends AppCompatActivity {
                     // Iterate through the collection and show a toast of the scores
                     int rank = 1;
                     for (Pair<String, Integer> score : scores) {
-                        global_qr_leaderboard.addView(createNewRow(score.first, score.second.longValue(), rank));
+                        // TODO: Fix the hash
+                        global_qr_leaderboard.addView(createNewRow(score.first, score.second.longValue(), rank, null));
                         rank++;
                     }
                     isGlobalAdded = true;
@@ -370,7 +376,8 @@ public class LeaderboardActivity extends AppCompatActivity {
                     // iterate through the list and add the rows to the table
                     int rank = 1;
                     for (Pair<String, Integer> score : userScores) {
-                        global_ovr_leaderboard.addView(createNewRow(score.first, score.second.longValue(), rank));
+                        // TODO: Fix the hash
+                        global_ovr_leaderboard.addView(createNewRow(score.first, score.second.longValue(), rank, null));
                         rank++;
                     }
 
@@ -431,7 +438,7 @@ public class LeaderboardActivity extends AppCompatActivity {
      * @return row
      */
 
-    private TableRow createNewRow(String name, Long score, int rank){
+    private TableRow createNewRow(String name, Long score, int rank, String hash){
         // Create a new TableRow
         TableRow row = new TableRow(LeaderboardActivity.this);
         row.setBackgroundResource(R.drawable.leaderboard_row_item);
@@ -447,13 +454,10 @@ public class LeaderboardActivity extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
         linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
         linearLayout.setGravity(Gravity.CENTER);
-        linearLayout.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent intent = new Intent(LeaderboardActivity.this, QRCodeActivity.class);
-                intent.putExtra("qrName", "test");
-                startActivity(intent);
-            }
+        linearLayout.setOnClickListener(view -> {
+            Intent intent = new Intent(LeaderboardActivity.this, QRCodeActivity.class);
+            intent.putExtra("hash", hash);
+            startActivity(intent);
         });
 
 
