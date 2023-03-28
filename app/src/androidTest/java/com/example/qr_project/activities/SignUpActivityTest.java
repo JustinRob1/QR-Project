@@ -45,8 +45,6 @@ public class SignUpActivityTest {
         fillEntries(true, true, true);
         onView(withId(R.id.submit_sign_up_button)).perform(click());
 
-        // FIXME: This dialog should be changed later.
-        onView(withText("Yes")).perform(click());
         Instrumentation.ActivityResult activityResult = activityScenario
                 .getResult();
 

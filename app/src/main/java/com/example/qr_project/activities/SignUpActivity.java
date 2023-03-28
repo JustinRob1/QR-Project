@@ -69,57 +69,17 @@ public class SignUpActivity extends AppCompatActivity {
 
             // All entries are non-empty, proceed
             if (!(username.isEmpty() || email.isEmpty() || phoneNumber.isEmpty())){
-                // Ask if the user wants to share their location
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Share Location");
-                builder.setMessage("Would you like to share your location?");
-                builder.setPositiveButton("Yes", (dialog, which) -> {
-                    // Store the user's location preference
-                    SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putBoolean("location_pref", true);
-                    editor.apply();
+                // Create a new user with the information
+                Player user = new Player(username, email, phoneNumber, userID);
+                db.collection("users").document(userID).set(user);
 
-                    // Create a new user with the information
-                    Player user = new Player(username, email, phoneNumber, userID);
-                    db.collection("users").document(userID).set(user);
+                // Store userID
+                Intent intent = new Intent();
+                intent.putExtra("userId", userID);
 
-                    // Store userID
-                    Intent intent = new Intent();
-                    intent.putExtra("userId", userID);
-
-                    // Result code 0 indicating sign up complete
-                    setResult(0, intent);
-                    finish();
-                });
-                builder.setNegativeButton("No", (dialog, which) -> {
-                    // Store the user's location preference
-                    SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putBoolean("location_pref", false);
-                    editor.apply();
-
-                    // Create a new user with the information
-                    Player user = new Player(username, email, phoneNumber, userID);
-                    db.collection("users").document(userID).set(user);
-
-                    // Store userID
-                    Intent intent = new Intent();
-                    intent.putExtra("userId", userID);
-
-                    // Result code 0 indicating sign up complete
-                    setResult(0, intent);
-                    finish();
-                });
-                builder.show();
-
-                // Get the shared preferences object
-                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
-
-                // Store the user's information
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("user_id", userID);
-                editor.apply();
+                // Result code 0 indicating sign up complete
+                setResult(0, intent);
+                finish();
             }
             // Some entries were empty, raise a toast message w/ warning
             else{
