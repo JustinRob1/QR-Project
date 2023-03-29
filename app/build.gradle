@@ -8,6 +8,7 @@ android {
     namespace 'com.example.qr_project'
     compileSdk 33
 
+
     defaultConfig {
         applicationId "com.example.qr_project"
         minSdk 29
