@@ -23,7 +23,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value=""/>
+            android:value="AIzaSyBtMoXid6zkkEaKGdv9BBlc17rNq5NSmTY"/>
 
         <activity
             android:name=".activities.QRCodeActivity"
@@ -59,7 +59,7 @@
 
         <activity
         android:name="com.journeyapps.barcodescanner.CaptureActivity"
-        android:screenOrientation="portrait"
+        android:screenOrientation="fullSensor"
         tools:replace="screenOrientation"
         tools:ignore="MissingClass,WrongManifestParent" />
         </application>
