@@ -46,6 +46,7 @@
                 android:layout_height="48dp"
                 android:layout_weight="1"
                 android:elevation="8dp"
+                android:onClick="searchUser"
                 app:srcCompat="@drawable/add_friends_icon" />
 
         </LinearLayout>

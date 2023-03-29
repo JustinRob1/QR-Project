@@ -5,18 +5,13 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +20,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.R;
+import com.example.qr_project.utils.UtilityFunctions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -219,7 +215,17 @@ public class LeaderboardActivity extends AppCompatActivity {
                             Long score = (Long) qrCode.get("score");
                             String hash = (String) qrCode.get("hash");
 
-                            user_qr_leaderboard.addView(createNewRow(name, score, rank, hash));
+
+
+                            user_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
+                                                                                                name,
+                                                                                                Long.toString(score),
+                                                                                                rank,
+                                                                                                hash,
+                                                                                                R.drawable.leaderboard_row_item,
+                                                                                                R.drawable.logo,
+                                                                                                R.drawable.arrow_right_solid,
+                                                                                                new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", hash)));
 
                             rank++;
                         }
@@ -267,17 +273,26 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         // TODO: TESTING DATA FOR QR CODE
         if (!isFriendAdded){
-            TableRow testRow = createNewRow("Fmpty", Long.valueOf(1232), 1, null);
-            TableRow testRow2 = createNewRow("Fmpty2", Long.valueOf(1000), 2, null);
+            friend_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
+                    "Dummy",
+                    Integer.toString(1000),
+                    1,
+                    null,
+                    R.drawable.leaderboard_row_item,
+                    R.drawable.logo,
+                    R.drawable.arrow_right_solid,
+                    new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
 
-            TableRow testRow3 = createNewRow("Fmptyy", Long.valueOf(1232), 1, null);
-            TableRow testRow4 = createNewRow("Fmptyy2", Long.valueOf(1000), 2, null);
+            friend_ovr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
+                    "Dummy2",
+                    Integer.toString(10000),
+                    1,
+                    null,
+                    R.drawable.leaderboard_row_item,
+                    R.drawable.logo,
+                    R.drawable.arrow_right_solid,
+                    new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
 
-            friend_qr_leaderboard.addView(testRow);
-            friend_qr_leaderboard.addView(testRow2);
-
-            friend_ovr_leaderboard.addView(testRow3);
-            friend_ovr_leaderboard.addView(testRow4);
             isFriendAdded = true;
         }
     }
@@ -343,7 +358,15 @@ public class LeaderboardActivity extends AppCompatActivity {
                     int rank = 1;
                     for (Pair<String, Integer> score : scores) {
                         // TODO: Fix the hash
-                        global_qr_leaderboard.addView(createNewRow(score.first, score.second.longValue(), rank, null));
+                        global_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
+                                            "Dummy",
+                                            Integer.toString(1000),
+                                            1,
+                                            null,
+                                            R.drawable.leaderboard_row_item,
+                                            R.drawable.logo,
+                                            R.drawable.arrow_right_solid,
+                                            new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
                         rank++;
                     }
                     isGlobalAdded = true;
@@ -377,7 +400,15 @@ public class LeaderboardActivity extends AppCompatActivity {
                     int rank = 1;
                     for (Pair<String, Integer> score : userScores) {
                         // TODO: Fix the hash
-                        global_ovr_leaderboard.addView(createNewRow(score.first, score.second.longValue(), rank, null));
+                        global_ovr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
+                                "Dummy",
+                                Integer.toString(1000),
+                                1,
+                                null,
+                                R.drawable.leaderboard_row_item,
+                                R.drawable.logo,
+                                R.drawable.arrow_right_solid,
+                                new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
                         rank++;
                     }
 
@@ -436,9 +467,9 @@ public class LeaderboardActivity extends AppCompatActivity {
      * @param score
      * @param rank
      * @return row
-     */
 
-    private TableRow createNewRow(String name, Long score, int rank, String hash){
+
+    public TableRow createNewRow(String name, Long score, int rank, String hash){
         // Create a new TableRow
         TableRow row = new TableRow(LeaderboardActivity.this);
         row.setBackgroundResource(R.drawable.leaderboard_row_item);
@@ -513,6 +544,6 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         return row;
     }
-
+    */
 
 }

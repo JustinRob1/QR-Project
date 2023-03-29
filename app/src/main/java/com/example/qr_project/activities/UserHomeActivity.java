@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -44,6 +47,10 @@ public class UserHomeActivity extends AppCompatActivity {
     TextView qrCode3Name;
     TextView qrCode3Score;
 
+    EditText searchUserTxt;
+
+    ImageView searchUserBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +76,9 @@ public class UserHomeActivity extends AppCompatActivity {
         qrCode1Score = findViewById(R.id.qr_code_score_1);
         qrCode2Score = findViewById(R.id.qr_code_score_2);
         qrCode3Score = findViewById(R.id.qr_code_score_3);
+        searchUserTxt = findViewById(R.id.search_bar);
+        searchUserBtn = findViewById(R.id.add_friend_btn);
+
 
         collRef.addSnapshotListener((value, error) -> {
             ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
@@ -176,6 +186,16 @@ public class UserHomeActivity extends AppCompatActivity {
         Intent intent = new Intent(this, UserProfileActivity.class);
         intent.putExtra("userId", userId);
         startActivity(intent);
+    }
+
+    public void searchUser(View view){
+        Intent intent = new Intent(this, UserSearchActivity.class);
+        if (searchUserTxt.getText().toString().isEmpty()){
+            Toast.makeText(this, "Must Enter Text To Search For User", Toast.LENGTH_SHORT).show();
+        } else {
+            intent.putExtra("userSearch", searchUserTxt.getText().toString());
+            startActivity(intent);
+        }
     }
 
 }
