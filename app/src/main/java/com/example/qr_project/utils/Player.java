@@ -9,6 +9,7 @@ public class Player {
     private String userID; // Stores the userID
     private String phoneNumber; // Stores the phone number
     private List<QR_Code> QRCodes; // Array list to store the QR codes
+    private List<Player> friends; // Array list to store the friends
     private int totalScore; // Stores the total score
 
     /**
@@ -28,6 +29,8 @@ public class Player {
         this.userID = userID;
 
         this.QRCodes = new ArrayList<>();
+        // Array list to store the friends list
+        this.friends = new ArrayList<>();
         this.totalScore = 0;
     }
 
@@ -115,6 +118,10 @@ public class Player {
      */
     public String getUserID() {
         return userID;
+    }
+
+    public List<Player> getFriends() {
+        return friends;
     }
 
     /**
