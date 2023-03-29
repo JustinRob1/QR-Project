@@ -72,9 +72,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Log.d("My Tag", "Error getting documents: ", task.getException());
             }
         });
-
-
-
     }
 
     @Override
