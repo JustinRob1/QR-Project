@@ -181,16 +181,16 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-    // Get the current user's ID
+        // Get the current user's ID
         SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
-    // Retrieve the user's information
+        // Retrieve the user's information
         String userID = sharedPref.getString("user_id", null);
 
-    // Get a reference to the user's document in Firestore
+        // Get a reference to the user's document in Firestore
         DocumentReference userRef = db.collection("users").document(userID);
 
-    // Populate the leaderboard
+        // Populate the leaderboard
         if (!isUserAdded) {
             userRef.addSnapshotListener((documentSnapshot, e) -> {
                 if (e != null) {
