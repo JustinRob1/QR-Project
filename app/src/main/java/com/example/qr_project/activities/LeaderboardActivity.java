@@ -24,6 +24,7 @@ import com.example.qr_project.utils.UtilityFunctions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -291,7 +292,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     R.drawable.leaderboard_row_item,
                     R.drawable.logo,
                     R.drawable.arrow_right_solid,
-                    new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
+                    new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", "")));
 
             isFriendAdded = true;
         }
@@ -326,13 +327,45 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        ArrayList<ArrayList<String>> topUsers = new ArrayList<>();
+
         // TODO: Make sure this works with real data
 
         // Populate the leaderboard
         if (!isGlobalAdded) {
             CollectionReference userRef = db.collection("users");
+
+            userRef.orderBy("totalScore", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()){
+                    for (QueryDocumentSnapshot document : task.getResult()){
+                        ArrayList<String> user = new ArrayList<>();
+                        user.add((String) document.get("userID"));
+                        user.add((String) document.get("username"));
+                        user.add(String.valueOf(document.get("totalScore")));
+                        topUsers.add(user);
+                    }
+                    for (int i=0; i < topUsers.size(); i++){
+                        ArrayList<String> userData = topUsers.get(i);
+                        global_ovr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
+                                userData.get(1),
+                                userData.get(2),
+                                i+1,
+                                null,
+                                R.drawable.leaderboard_row_item,
+                                R.drawable.logo,
+                                R.drawable.arrow_right_solid,
+                                new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", userData.get(0))));
+                    }
+                } else {
+                    Log.w("Firestore", "Error getting top 10 documens", task.getException());
+                }
+
+
+            });
+
             userRef.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
+                    // For QR Codes
                     List<Pair<String, Integer>> scores = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Map<String, Object> data = document.getData();
@@ -347,13 +380,14 @@ public class LeaderboardActivity extends AppCompatActivity {
                         }
                     }
 
-
                     Collections.sort(scores, new Comparator<Pair<String, Integer>>() {
                         @Override
                         public int compare(Pair<String, Integer> pair1, Pair<String, Integer> pair2) {
                             return pair2.second.compareTo(pair1.second); // sort in descending order
                         }
                     });
+
+
                     // Iterate through the collection and show a toast of the scores
                     int rank = 1;
                     for (Pair<String, Integer> score : scores) {
@@ -375,46 +409,6 @@ public class LeaderboardActivity extends AppCompatActivity {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
 
-            });
-
-            userRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    List<Pair<String, Integer>> userScores = new ArrayList<>();
-
-                    // iterate through all the users and add their username and total score as a pair to the list
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        String username = document.getString("username");
-                        int totalScore = document.getLong("totalScore").intValue();
-                        userScores.add(new Pair<>(username, totalScore));
-                    }
-
-                    // sort the list by the score in descending order
-                    Collections.sort(userScores, new Comparator<Pair<String, Integer>>() {
-                        @Override
-                        public int compare(Pair<String, Integer> pair1, Pair<String, Integer> pair2) {
-                            return pair2.second - pair1.second;
-                        }
-                    });
-
-                    // iterate through the list and add the rows to the table
-                    int rank = 1;
-                    for (Pair<String, Integer> score : userScores) {
-                        // TODO: Fix the hash
-                        global_ovr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
-                                "Dummy",
-                                Integer.toString(1000),
-                                1,
-                                null,
-                                R.drawable.leaderboard_row_item,
-                                R.drawable.logo,
-                                R.drawable.arrow_right_solid,
-                                new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
-                        rank++;
-                    }
-
-                } else {
-                    Log.e(TAG, "Error getting documents: ", task.getException());
-                }
             });
 
         }
@@ -455,95 +449,5 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     }
 
-    /**
-     *  Create a new ImageView for the TableRow
-     *  Create a new TableRow
-     *  Create a new LinearLayout for the TableRow
-     *  Create a new TextView for the TableRow
-     *  Create a new TextView for the TableRow
-     *  This creates the table for the leaderboardship
-     *  This shows the data of the leader with the highest score for the QRCode
-     * @param name
-     * @param score
-     * @param rank
-     * @return row
-
-
-    public TableRow createNewRow(String name, Long score, int rank, String hash){
-        // Create a new TableRow
-        TableRow row = new TableRow(LeaderboardActivity.this);
-        row.setBackgroundResource(R.drawable.leaderboard_row_item);
-        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(
-                TableRow.LayoutParams.MATCH_PARENT,
-                TableRow.LayoutParams.WRAP_CONTENT);
-
-        layoutParams.setMargins(75, 30, 75, 0);
-        row.setLayoutParams(layoutParams);
-
-        // Create a new LinearLayout for the TableRow
-        LinearLayout linearLayout = new LinearLayout(LeaderboardActivity.this);
-        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-        linearLayout.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
-        linearLayout.setGravity(Gravity.CENTER);
-        linearLayout.setOnClickListener(view -> {
-            Intent intent = new Intent(LeaderboardActivity.this, QRCodeActivity.class);
-            intent.putExtra("hash", hash);
-            startActivity(intent);
-        });
-
-
-        // Create a new TextView for the TableRow
-        TextView rankTextView = new TextView(LeaderboardActivity.this);
-        rankTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        rankTextView.setText(rank+ ".");
-        rankTextView.setTextColor(Color.BLACK);
-        rankTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
-        rankTextView.setGravity(Gravity.CENTER);
-        rankTextView.setPadding(10, 0, 0, 0);
-
-        // Create a new ImageView for the TableRow
-        ImageView qrImageView = new ImageView(LeaderboardActivity.this);
-        qrImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
-        qrImageView.setImageResource(R.drawable.logo);
-
-        // Create a new TextView for the TableRow
-        TextView nameTextView = new TextView(LeaderboardActivity.this);
-        nameTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        nameTextView.setText(name);
-        nameTextView.setTextColor(Color.BLACK);
-        nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        nameTextView.setGravity(Gravity.CENTER);
-        nameTextView.setPadding(15, 0, 0, 0);
-
-        // Create a new TextView for the TableRow
-        TextView scoreTextView = new TextView(LeaderboardActivity.this);
-        scoreTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        scoreTextView.setText(String.valueOf(score));
-        scoreTextView.setTextColor(Color.BLACK);
-        scoreTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        scoreTextView.setTypeface(null, Typeface.BOLD);
-        scoreTextView.setGravity(Gravity.CENTER);
-        scoreTextView.setPadding(25, 0, 0, 0);
-
-        // Create a new ImageView for the TableRow
-        ImageView arrowImageView = new ImageView(LeaderboardActivity.this);
-        arrowImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
-        arrowImageView.setImageResource(R.drawable.arrow_right_solid);
-        arrowImageView.setPadding(0, 0, 0, 0);
-
-
-        linearLayout.addView(rankTextView);
-        linearLayout.addView(qrImageView);
-        linearLayout.addView(nameTextView);
-        linearLayout.addView(scoreTextView);
-        linearLayout.addView(arrowImageView);
-
-        row.addView(linearLayout);
-
-        row.setBackgroundResource(R.drawable.leaderboard_row_item);
-
-        return row;
-    }
-    */
 
 }

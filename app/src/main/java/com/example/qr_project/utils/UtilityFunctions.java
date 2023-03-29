@@ -58,9 +58,9 @@ public class UtilityFunctions {
         // Create a new TextView for the TableRow
         TextView nameTextView = new TextView(context);
         nameTextView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        nameTextView.setText(name);
+        nameTextView.setText(name.length() > 7 ? name.substring(0, 7) + "..": name);
         nameTextView.setTextColor(Color.BLACK);
-        nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
+        nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         nameTextView.setGravity(Gravity.CENTER);
         nameTextView.setPadding(15, 0, 0, 0);
 
