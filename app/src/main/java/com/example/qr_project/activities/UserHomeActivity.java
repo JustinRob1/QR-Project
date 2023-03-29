@@ -2,40 +2,24 @@ package com.example.qr_project.activities;
 
 import static com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE;
 
-import android.app.Activity;
-import android.content.Context;
+import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.R;
-import com.example.qr_project.utils.QR_Code;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.units.qual.A;
-
-import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collections;
-import android.Manifest;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -169,7 +153,8 @@ public class UserHomeActivity extends AppCompatActivity {
      * @param view The text view which is pressed
      */
     public void onMapClick(View view) {
-        Toast.makeText(this, "Map Button Click", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
     }
 
     /**
