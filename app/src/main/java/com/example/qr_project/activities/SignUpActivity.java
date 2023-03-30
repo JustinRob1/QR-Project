@@ -1,6 +1,8 @@
 package com.example.qr_project.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -69,6 +71,11 @@ public class SignUpActivity extends AppCompatActivity {
                 // Create a new user with the information
                 Player user = new Player(username, email, phoneNumber, userID);
                 db.collection("users").document(userID).set(user);
+                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("user_id", userID);
+                editor.apply();
+
 
                 // Store userID
                 Intent intent = new Intent();
