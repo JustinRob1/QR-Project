@@ -6,20 +6,27 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +39,6 @@ import java.util.NoSuchElementException;
 public class UserHomeActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String userId;
-    List<Map<String, Object>> qrCodes;
 
     TextView totalScore;
 
@@ -79,70 +85,103 @@ public class UserHomeActivity extends AppCompatActivity {
         searchUserTxt = findViewById(R.id.search_bar);
         searchUserBtn = findViewById(R.id.add_friend_btn);
 
+        /*
+        Reworked snapshot listener for collRef
+         */
+        collRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) return;
+                if (value == null) return;
 
-        collRef.addSnapshotListener((value, error) -> {
-            ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
-            for (QueryDocumentSnapshot doc : value) {
-                Map<String, Integer> userId_score_pair = new HashMap<>();
-                Object totalScoreObj = doc.get("totalScore");
-                if (totalScoreObj != null) {
-                    Long totalScoreLong = (Long) totalScoreObj;
-                    userId_score_pair.put(doc.getId(), Math.toIntExact(totalScoreLong));
-                    rankings.add(userId_score_pair);
-                }
-            }
-            Collections.sort(rankings, Comparator.comparing(x -> x.entrySet().iterator().next().getValue()));
-            String rank;
-            int counter = rankings.size();
-            for (Map<String, Integer> x : rankings) {
-                if (x.containsKey(userId)) {
-                    rank = "Global Rank: " + counter;
-                    globalRank.setText(rank);
-                    break;
-                }
-                counter--;
-            }
+                ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
 
+                for (QueryDocumentSnapshot doc : value) {
+                    Map<String, Integer> userId_score_pair = new HashMap<>();
+                    Object totalScoreObj = doc.get("totalScore");
+                    if (totalScoreObj != null) {
+                        Long totalScoreLong = (Long) totalScoreObj;
+                        userId_score_pair.put(doc.getId(), Math.toIntExact(totalScoreLong));
+                        rankings.add(userId_score_pair);
+                    }
+                }
+
+                rankings.sort(Comparator.comparing(x -> x.entrySet().iterator().next().getValue()));
+                String rank;
+                int counter = rankings.size();
+                for (Map<String, Integer> x : rankings) {
+                    if (x.containsKey(userId)) {
+                        rank = "Global Rank: " + counter;
+                        globalRank.setText(rank);
+                        break;
+                    }
+                    counter--;
+                }
+
+            }
         });
 
-        docRef.addSnapshotListener((value, error) -> {
-            totalScore.setText(value.get("totalScore").toString());
+//        docRef.addSnapshotListener((value, error) -> {
+//            totalScore.setText(value.get("totalScore").toString());
+//
+//            qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
+//            ArrayList<Integer> scores = new ArrayList<>();
+//            for (Map<String, Object> qrCode: qrCodes) {
+//                scores.add(Math.toIntExact((Long) qrCode.get("score")));
+//            }
+//
+//            int maxScore = 0;
+//            int idx = 0;
+//            try {
+//                maxScore = Collections.max(scores);
+//                idx = scores.indexOf(maxScore);
+//                qrCode1Score.setText(String.valueOf(maxScore));
+//                qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
+//                scores.remove(idx);
+//
+//                maxScore = Collections.max(scores);
+//                idx = scores.indexOf(maxScore);
+//                qrCode2Score.setText(String.valueOf(maxScore));
+//                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
+//                scores.remove(idx);
+//
+//                maxScore = Collections.max(scores);
+//                idx = scores.indexOf(maxScore);
+//                qrCode3Score.setText(String.valueOf(maxScore));
+//                qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
+//            } catch (NoSuchElementException e) {
+//
+//            }
+//
+//            String totalQr;
+//            totalQr = "Total QR Codes: " + scores.size();
+//            totalQrCodes.setText(totalQr);
+//        });
 
-            qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
-            ArrayList<Integer> scores = new ArrayList<>();
-            for (Map<String, Object> qrCode: qrCodes) {
-                scores.add(Math.toIntExact((Long) qrCode.get("score")));
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) return;
+                if (value != null && value.exists()) {
+                    Map<String, Object> data = value.getData();
+                    if (data != null){
+                        List<Map<String, Object>> qrcodes = (List<Map<String, Object>>) data.get("qrcodes");
+                        if (qrcodes != null) {
+                            ArrayList<Long> scores = new ArrayList<>();
+                            for (Map<String, Object> qrcode : qrcodes) {
+                                scores.add((Long) qrcode.get("score"));
+                            }
+                        }
+                        totalScore.setText(String.valueOf(data.get("totalScore")));
+                    }
+
+                }
+
             }
-
-            int maxScore = 0;
-            int idx = 0;
-            try {
-                maxScore = Collections.max(scores);
-                idx = scores.indexOf(maxScore);
-                qrCode1Score.setText(String.valueOf(maxScore));
-                qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
-                scores.remove(idx);
-
-                maxScore = Collections.max(scores);
-                idx = scores.indexOf(maxScore);
-                qrCode2Score.setText(String.valueOf(maxScore));
-                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
-                scores.remove(idx);
-
-                maxScore = Collections.max(scores);
-                idx = scores.indexOf(maxScore);
-                qrCode3Score.setText(String.valueOf(maxScore));
-                qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
-            } catch (NoSuchElementException e) {
-
-            }
-
-            String totalQr;
-            totalQr = "Total QR Codes: " + scores.size();
-            totalQrCodes.setText(totalQr);
         });
 
     }
+
 
     /**
      * When the user clicks the camera button, this method will be called
