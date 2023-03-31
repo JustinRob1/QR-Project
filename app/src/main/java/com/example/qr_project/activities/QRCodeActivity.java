@@ -132,6 +132,7 @@ public class QRCodeActivity extends AppCompatActivity {
                             // Retrieve the comment and display it in the UI
                             String comment = document.getString("comment");
                             // little bug right here too, will be fixed soon :33
+                            // being able to add the comment or not
                             AddComment().getText(comment);
                         } else {
                             Log.d(TAG, "No such document");
