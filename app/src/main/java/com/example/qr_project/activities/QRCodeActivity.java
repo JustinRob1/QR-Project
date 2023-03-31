@@ -108,7 +108,11 @@ public class QRCodeActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-    
+
+    /*
+    just a demo, not fully completed yet
+    please build on
+     */
         public void AddComment() {
             // Create a new QR code document
             Map<String, Object> qrCode = new HashMap<>();
@@ -127,6 +131,7 @@ public class QRCodeActivity extends AppCompatActivity {
                         if (document.exists()) {
                             // Retrieve the comment and display it in the UI
                             String comment = document.getString("comment");
+                            // little bug right here too, will be fixed soon :33
                             AddComment().getText(comment);
                         } else {
                             Log.d(TAG, "No such document");
