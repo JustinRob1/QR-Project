@@ -77,7 +77,9 @@ public class UserProfileActivity extends AppCompatActivity {
         friendRank = findViewById(R.id.friend_user_rank);
         totalQrCodes = findViewById(R.id.user_total_qr_codes);
 
-
+        /*
+            Reworked snapshot listener for collRef
+         */
         collRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -110,6 +112,14 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
 
+        /*
+            Reword snapshot listener for docRef
+            fixes:
+                -   new ranking method for the top 3 qr codes,
+                    should be faster and more reliable
+                -   identified and handled points of error,
+                    still needs to be tested further
+         */
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -134,7 +144,12 @@ public class UserProfileActivity extends AppCompatActivity {
 
                                 // POTENTIAL ERROR
                                 int score = Math.toIntExact((Long) qrCode.get("score"));
+
+                                // IDENTIFIED ERROR POINT
+                                // Not all qr codes in the db have a face,
+                                // so this call will fail for the older docs in docRef
                                 String face = (String) qrCode.get("face");
+
                                 Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                                 // adding QR_Code obj to the list

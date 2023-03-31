@@ -98,7 +98,7 @@ public class UserHomeActivity extends AppCompatActivity {
 
 
         /*
-        Reworked snapshot listener for collRef
+            Reworked snapshot listener for collRef
          */
         collRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -133,43 +133,14 @@ public class UserHomeActivity extends AppCompatActivity {
             }
         });
 
-//        docRef.addSnapshotListener((value, error) -> {
-//            totalScore.setText(value.get("totalScore").toString());
-//
-//            qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
-//            ArrayList<Integer> scores = new ArrayList<>();
-//            for (Map<String, Object> qrCode: qrCodes) {
-//                scores.add(Math.toIntExact((Long) qrCode.get("score")));
-//            }
-//
-//            int maxScore = 0;
-//            int idx = 0;
-//            try {
-//                maxScore = Collections.max(scores);
-//                idx = scores.indexOf(maxScore);
-//                qrCode1Score.setText(String.valueOf(maxScore));
-//                qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
-//                scores.remove(idx);
-//
-//                maxScore = Collections.max(scores);
-//                idx = scores.indexOf(maxScore);
-//                qrCode2Score.setText(String.valueOf(maxScore));
-//                qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
-//                scores.remove(idx);
-//
-//                maxScore = Collections.max(scores);
-//                idx = scores.indexOf(maxScore);
-//                qrCode3Score.setText(String.valueOf(maxScore));
-//                qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
-//            } catch (NoSuchElementException e) {
-//
-//            }
-//
-//            String totalQr;
-//            totalQr = "Total QR Codes: " + scores.size();
-//            totalQrCodes.setText(totalQr);
-//        });
-
+        /*
+            Reword snapshot listener for docRef
+            fixes:
+                -   new ranking method for the top 3 qr codes,
+                    should be faster and more reliable
+                -   identified and handled points of error,
+                    still needs to be tested further
+         */
         docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -194,7 +165,12 @@ public class UserHomeActivity extends AppCompatActivity {
 
                                 // POTENTIAL ERROR
                                 int score = Math.toIntExact((Long) qrCode.get("score"));
+
+                                // IDENTIFIED ERROR POINT
+                                // Not all qr codes in the db have a face,
+                                // so this call will fail for the older docs in docRef
                                 String face = (String) qrCode.get("face");
+
                                 Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                                 // adding QR_Code obj to the list
