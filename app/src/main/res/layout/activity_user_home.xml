@@ -131,15 +131,34 @@
             android:layout_marginTop="15dp"/>
 
         <LinearLayout
-            android:layout_width="270dp"
-            android:layout_height="230dp"
+            android:layout_width="350dp"
+            android:layout_height="250dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
-            android:background="@drawable/table_background">
+            android:background="@drawable/table_background"
+            android:orientation="vertical">
             <ListView
+                android:layout_marginTop="15dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="5dp"
                 android:id="@+id/user_top_qr_table"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="170dp"
+                android:dividerHeight="5dp"
+                android:divider="@color/zxing_transparent"
+                />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/view_all_btn"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@drawable/table_button_background"
+                android:text="View All"
+                android:textColor="#000000"
+                android:onClick="onViewAllClick"
+                android:visibility="gone"
+                />
 
         </LinearLayout>
 
@@ -359,18 +378,10 @@
                 android:layout_marginVertical="10dp"
                 android:layout_marginHorizontal="15dp">
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/view_all_btn"
-                    android:layout_width="130dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:background="@drawable/table_button_background"
-                    android:text="View All"
-                    android:textColor="#000000"
-                    android:onClick="onViewAllClick"/>
+
             </TableRow>
         </TableLayout>-->
+
 
         <!-- Friends Header -->
         <TextView
@@ -381,7 +392,7 @@
             android:textAlignment="center"
             android:textColor="#000000"
             android:textSize="18sp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="10dp"/>
 
         <!-- Friends Display -->
