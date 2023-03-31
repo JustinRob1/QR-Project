@@ -109,6 +109,11 @@ public class QRCodeActivity extends AppCompatActivity {
                 .show();
     }
     
+    /*
+    just a demo, not fully completed yet
+    please build on
+     */
+    
         public void AddComment() {
             // Create a new QR code document
             Map<String, Object> qrCode = new HashMap<>();
