@@ -106,6 +106,8 @@
                 android:translationX="-25dp" />
         </LinearLayout>
 
+
+
         <!-- Total QR Codes -->
         <TextView
             android:id="@+id/total_qr_codes"
@@ -128,13 +130,28 @@
             android:textColor="#000000"
             android:layout_marginTop="15dp"/>
 
-        <!-- Table for top QR Codes -->
-        <TableLayout
+        <LinearLayout
             android:layout_width="270dp"
             android:layout_height="230dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="15dp"
             android:background="@drawable/table_background">
+            <ListView
+                android:id="@+id/user_top_qr_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <!-- Table for top QR Codes
+        <TableLayout
+            android:id="@+id/user_top_qr_table"
+            android:layout_width="270dp"
+            android:layout_height="230dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/table_background">
+
 
             <TableRow
                 android:layout_width="240dp"
@@ -353,7 +370,7 @@
                     android:textColor="#000000"
                     android:onClick="onViewAllClick"/>
             </TableRow>
-        </TableLayout>
+        </TableLayout>-->
 
         <!-- Friends Header -->
         <TextView

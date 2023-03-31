@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.R;
+import com.example.qr_project.utils.UtilityFunctions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -53,6 +56,8 @@ public class UserHomeActivity extends AppCompatActivity {
     TextView qrCode3Name;
     TextView qrCode3Score;
 
+    ListView qrCodeTable;
+
     EditText searchUserTxt;
 
     ImageView searchUserBtn;
@@ -76,14 +81,18 @@ public class UserHomeActivity extends AppCompatActivity {
         globalRank = findViewById(R.id.global_rank);
         friendRank = findViewById(R.id.friend_rank);
         totalQrCodes = findViewById(R.id.total_qr_codes);
-        qrCode1Name = findViewById(R.id.qr_code_name_1);
-        qrCode2Name = findViewById(R.id.qr_code_name_2);
-        qrCode3Name = findViewById(R.id.qr_code_name_3);
-        qrCode1Score = findViewById(R.id.qr_code_score_1);
-        qrCode2Score = findViewById(R.id.qr_code_score_2);
-        qrCode3Score = findViewById(R.id.qr_code_score_3);
+//        qrCode1Name = findViewById(R.id.qr_code_name_1);
+//        qrCode2Name = findViewById(R.id.qr_code_name_2);
+//        qrCode3Name = findViewById(R.id.qr_code_name_3);
+//        qrCode1Score = findViewById(R.id.qr_code_score_1);
+//        qrCode2Score = findViewById(R.id.qr_code_score_2);
+//        qrCode3Score = findViewById(R.id.qr_code_score_3);
+
+        qrCodeTable = findViewById(R.id.user_top_qr_table);
+
         searchUserTxt = findViewById(R.id.search_bar);
         searchUserBtn = findViewById(R.id.add_friend_btn);
+
 
         /*
         Reworked snapshot listener for collRef
@@ -165,12 +174,18 @@ public class UserHomeActivity extends AppCompatActivity {
                 if (value != null && value.exists()) {
                     Map<String, Object> data = value.getData();
                     if (data != null){
-                        List<Map<String, Object>> qrcodes = (List<Map<String, Object>>) data.get("qrcodes");
-                        if (qrcodes != null) {
-                            ArrayList<Long> scores = new ArrayList<>();
-                            for (Map<String, Object> qrcode : qrcodes) {
-                                scores.add((Long) qrcode.get("score"));
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
+                        if (qrCodes != null) {
+                            qrCodes.sort((a,b) -> ( (Long) b.get("score")).compareTo(( (Long) a.get("score")) ));
+                            int rank = 1;
+                            for (Map<String, Object> qrCode : qrCodes) {
+                                String name = String.valueOf(qrCode.get("name"));
+                                Long score = (Long) qrCode.get("score");
+
+
+                                rank++;
                             }
+                            Log.d("DOCSNAP", qrCodes.toString());
                         }
                         totalScore.setText(String.valueOf(data.get("totalScore")));
                     }
