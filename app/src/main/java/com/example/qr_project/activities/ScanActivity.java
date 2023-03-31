@@ -161,7 +161,6 @@ public class ScanActivity extends AppCompatActivity {
      * however if they do not wish to add the location to the database on FireStore, they can opt out.
      * The user will be prompted to decide to add the location or not.
      * @see FirebaseFirestore
-     * @see com.example.qr_project.FireStore
      * @see UserProfileActivity
      * @see UserHomeActivity
      */

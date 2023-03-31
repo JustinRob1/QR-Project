@@ -124,6 +124,7 @@ public class Player {
         return friends;
     }
 
+
     /**
      * Setting up the email of the user
      * The user's ID  with the type of String

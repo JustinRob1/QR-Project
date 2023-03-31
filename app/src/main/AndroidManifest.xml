@@ -24,6 +24,7 @@
             android:name=".activities.QRCodeActivity"
             android:exported="false" />
         <activity android:name=".activities.MapActivity"/>
+        <activity android:name=".activities.UserSearchActivity" />
         <activity
             android:name=".activities.UserHomeActivity"
             android:exported="false" />

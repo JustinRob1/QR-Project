@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.R;
+import com.example.qr_project.utils.UserManager;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -62,6 +63,7 @@ public class UserHomeActivity extends AppCompatActivity {
         }
 
         userId = getIntent().getStringExtra("userId");
+        UserManager.getInstance().setUserID(userId);
         db = FirebaseFirestore.getInstance();
         CollectionReference collRef = db.collection("users");
         DocumentReference docRef = collRef.document(userId);

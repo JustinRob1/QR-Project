@@ -35,7 +35,7 @@
             android:id="@+id/username_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="lwismer"
+            android:text="NA"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="30sp"
@@ -47,7 +47,7 @@
             android:id="@+id/user_email_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="lwismer@ualberta.ca"
+            android:text="NA"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -69,7 +69,7 @@
             android:id="@+id/user_total_score_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="5263"
+            android:text="NA"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="45sp"
@@ -98,7 +98,7 @@
                 android:id="@+id/global_user_rank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="148"
+                android:text="NA"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -117,7 +117,7 @@
                 android:id="@+id/friend_user_rank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="8"
+                android:text="NA"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -144,7 +144,7 @@
                 android:id="@+id/user_total_qr_codes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="234"
+                android:text="NA"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -211,7 +211,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="QRCode1"
+                        android:text="NA"
                         android:textColor="#000000"
                         android:textSize="18sp"
                         android:layout_gravity="center"
@@ -223,7 +223,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="1232"
+                        android:text="NA"
                         android:textAlignment="center"
                         android:textColor="#000000"
                         android:textSize="22sp"
@@ -273,7 +273,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="QRCode2"
+                        android:text="NA"
                         android:textColor="#000000"
                         android:textSize="18sp"
                         android:layout_gravity="center"
@@ -285,7 +285,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="898"
+                        android:text="NA"
                         android:textAlignment="center"
                         android:textColor="#000000"
                         android:textSize="22sp"
@@ -335,7 +335,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="QRCode3"
+                        android:text="NA"
                         android:textColor="#000000"
                         android:textSize="18sp"
                         android:layout_gravity="center"
@@ -347,7 +347,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="765"
+                        android:text="NA"
                         android:textAlignment="center"
                         android:textColor="#000000"
                         android:textSize="22sp"
@@ -375,6 +375,19 @@
                     android:onClick="onViewAllClick"/>
             </TableRow>
         </TableLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/add_friend_btn"
+            android:layout_gravity="center"
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Add Friend"
+            android:background="@drawable/green_round_btn"
+            android:textAlignment="center"
+            android:textSize="12sp" />
+
 
         <!-- Button Icons -->
         <LinearLayout
