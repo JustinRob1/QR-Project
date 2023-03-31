@@ -127,6 +127,10 @@ public class UserProfileActivity extends AppCompatActivity {
                 if (value != null && value.exists()) {
                     Map<String, Object> data = value.getData();
                     if (data != null){
+                        username.setText(String.valueOf(data.get("username")));
+                        email.setText(String.valueOf(data.get("email")));
+                        totalScore.setText(String.valueOf(data.get("totalScore")));
+
                         List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
                         if (qrCodes != null) {
                             // Sort QR codes based on score
