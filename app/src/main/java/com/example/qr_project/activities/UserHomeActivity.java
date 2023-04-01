@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class UserHomeActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -82,6 +83,7 @@ public class UserHomeActivity extends AppCompatActivity {
 
         collRef.addSnapshotListener((value, error) -> {
             ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
+            assert value != null;
             for (QueryDocumentSnapshot doc : value) {
                 Map<String, Integer> userId_score_pair = new HashMap<>();
                 Object totalScoreObj = doc.get("totalScore");
@@ -91,7 +93,7 @@ public class UserHomeActivity extends AppCompatActivity {
                     rankings.add(userId_score_pair);
                 }
             }
-            Collections.sort(rankings, Comparator.comparing(x -> x.entrySet().iterator().next().getValue()));
+            rankings.sort(Comparator.comparing(x -> x.entrySet().iterator().next().getValue()));
             String rank;
             int counter = rankings.size();
             for (Map<String, Integer> x : rankings) {
@@ -102,17 +104,22 @@ public class UserHomeActivity extends AppCompatActivity {
                 }
                 counter--;
             }
-
         });
 
         docRef.addSnapshotListener((value, error) -> {
-            totalScore.setText(value.get("totalScore").toString());
+            assert value != null;
+            totalScore.setText(Objects.requireNonNull(value.get("totalScore")).toString());
 
             qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
             ArrayList<Integer> scores = new ArrayList<>();
-            for (Map<String, Object> qrCode: qrCodes) {
-                scores.add(Math.toIntExact((Long) qrCode.get("score")));
+            for (Map<String, Object> qrCode : qrCodes) {
+                Object scoreObj = qrCode.get("score");
+                if (scoreObj instanceof Long) {
+                    Long scoreLong = (Long) scoreObj;
+                    scores.add(Math.toIntExact(scoreLong));
+                }
             }
+
 
             int maxScore = 0;
             int idx = 0;
@@ -134,8 +141,15 @@ public class UserHomeActivity extends AppCompatActivity {
                 qrCode3Score.setText(String.valueOf(maxScore));
                 qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
             } catch (NoSuchElementException e) {
-
+                // Handle the case where there are no QR codes available
+                qrCode1Score.setText("N/A");
+                qrCode1Name.setText("N/A");
+                qrCode2Score.setText("N/A");
+                qrCode2Name.setText("N/A");
+                qrCode3Score.setText("N/A");
+                qrCode3Name.setText("N/A");
             }
+
 
             String totalQr;
             totalQr = "Total QR Codes: " + scores.size();
@@ -151,7 +165,6 @@ public class UserHomeActivity extends AppCompatActivity {
      * @param view The text view which is pressed
      */
     public void onCameraClick(View view) {
-        //Toast.makeText(this, "Camera Button Click", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
     }
