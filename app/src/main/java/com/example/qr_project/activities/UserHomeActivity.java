@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class UserHomeActivity extends AppCompatActivity {
     FirebaseFirestore db;
@@ -193,8 +194,6 @@ public class UserHomeActivity extends AppCompatActivity {
                 }
 
             }
-        });
-
     }
 
 
@@ -205,7 +204,6 @@ public class UserHomeActivity extends AppCompatActivity {
      * @param view The text view which is pressed
      */
     public void onCameraClick(View view) {
-        //Toast.makeText(this, "Camera Button Click", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
     }

@@ -2,25 +2,19 @@ package com.example.qr_project.activities;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
@@ -30,15 +24,19 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class ScanActivity extends AppCompatActivity {
-    private static final int MY_CAMERA_REQUEST_CODE = 100;
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 101;
     QR_Code qrCode;
     FirebaseFirestore db;
-    private ActivityResultLauncher<Intent> cameraLauncher;
+    private static final int LOCATION_REQUEST_CODE = 100;
 
     /**
      * Defining the cameralauncher ready to scan the QR_Code
@@ -63,26 +61,14 @@ public class ScanActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Start the QR code scanner
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
         integrator.setPrompt("Scan a QR code");
-        integrator.setCameraId(0);  // Use a specific camera of the device
-        integrator.setBeepEnabled(false);
-        integrator.setBarcodeImageEnabled(true);
+        integrator.setOrientationLocked(false);
         integrator.initiateScan();
 
         db = FirebaseFirestore.getInstance();
-        // Define cameraLauncher
-        cameraLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                Intent data = result.getData();
-                assert data != null;
-                Bitmap image = (Bitmap) data.getExtras().get("data");
-                addQR();
-                finish();
-            }
-        });
-
     }
 
     /**
@@ -113,42 +99,47 @@ public class ScanActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
-        } else {
-            if (result != null) {
-                if (result.getContents() != null) {
-                    // String name = hash.generateName(result.getContents()); Fix the name
-                    qrCode = new QR_Code(result.getContents());
+        if (result != null) {
+            qrCode = new QR_Code(result.getContents());
 
-                    // Get the current user's ID
-                    SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+            // Check for camera permissions
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                // Request camera permissions if not granted
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+            } else {
+                // Get the current user's ID
+                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
-                    String qrCodeHash = qrCode.getHash();
-                    // Retrieve the user's information
-                    String userID = sharedPref.getString("user_id", null);
-
-                    db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
-                        // Check if the document exists
-                        if (documentSnapshot.exists()) {
-                            // Get the qrcodes array from the document data
-                            List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
-                            assert qrCodes != null;
-                            for (Map<String, Object> qrCode : qrCodes) {
-                                String hash = (String) qrCode.get("hash");
-                                if (Objects.equals(hash, qrCodeHash)) {
-                                    Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                    return;
-                                }
+                String qrCodeHash = qrCode.getHash();
+                // Retrieve the user's information
+                String userID = sharedPref.getString("user_id", null);
+                db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
+                    // Check if the document exists
+                    if (documentSnapshot.exists()) {
+                        // Get the qrcodes array from the document data
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                        assert qrCodes != null;
+                        boolean qrCodeScanned = false;
+                        for (Map<String, Object> qrCode : qrCodes) {
+                            String hash = (String) qrCode.get("hash");
+                            if (Objects.equals(hash, qrCodeHash)) {
+                                qrCodeScanned = true;
+                                break;
                             }
-                            // If the QR code hasn't been scanned before, launch the camera intent
-                            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                            cameraLauncher.launch(takePictureIntent);
                         }
-                    });
-
-                }
+                        if (qrCodeScanned) {
+                            Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            addQR();
+                            Intent intent = new Intent(this, PictureActivity.class);
+                            intent.putExtra("qrHash", qrCodeHash);
+                            intent.putExtra("userID", userID);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                });
             }
         }
     }
@@ -172,54 +163,68 @@ public class ScanActivity extends AppCompatActivity {
         // Retrieve the user's information
         String userID = sharedPref.getString("user_id", null);
 
+        // Initialize the FusedLocationProviderClient
+        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Check for location permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // If permissions are granted, set the QR code's location to the user's current location
+            fusedLocationProviderClient.getLastLocation()
+                    .addOnSuccessListener(location -> {
+                        if (location != null) {
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+                            qrCode.setLocation(new GeoPoint(latitude, longitude));
+
+                            // Update the user's document in the database
+                            db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d("MY TAG", "QR code added to user's document in DB");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
+                                    });
+                        } else {
+                            // Handle location not found error
+                            Toast.makeText(this, "Unable to retrieve location.", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        // Handle location service error
+                        Toast.makeText(this, "Location services not available.", Toast.LENGTH_SHORT).show();
+                        Log.w("MY TAG", "Error getting location", e);
+                    });
+        } else {
+            // If permissions are not granted, request them from the user
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
+        }
+
+        // Update the user's total score in the database
         db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
             if (documentSnapshot.exists()) {
                 // Get the user's current score
-                int currentScore = documentSnapshot.getLong("totalScore").intValue();
-
+                int currentScore = Objects.requireNonNull(documentSnapshot.getLong("totalScore")).intValue();
                 int newScore = currentScore + qrCode.getScore();
 
                 // Update the user's score in the database
                 db.collection("users").document(userID).update("totalScore", newScore);
             }
         });
+    }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Permission has not been granted
-            qrCode.setLocation(null);
-        } else {
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (lastKnownLocation != null) {
-                // Use the last known location
-                GeoPoint geoPoint = new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-                if (qrCode != null) {
-                    qrCode.setLocation(geoPoint);
-                }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // If permissions are granted, call addQR() again to update the QR code's location
+                addQR();
             } else {
-                // Register the location listener
-                LocationListener locationListener = location -> {
-                    GeoPoint geoPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                    if (qrCode != null) {
-                        qrCode.setLocation(geoPoint);
-                    }
-                    // Unregister the listener after the first location update
-                    locationManager.removeUpdates((LocationListener) this);
-                };
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                // Handle permission denied error
+                Toast.makeText(this, "Location permissions denied.", Toast.LENGTH_SHORT).show();
             }
         }
-
-        Log.d("MY TAG", "QR code location: " + qrCode.getLocation());
-        // Update the qrcodes array field with the new QR code
-        db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("MY TAG", "QR code added to user's document in DB");
-                })
-                .addOnFailureListener(e -> {
-                    Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
-                });
     }
 }
 
