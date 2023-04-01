@@ -5,9 +5,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.Map;
 
 public class FirestoreDBHelper implements DatabaseHelper {
 
@@ -40,6 +43,30 @@ public class FirestoreDBHelper implements DatabaseHelper {
                 .orderBy(orderBy, ascending ? Query.Direction.ASCENDING : Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(completeListener);
+    }
+
+    @Override
+    public void appendMapToArrayField(String collectionName, String documentId,
+                                      String arrayFieldName, Map<String, Object> mapObject,
+                                      OnSuccessListener<Void> successListener,
+                                      OnFailureListener failureListener) {
+        firebaseFirestore.collection(collectionName)
+                .document(documentId)
+                .update(arrayFieldName, FieldValue.arrayUnion(mapObject))
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
+    }
+
+    @Override
+    public void removeMapFromArrayField(String collectionName, String documentId,
+                                        String arrayFieldName, Map<String, Object> mapObject,
+                                        OnSuccessListener<Void> successListener,
+                                        OnFailureListener failureListener) {
+        firebaseFirestore.collection(collectionName)
+                .document(documentId)
+                .update(arrayFieldName, FieldValue.arrayRemove(mapObject))
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
     }
 
 }

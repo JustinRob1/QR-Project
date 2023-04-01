@@ -6,6 +6,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.Map;
+
 public interface DatabaseHelper {
     void getDocument(String collectionName, String documentId,
                      OnSuccessListener<DocumentSnapshot> successListener,
@@ -17,5 +19,16 @@ public interface DatabaseHelper {
 
     void getAllDocumentsOrdered(String collectionName, String orderBy, boolean ascending,
                                OnCompleteListener<QuerySnapshot> completeListener);
+
+    void appendMapToArrayField(String collectionName, String documentId,
+                               String arrayFieldName, Map<String, Object> mapObject,
+                               OnSuccessListener<Void> successListener,
+                               OnFailureListener failureListener);
+
+    void removeMapFromArrayField(String collectionName, String documentId,
+                                 String arrayFieldName, Map<String, Object> mapObject,
+                                 OnSuccessListener<Void> successListener,
+                                 OnFailureListener failureListener);
+
 }
 

@@ -171,6 +171,7 @@
             android:background="@drawable/table_background">
 
             <TableRow
+                android:id="@+id/qr_code_row_1"
                 android:layout_width="240dp"
                 android:layout_height="37dp"
                 android:background="@drawable/table_row_background"
@@ -234,6 +235,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/qr_code_row_2"
                 android:layout_width="240dp"
                 android:layout_height="37dp"
                 android:background="@drawable/table_row_background"
@@ -296,6 +298,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/qr_code_row_3"
                 android:layout_width="240dp"
                 android:layout_height="37dp"
                 android:background="@drawable/table_row_background"

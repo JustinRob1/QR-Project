@@ -2,13 +2,13 @@ package com.example.qr_project.activities;
 
 import static android.content.ContentValues.TAG;
 import static android.view.View.GONE;
-
 import static com.example.qr_project.utils.UserManager.containsUserID;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +22,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +32,6 @@ public class UserProfileActivity extends AppCompatActivity {
     String userId;
     List<Map<String, Object>> qrCodes;
 
-    List<Map<String, Object>> friends;
 
     TextView usernameTxt;
     TextView emailTxt;
@@ -50,11 +51,16 @@ public class UserProfileActivity extends AppCompatActivity {
 
     TextView tableTitleText;
 
+    TableRow qrCode1Row;
+    TableRow qrCode2Row;
+    TableRow qrCode3Row;
+
     AppCompatButton addFriendBtn;
 
     UserManager userManager;
 
     UserManager otherUserManager;
+    private ArrayList<Map<String, Object>> friends;
 
 
     @Override
@@ -71,6 +77,7 @@ public class UserProfileActivity extends AppCompatActivity {
         // Setup User classes
         userManager = UserManager.getInstance();
         otherUserManager = UserManager.newInstance(getIntent().getStringExtra("userId"));
+        friends = new ArrayList<>();
 
 
         usernameTxt = findViewById(R.id.username_txt);
@@ -85,16 +92,23 @@ public class UserProfileActivity extends AppCompatActivity {
         qrCode1ScoreTxt = findViewById(R.id.qr_code_score_1);
         qrCode2ScoreTxt = findViewById(R.id.qr_code_score_2);
         qrCode3ScoreTxt = findViewById(R.id.qr_code_score_3);
+        qrCode1Row = findViewById(R.id.qr_code_row_1);
+        qrCode2Row = findViewById(R.id.qr_code_row_2);
+        qrCode3Row = findViewById(R.id.qr_code_row_3);
         tableTitleText = findViewById(R.id.table_header);
         addFriendBtn = findViewById(R.id.add_friend_btn);
-
-
 
 
         userManager.getFriends(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
-                friends = result;
+
+                for (int i = 0; i < result.size(); i++){
+                    Map<String, Object> newFriend = new HashMap<>();
+                    newFriend.put("userID", result.get(i).get("userID"));
+                    friends.add(newFriend);
+                }
+                updateAddFriendButton();
             }
 
             @Override
@@ -103,7 +117,7 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
 
-
+        // If its your own profile
         if (userManager.getUserID().equals(otherUserManager.getUserID())) {
             // Your own profile
             tableTitleText.setText("Your Top Codes");
@@ -177,8 +191,9 @@ public class UserProfileActivity extends AppCompatActivity {
             });
 
         } else {
-            //tableTitleText.setText(otherUserManager.getUsername() + " Top Codes");
+
             addFriendBtn.setVisibility(View.VISIBLE);
+
             otherUserManager.getGlobalRanking(new DatabaseResultCallback<Integer>() {
                 @Override
                 public void onSuccess(Integer result) {
@@ -251,26 +266,76 @@ public class UserProfileActivity extends AppCompatActivity {
                             Map<String, Object> firstQRCode = result.get(0);
                             qrCode1NameTxt.setText(firstQRCode.get("name").toString().length() > 6 ? firstQRCode.get("name").toString().substring(0, 7)+ "..": firstQRCode.get("name").toString());
                             qrCode1ScoreTxt.setText(String.valueOf(firstQRCode.get("score")));
+                            qrCode1Row.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
+                                    intent.putExtra("qr_code_hash", String.valueOf(firstQRCode.get("hash")));
+                                    startActivity(intent);
+                                }
+                            });
 
                             Map<String, Object> secondQRCode = result.get(1);
                             qrCode2NameTxt.setText(secondQRCode.get("name").toString().length() > 6 ? secondQRCode.get("name").toString().substring(0, 7)+ "..": secondQRCode.get("name").toString());
                             qrCode2ScoreTxt.setText(String.valueOf(secondQRCode.get("score")));
+                            qrCode2Row.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
+                                    intent.putExtra("qr_code_hash", String.valueOf(secondQRCode.get("hash")));
+                                    startActivity(intent);
+                                }
+                            });
 
                             Map<String, Object> thirdQRCode = result.get(2);
-                            qrCode2NameTxt.setText(thirdQRCode.get("name").toString().length() > 6 ? thirdQRCode.get("name").toString().substring(0, 7)+ "..": thirdQRCode.get("name").toString());
-                            qrCode2ScoreTxt.setText(String.valueOf(thirdQRCode.get("score")));
+                            qrCode3NameTxt.setText(thirdQRCode.get("name").toString().length() > 6 ? thirdQRCode.get("name").toString().substring(0, 7)+ "..": thirdQRCode.get("name").toString());
+                            qrCode3ScoreTxt.setText(String.valueOf(thirdQRCode.get("score")));
+                            qrCode3Row.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
+                                    intent.putExtra("qr_code_hash", String.valueOf(thirdQRCode.get("hash")));
+                                    startActivity(intent);
+                                }
+                            });
+
                         } else if (result.size() == 2){
                             Map<String, Object> firstQRCode = result.get(0);
                             qrCode1NameTxt.setText(firstQRCode.get("name").toString().length() > 6 ? firstQRCode.get("name").toString().substring(0, 7)+ "..": firstQRCode.get("name").toString());
                             qrCode1ScoreTxt.setText(String.valueOf(firstQRCode.get("score")));
+                            qrCode1Row.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
+                                    intent.putExtra("qr_code_hash", String.valueOf(firstQRCode.get("hash")));
+                                    startActivity(intent);
+                                }
+                            });
+
 
                             Map<String, Object> secondQRCode = result.get(1);
                             qrCode2NameTxt.setText(secondQRCode.get("name").toString().length() > 6 ? secondQRCode.get("name").toString().substring(0, 7)+ "..": secondQRCode.get("name").toString());
                             qrCode2ScoreTxt.setText(String.valueOf(secondQRCode.get("score")));
+                            qrCode2Row.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
+                                    intent.putExtra("qr_code_hash", String.valueOf(secondQRCode.get("hash")));
+                                    startActivity(intent);
+                                }
+                            });
                         } else if (result.size() == 1){
                             Map<String, Object> firstQRCode = result.get(0);
                             qrCode1NameTxt.setText(firstQRCode.get("name").toString().length() > 6 ? firstQRCode.get("name").toString().substring(0, 7)+ "..": firstQRCode.get("name").toString());
                             qrCode1ScoreTxt.setText(String.valueOf(firstQRCode.get("score")));
+                            qrCode1Row.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
+                                    intent.putExtra("qr_code_hash", String.valueOf(firstQRCode.get("hash")));
+                                    startActivity(intent);
+                                }
+                            });
                         }
 
                     } else {
@@ -295,61 +360,39 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             });
 
-            if (friends != null && containsUserID(friends, otherUserManager.getUserID())) {
-                addFriendBtn.setBackgroundResource(R.drawable.red_round_btn);
-                addFriendBtn.setText("Remove friend");
-            } else {
-                addFriendBtn.setBackgroundResource(R.drawable.green_round_btn);
-                addFriendBtn.setText("Add friend");
-            }
+
+
+
         }
     }
-    /*
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
-                username.setText((String) value.get("username"));
-                email.setText((String) value.get("email"));
-                totalScore.setText(value.get("totalScore").toString());
 
-                qrCodes = (List<Map<String, Object>>) value.get("qrcodes");
-                ArrayList<Integer> scores = new ArrayList<>();
-                for (Map<String, Object> qrCode: qrCodes) {
-                    scores.add(Math.toIntExact((Long) qrCode.get("score")));
+    private void updateAddFriendButton() {
+        Log.d(TAG, "Friends list: " + friends);
+
+        if (friends != null && containsUserID(friends, otherUserManager.getUserID())) {
+            addFriendBtn.setBackgroundResource(R.drawable.red_round_btn);
+            addFriendBtn.setText("Remove friend");
+            addFriendBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    userManager.removeFriend(otherUserManager.getUserID());
+                    addFriendBtn.setBackgroundResource(R.drawable.green_round_btn);
+                    addFriendBtn.setText("Add friend");
                 }
-
-                int maxScore = 0;
-                int idx = 0;
-                try {
-                    maxScore = Collections.max(scores);
-                    idx = scores.indexOf(maxScore);
-                    qrCode1Score.setText(String.valueOf(maxScore));
-                    qrCode1Name.setText((String) qrCodes.get(idx).get("name"));
-                    scores.remove(idx);
-
-                    maxScore = Collections.max(scores);
-                    idx = scores.indexOf(maxScore);
-                    qrCode2Score.setText(String.valueOf(maxScore));
-                    qrCode2Name.setText((String) qrCodes.get(idx).get("name"));
-                    scores.remove(idx);
-
-                    maxScore = Collections.max(scores);
-                    idx = scores.indexOf(maxScore);
-                    qrCode3Score.setText(String.valueOf(maxScore));
-                    qrCode3Name.setText((String) qrCodes.get(idx).get("name"));
-                } catch (NoSuchElementException e) {
-
+            });
+        } else {
+            addFriendBtn.setBackgroundResource(R.drawable.green_round_btn);
+            addFriendBtn.setText("Add friend");
+            addFriendBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    userManager.addFriend(otherUserManager.getUserID());
+                    addFriendBtn.setBackgroundResource(R.drawable.red_round_btn);
+                    addFriendBtn.setText("Remove friend");
                 }
-
-                String totalQr;
-                totalQr = "Total QR Codes: " + String.valueOf(scores.size());
-                totalQrCodes.setText(totalQr);
-            }
-        });
-
+            });
+        }
     }
-    */
-
 
     public void onViewAllClick(View view){
         Intent intent = new Intent(UserProfileActivity.this, LeaderboardActivity.class);
@@ -358,8 +401,6 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     public void onClickBack(View view){
-        //Intent intent = new Intent(UserProfileActivity.this, UserHomeActivity.class);
-        //startActivity(intent);
         finish();
     }
 

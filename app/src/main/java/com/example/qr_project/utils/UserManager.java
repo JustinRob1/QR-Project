@@ -17,6 +17,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -207,7 +208,7 @@ public class UserManager {
             @Override
             public void onSuccess(Object result) {
                 if (result instanceof List) {
-                    callback.onSuccess((List<Map<String, Object>>) friends);
+                    callback.onSuccess((List<Map<String, Object>>) result);
                 } else {
                     callback.onFailure(new Exception("Friends list is not a valid List type."));
                 }
@@ -245,6 +246,80 @@ public class UserManager {
         });
     }
 
+    public void addFriend(String UserId){
+        Map<String, Object> newMapObject = new HashMap<>();
+        newMapObject.put("userID", UserId);
+
+        dbHelper.appendMapToArrayField("users", this.userID, "friends", newMapObject,
+                new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Map object successfully appended to array field!");
+                    }
+                },
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error appending map object to array field", e);
+                    }
+                });
+
+        // Gets friends
+        dbHelper.getDocument("users", this.userID,
+                new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
+                    }
+                }, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error getting document", e);
+                    }
+                });
+
+    }
+
+    public void removeFriend(String UserId){
+        Map<String, Object> mapToRemove = new HashMap<>();
+        mapToRemove.put("userID", UserId);
+
+        dbHelper.removeMapFromArrayField("users", this.userID, "friends", mapToRemove,
+                new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Map object successfully removed from array field!");
+                    }
+                },
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error removing map object from array field", e);
+                    }
+                });
+
+        // Gets friends
+        dbHelper.getDocument("users", this.userID,
+                new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
+                    }
+                }, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error getting document", e);
+                    }
+                });
+    }
 
     public void getGlobalRanking(DatabaseResultCallback<Integer> callback){
         dbHelper.getAllDocumentsOrdered("users", "totalScore", false, new OnCompleteListener<QuerySnapshot>() {
@@ -350,31 +425,6 @@ public class UserManager {
         });
     }
 
-
-
-    public boolean hasFriend(String userID){
-        // Gets friends
-        dbHelper.getDocument("users", this.userID,
-                new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error getting document", e);
-                    }
-                });
-
-        if (containsUserID(friends, userID)){
-            return true;
-        } return false;
-    }
     public static boolean containsUserID(List<Map<String, Object>> list, String targetUserID) {
         for (Map<String, Object> map : list) {
             if (map.containsKey("userID")) {

@@ -40,6 +40,7 @@ public class QRCodeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrcode);
+        String qr_code = getIntent().getStringExtra("qr_code_hash");
     }
 
     /**
