@@ -21,6 +21,9 @@
         tools:ignore="ExtraText">
 
         <activity
+            android:name=".activities.PictureActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.QRCodeActivity"
             android:exported="false" />
         <activity android:name=".activities.MapActivity"/>
