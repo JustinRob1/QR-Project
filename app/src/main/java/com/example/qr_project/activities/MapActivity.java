@@ -91,39 +91,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     Object tag = clickedMarker.getTag();
                     if (tag != null && tag instanceof Map) {
                         Map<String, Object> qrCode = (Map<String, Object>) tag;
-                        String photoUrl = qrCode.get("photo").toString();
-                        // Download the photo using Picasso and convert it to a Bitmap
-                        Picasso.get().load(photoUrl).into(new Target() {
-                            @Override
-                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                // Show the custom view in an AlertDialog or other dialog
-                                AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
-                                View markerView = getLayoutInflater().inflate(R.layout.marker_layout, null);
-                                ImageView imageView = markerView.findViewById(R.id.marker_image);
-                                TextView textView = markerView.findViewById(R.id.marker_title);
-                                Picasso.get().load(photoUrl).into(imageView);
-                                textView.setText(Objects.requireNonNull(qrCode.get("name")).toString());
-                                builder.setView(markerView);
-                                builder.create().show();
-                            }
+                        String photoUrl = qrCode.get("photo") != null ? qrCode.get("photo").toString() : null;
+                        // Show the custom view in an AlertDialog or other dialog
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                        View markerView = getLayoutInflater().inflate(R.layout.marker_layout, null);
+                        ImageView imageView = markerView.findViewById(R.id.marker_image);
+                        TextView textView = markerView.findViewById(R.id.marker_title);
+                        if (photoUrl != null) {
+                            // Download the photo using Picasso and convert it to a Bitmap
+                            Picasso.get().load(photoUrl).into(new Target() {
+                                @Override
+                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                    imageView.setImageBitmap(bitmap);
+                                }
 
-                            @Override
-                            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                                Log.e("My Tag", "Error downloading photo", e);
-                            }
+                                @Override
+                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                    Log.e("My Tag", "Error downloading photo", e);
+                                }
 
-                            @Override
-                            public void onPrepareLoad(Drawable placeHolderDrawable) {
-                                // Do nothing
-                            }
-                        });
+                                @Override
+                                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                    // Do nothing
+                                }
+                            });
+                        } else {
+                            // Hide the image view if the photo is null
+                            imageView.setVisibility(View.GONE);
+                        }
+                        textView.setText(Objects.requireNonNull(qrCode.get("name")).toString());
+                        builder.setView(markerView);
+                        builder.create().show();
                     }
                     return false;
                 });
+
             } else {
                 Log.d("My Tag", "Error getting documents: ", task.getException());
             }
         });
+
+
 
         // Initialize search bar
         SearchView searchView = findViewById(R.id.searchView);
@@ -214,4 +222,3 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 }
-
