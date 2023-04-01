@@ -46,6 +46,18 @@ public class QR_Code {
     }
 
     /**
+     * TESTING: CONSTRUCTOR FOR QR CODE RETRIEVED FROM DB
+     * TO BE REMOVED
+     * Implemented by akhadeli
+     */
+    public QR_Code(Hash hash, int score, String name, String face) {
+        this.hash = hash;
+        this.score = score;
+        this.name = name;
+        this.face = face;
+    }
+
+    /**
      * @return Score of the QR Code
      */
     public int getScore() {

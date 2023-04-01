@@ -8,7 +8,6 @@ android {
     namespace 'com.example.qr_project'
     compileSdk 33
 
-
     defaultConfig {
         applicationId "com.example.qr_project"
         minSdk 29
@@ -40,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-storage:20.1.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.android.gms:play-services-base:18.2.0'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
@@ -73,5 +73,5 @@ dependencies {
     // For intent tests:
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
 }
-
+apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'

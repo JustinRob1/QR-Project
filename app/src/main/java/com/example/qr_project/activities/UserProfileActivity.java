@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TableRow;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,11 +20,16 @@ import androidx.appcompat.widget.AppCompatButton;
 import com.example.qr_project.R;
 import com.example.qr_project.models.DatabaseResultCallback;
 import com.example.qr_project.utils.UserManager;
+import com.example.qr_project.utils.Hash;
+import com.example.qr_project.utils.QR_Adapter;
+import com.example.qr_project.utils.QR_Code;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +37,12 @@ import java.util.Map;
 public class UserProfileActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String userId;
-    List<Map<String, Object>> qrCodes;
+
+    ArrayList<QR_Code> rankedQRCodes_list;
+    ArrayAdapter<QR_Code> rankedQRCodes_adapter;
+    ListView rankedQRCodes_view;
+
+    AppCompatButton viewAllBtn;
 
 
     TextView usernameTxt;
@@ -74,6 +86,7 @@ public class UserProfileActivity extends AppCompatActivity {
         CollectionReference collRef = db.collection("users");
         DocumentReference docRef = collRef.document(userId);
 
+
         // Setup User classes
         userManager = UserManager.getInstance();
         otherUserManager = UserManager.newInstance(getIntent().getStringExtra("userId"));
@@ -102,7 +115,6 @@ public class UserProfileActivity extends AppCompatActivity {
         userManager.getFriends(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
-
                 for (int i = 0; i < result.size(); i++){
                     Map<String, Object> newFriend = new HashMap<>();
                     newFriend.put("userID", result.get(i).get("userID"));
@@ -110,6 +122,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
                 updateAddFriendButton();
             }
+
 
             @Override
             public void onFailure(Exception e) {
