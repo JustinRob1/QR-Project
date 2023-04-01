@@ -23,6 +23,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.R;
+import com.example.qr_project.utils.UserManager;
 import com.example.qr_project.utils.Hash;
 import com.example.qr_project.utils.QR_Adapter;
 import com.example.qr_project.utils.QR_Code;
@@ -78,6 +79,7 @@ public class UserHomeActivity extends AppCompatActivity {
         }
 
         userId = getIntent().getStringExtra("userId");
+        UserManager.getInstance().setUserID(userId);
         db = FirebaseFirestore.getInstance();
         CollectionReference collRef = db.collection("users");
         DocumentReference docRef = collRef.document(userId);
