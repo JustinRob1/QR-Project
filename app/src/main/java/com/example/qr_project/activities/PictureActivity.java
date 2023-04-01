@@ -8,11 +8,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.qr_project.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -37,6 +41,9 @@ public class PictureActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Inflate the loading screen layout
+        View loadingScreen = getLayoutInflater().inflate(R.layout.loading_screen, null);
+        setContentView(loadingScreen);
 
         // get QR code hash and user ID from intent extras
         Intent intent = getIntent();
@@ -67,6 +74,58 @@ public class PictureActivity extends AppCompatActivity {
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
     }
 
+
+    @Override
+    public void onBackPressed() {
+        // Get the QR code hash and user ID from the intent
+        Intent intent = getIntent();
+        String qrCodeHash = intent.getStringExtra("qrHash");
+        String userID = intent.getStringExtra("userID");
+
+        // Delete the QR code from the database
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userRef = db.collection("users").document(userID);
+        db.runTransaction(transaction -> {
+                    DocumentSnapshot userSnapshot = transaction.get(userRef);
+
+                    // Get the current QR codes array and total score from the user document
+                    List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) userSnapshot.get("qrcodes");
+                    int totalScore = ((Long) Objects.requireNonNull(userSnapshot.get("totalScore"))).intValue();
+
+                    // Find the index of the QR code with the specified hash value in the array
+                    int qrCodeIndex = -1;
+                    int qrCodeScore = 0;
+                    for (int j = 0; j < Objects.requireNonNull(qrCodes).size(); j++) {
+                        String hash = (String) qrCodes.get(j).get("hash");
+                        assert hash != null;
+                        if (hash.equals(qrCodeHash)) {
+                            qrCodeIndex = j;
+                            qrCodeScore = ((Long) Objects.requireNonNull(qrCodes.get(j).get("score"))).intValue(); // Get the score of the deleted QR code
+                            break;
+                        }
+                    }
+
+                    if (qrCodeIndex >= 0) {
+                        // Remove the QR code from the array
+                        qrCodes.remove(qrCodeIndex);
+
+                        // Update the user document with the updated QR codes array and total score
+                        transaction.update(userRef, "qrcodes", qrCodes);
+                        transaction.update(userRef, "totalScore", totalScore - qrCodeScore); // Subtract the score of the deleted QR code
+                    }
+
+                    return null;
+                })
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("My Tag", "QR code removed from database.");
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("My Tag", "Error removing QR code from database.", e);
+                    finish();
+                });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -94,7 +153,7 @@ public class PictureActivity extends AppCompatActivity {
                             });
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(PictureActivity.this, "Failed to upload image line 93", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -120,11 +179,10 @@ public class PictureActivity extends AppCompatActivity {
                         // Update the document in Firestore with the modified qrcodes array
                         db.collection("users").document(userID).update("qrcodes", qrCodes)
                                 .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(PictureActivity.this, "Image uploaded successfully", Toast.LENGTH_SHORT).show();
                                     finish();
                                 })
                                 .addOnFailureListener(e -> {
-                                    Toast.makeText(PictureActivity.this, "Failed to upload image, line 105", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
                                 });
 
                         break;
