@@ -1,12 +1,18 @@
 package com.example.qr_project.activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,14 +24,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -61,25 +71,67 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             }
                             if (location != null) {
                                 MarkerOptions markerOptions = new MarkerOptions()
-                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                                        .title(qrCode.get("name").toString());
-                                mMap.addMarker(markerOptions);
+                                        .position(new LatLng(location.getLatitude(), location.getLongitude()));
+                                Marker marker = mMap.addMarker(markerOptions);
+                                // Store the qrCode object as a tag of the marker
+                                marker.setTag(qrCode);
                             }
                         }
                     }
                 }
+
+                // Set click listener for the marker
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker clickedMarker) {
+                        Object tag = clickedMarker.getTag();
+                        if (tag != null && tag instanceof Map) {
+                            Map<String, Object> qrCode = (Map<String, Object>) tag;
+                            String photoUrl = qrCode.get("photo").toString();
+                            // Download the photo using Picasso and convert it to a Bitmap
+                            Picasso.get().load(photoUrl).into(new Target() {
+                                @Override
+                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                    // Show the custom view in an AlertDialog or other dialog
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
+                                    View markerView = getLayoutInflater().inflate(R.layout.marker_layout, null);
+                                    ImageView imageView = markerView.findViewById(R.id.marker_image);
+                                    TextView textView = markerView.findViewById(R.id.marker_title);
+                                    Picasso.get().load(photoUrl).into(imageView);
+                                    textView.setText(Objects.requireNonNull(qrCode.get("name")).toString());
+                                    builder.setView(markerView);
+                                    builder.create().show();
+                                }
+
+                                @Override
+                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                    Log.e("My Tag", "Error downloading photo", e);
+                                }
+
+                                @Override
+                                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                    // Do nothing
+                                }
+                            });
+                        }
+                        return false;
+                    }
+                });
             } else {
                 Log.d("My Tag", "Error getting documents: ", task.getException());
             }
         });
+
     }
+
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
         // Set the map type to hybrid
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         // Check if the user has granted location permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
