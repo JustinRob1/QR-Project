@@ -174,7 +174,6 @@ public class QRCodeActivity extends AppCompatActivity {
                                         dialog.show();
                                     }
 
-                                    @Override
                                     public void onBitmapFailed(Exception e, Drawable errorDrawable) {
                                         // Handle the error
                                         Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
