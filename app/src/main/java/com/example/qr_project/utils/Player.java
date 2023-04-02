@@ -136,16 +136,6 @@ public class Player {
     }
 
     /**
-     * Adds the qrCode to the array list and adds the QR code's score to total score
-     * This will also re-calculate the total score of the player's
-     * @param qrCode
-     */
-    public void addQRCode(QR_Code qrCode) {
-        QRCodes.add(qrCode);
-        totalScore = totalScore + qrCode.getScore();
-    }
-
-    /**
      * Allows the user to delete their unwanted QR_Code
      * Deletes the qrCode from the array list and subtracts the QR code's score to total score
      * This will also re-calculate the total score of the player's
