@@ -64,7 +64,8 @@
             android:layout_gravity="center"
             android:background="@drawable/edit_text_background"
             android:hint="Phone Number"
-            android:inputType="number"/>
+            android:inputType="number"
+            android:maxLength="14"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/submit_sign_up_button"

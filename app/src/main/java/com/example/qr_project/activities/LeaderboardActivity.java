@@ -133,7 +133,8 @@ public class LeaderboardActivity extends AppCompatActivity {
      * The text view which is pressed
      */
     public void onMapClick(View view) {
-        Toast.makeText(this, "Map Button Click", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
     }
 
     /**

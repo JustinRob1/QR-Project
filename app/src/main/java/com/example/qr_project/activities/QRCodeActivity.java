@@ -86,6 +86,37 @@ public class QRCodeActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * When the user clicks the camera button, this method will be called
+     * and will open the camera to scan a QR or barcode
+     *
+     * @param view The text view which is pressed
+     */
+    public void onCameraClick(View view) {
+        Intent intent = new Intent(this, ScanActivity.class);
+        startActivity(intent);
+    }
+
+
+    /**
+     * For the use and the feature of the map button
+     *
+     * @param view The text view which is pressed
+     */
+    public void onMapClick(View view) {
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Starts the LeaderboardActivity
+     * @param view The text view which is pressed
+     */
+    public void onLeaderboardClick(View view) {
+        Intent intent = new Intent(this, LeaderboardActivity.class);
+        startActivity(intent);
+    }
+
     public void onDeleteClick(View view) {
         db = FirebaseFirestore.getInstance();
         SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
