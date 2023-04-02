@@ -241,33 +241,33 @@ public class ScanActivity extends AppCompatActivity {
                 db.collection("users").document(userID).update("totalScore", newScore);
             }
         });
-//
-//        String qrCodeHash = qrCode.getHash();
-//
-//        // Check if QR code already exists in the Firestore collection
-//        DocumentReference qrCodeRef = db.collection("qrcodes").document(qrCodeHash);
-//        qrCodeRef.get().addOnCompleteListener(task -> {
-//            if (task.isSuccessful()) {
-//                DocumentSnapshot document = task.getResult();
-//                if (document.exists()) {
-//                    // QR code already exists, add the user ID to the 'users' array field
-//                    qrCodeRef.update("users", FieldValue.arrayUnion(userID));
-//                } else {
-//                    // QR code does not exist, add a new document with the 'users' array field
-//                    Map<String, Object> data = new HashMap<>();
-//                    data.put("users", Arrays.asList(userID));
-//                    qrCodeRef.set(data).addOnCompleteListener(setTask -> {
-//                        if (setTask.isSuccessful()) {
-//                            Log.d(TAG, "Added new QR code document with hash: " + qrCodeHash);
-//                        } else {
-//                            Log.e(TAG, "Failed to add new QR code document", setTask.getException());
-//                        }
-//                    });
-//                }
-//            } else {
-//                Log.e(TAG, "Failed to retrieve QR code document", task.getException());
-//            }
-//        });
+
+        String qrCodeHash = qrCode.getHash();
+
+        // Check if QR code already exists in the Firestore collection
+        DocumentReference qrCodeRef = db.collection("qrcodes").document(qrCodeHash);
+        qrCodeRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    // QR code already exists, add the user ID to the 'users' array field
+                    qrCodeRef.update("users", FieldValue.arrayUnion(userID));
+                } else {
+                    // QR code does not exist, add a new document with the 'users' array field
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("users", Arrays.asList(userID));
+                    qrCodeRef.set(data).addOnCompleteListener(setTask -> {
+                        if (setTask.isSuccessful()) {
+                            Log.d(TAG, "Added new QR code document with hash: " + qrCodeHash);
+                        } else {
+                            Log.e(TAG, "Failed to add new QR code document", setTask.getException());
+                        }
+                    });
+                }
+            } else {
+                Log.e(TAG, "Failed to retrieve QR code document", task.getException());
+            }
+        });
 
     }
 
