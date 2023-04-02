@@ -235,11 +235,12 @@ public class Hash {
         String nose = hex2Nose.get(hashStr.charAt(2));
         String mouth = hex2Mouth.get(hashStr.charAt(3));
         String head =
-                " /‾‾‾‾‾\\ \n" +
-                        ears.charAt(0) + "| " + eyes + " |" + ears.charAt(1) + " \n" +
-                        " | " + nose + " | \n" +
-                        "|  " + mouth + "  |\n" +
-                        " \\_____/ ";
+                "  /‾‾‾‾‾\\ \n" +
+                        ears.charAt(0) + "|  " + eyes + "  |" + ears.charAt(1) + " \n" +
+                        " |   " + nose + " | \n" +
+                        " |  " + mouth + "  |\n" +
+                        "  \\_____/ ";
+
         return head;
     }
 
