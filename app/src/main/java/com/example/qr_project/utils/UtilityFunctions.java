@@ -19,7 +19,7 @@ public class UtilityFunctions {
 
     }
 
-    public static TableRow createNewRow(Context context, String name, String score, int rank, String hash, int rowBackgroundDrawable, int qrLogoDrawable, int arrowDrawable, Intent intent){
+    public static TableRow createNewRow(Context context, String name, String score, int rank, String hash, int rowBackgroundDrawable, String face, int arrowDrawable, Intent intent){
         // Create a new TableRow
 
         TableRow row = new TableRow(context);
@@ -51,9 +51,13 @@ public class UtilityFunctions {
         rankTextView.setPadding(10, 0, 0, 0);
 
         // Create a new ImageView for the TableRow
-        ImageView qrImageView = new ImageView(context);
-        qrImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
-        qrImageView.setImageResource(qrLogoDrawable);
+        TextView nameFaceView = new TextView(context);
+        nameFaceView .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        nameFaceView .setText(face);
+        nameFaceView .setTextColor(Color.BLACK);
+        nameFaceView .setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        nameFaceView .setGravity(Gravity.CENTER);
+        nameFaceView .setPadding(15, 0, 0, 0);
 
         // Create a new TextView for the TableRow
         TextView nameTextView = new TextView(context);
@@ -82,7 +86,7 @@ public class UtilityFunctions {
 
 
         linearLayout.addView(rankTextView);
-        linearLayout.addView(qrImageView);
+        linearLayout.addView(nameFaceView);
         linearLayout.addView(nameTextView);
         linearLayout.addView(scoreTextView);
         linearLayout.addView(arrowImageView);
