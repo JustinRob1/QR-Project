@@ -20,6 +20,8 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.R;
+import com.example.qr_project.models.DatabaseResultCallback;
+import com.example.qr_project.utils.UserManager;
 import com.example.qr_project.utils.UtilityFunctions;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -49,6 +51,8 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     public TextView user_codes_title;
 
+    public TextView leaderboardScore;
+
     public LinearLayout leaderboard_dial_filters;
 
     public AppCompatButton btn_filter_user;
@@ -66,6 +70,8 @@ public class LeaderboardActivity extends AppCompatActivity {
     boolean isFriendAdded=false;
     boolean isGlobalAdded= false;
 
+    UserManager userManager;
+
     /**
      * Finds and fetches the right ID's for all the buttons
      * @param savedInstanceState   Fetching the ID's of the button and their function
@@ -76,6 +82,7 @@ public class LeaderboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_leaderboard);
 
         Intent intent = getIntent();
+
 
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
@@ -91,8 +98,21 @@ public class LeaderboardActivity extends AppCompatActivity {
         btn_filter_global = findViewById(R.id.btn_filter_global);
         btn_filter_friends = findViewById(R.id.btn_filter_friends);
         btn_filter_user = findViewById(R.id.btn_filter_you);
+        leaderboardScore = findViewById(R.id.leaderboard_score);
 
+        userManager = UserManager.getInstance();
 
+        userManager.getTotalScore(new DatabaseResultCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer result) {
+                leaderboardScore.setText(String.valueOf(result));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                leaderboardScore.setText("N/A");
+            }
+        });
 
         // Hide all other tables other than friends
         user_qr_leaderboard.setVisibility(View.GONE);
@@ -329,7 +349,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         ArrayList<ArrayList<String>> topUsers = new ArrayList<>();
 
-        // TODO: Make sure this works with real data
+
 
         // Populate the leaderboard
         if (!isGlobalAdded) {
