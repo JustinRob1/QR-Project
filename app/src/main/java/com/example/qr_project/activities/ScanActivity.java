@@ -3,14 +3,18 @@ package com.example.qr_project.activities;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -39,33 +43,36 @@ public class ScanActivity extends AppCompatActivity {
      * Defining the cameralauncher ready to scan the QR_Code
      * The camera can scan and take a photo of the QR_Code being presented to it
      * Getting the image presented to the camera
-     *
+     * <p>
      * Here, it also creates a hashmap of the QR_Code properties you want to store
      * Also updates the location of the QR_Code being scanned
      * Connecting with the FireStore FireBase,
      * this is to fetch the user's id/ account to store it on the FireBase Cloud
      * under their account.
-     *
+     * <p>
      * Then, the code will update the qrcodes array field with the new QR code
      * The scanned QR_Code will then be stored to the FireBase Cloud under the user's account/id
+     *
      * @param savedInstanceState a package to execute the scanning job of the app
      * @see FirebaseFirestore
      * @see QRCodeActivity
      * @see Player
-     *
      */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Start the QR code scanner
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrator.setPrompt("Scan a QR code");
-        integrator.setOrientationLocked(false);
-        integrator.initiateScan();
-
         db = FirebaseFirestore.getInstance();
+
+
+        // Permission was not granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            // Request camera permissions if not granted
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+            // Permission was granted
+        } else {
+            // Start the QR code scanner
+            initiateScanning();
+        }
     }
 
     /**
@@ -73,22 +80,22 @@ public class ScanActivity extends AppCompatActivity {
      * The ability of taking the photo and scanning an image as the QR_Code
      * The camera can scan and take a photo of the QR_Code being presented to it
      * Getting the image presented to the camera
-     *
+     * <p>
      * Here, it also creates a hashmap of the QR_Code properties you want to store
      * Also updates the location of the QR_Code being scanned
      * Connecting with the FireStore FireBase,
      * this is to fetch the user's id/ account to store it on the FireBase Cloud
      * under their account.
-     *
+     * <p>
      * Then, the code will update the qrcodes array field with the new QR code
      * The scanned QR_Code will then be stored to the FireBase Cloud under the user's account/id
-     * @param resultCode   displays the result
-     * @param requestCode   taking the code
-     * @param data    the data of the QR_Code
+     *
+     * @param resultCode  displays the result
+     * @param requestCode taking the code
+     * @param data        the data of the QR_Code
      * @see FirebaseFirestore
      * @see QRCodeActivity
      * @see Player
-     *
      */
 
     // Handle the scanning of the QR code
@@ -97,46 +104,51 @@ public class ScanActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
-            qrCode = new QR_Code(result.getContents());
+            if (result.getContents() != null) {
+                qrCode = new QR_Code(result.getContents());
 
-            // Check for camera permissions
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                // Request camera permissions if not granted
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
-            } else {
-                // Get the current user's ID
-                SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+                // Check for camera permissions
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    // Request camera permissions if not granted
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+                } else {
+                    // Get the current user's ID
+                    SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
 
-                String qrCodeHash = qrCode.getHash();
-                // Retrieve the user's information
-                String userID = sharedPref.getString("user_id", null);
-                db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
-                    // Check if the document exists
-                    if (documentSnapshot.exists()) {
-                        // Get the qrcodes array from the document data
-                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
-                        assert qrCodes != null;
-                        boolean qrCodeScanned = false;
-                        for (Map<String, Object> qrCode : qrCodes) {
-                            String hash = (String) qrCode.get("hash");
-                            if (Objects.equals(hash, qrCodeHash)) {
-                                qrCodeScanned = true;
-                                break;
+                    String qrCodeHash = qrCode.getHash();
+                    // Retrieve the user's information
+                    String userID = sharedPref.getString("user_id", null);
+                    db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
+                        // Check if the document exists
+                        if (documentSnapshot.exists()) {
+                            // Get the qrcodes array from the document data
+                            List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                            assert qrCodes != null;
+                            boolean qrCodeScanned = false;
+                            for (Map<String, Object> qrCode : qrCodes) {
+                                String hash = (String) qrCode.get("hash");
+                                if (Objects.equals(hash, qrCodeHash)) {
+                                    qrCodeScanned = true;
+                                    break;
+                                }
+                            }
+                            if (qrCodeScanned) {
+                                Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                addQR();
+                                Intent intent = new Intent(this, PictureActivity.class);
+                                intent.putExtra("qrHash", qrCodeHash);
+                                intent.putExtra("userID", userID);
+                                startActivity(intent);
+                                finish();
                             }
                         }
-                        if (qrCodeScanned) {
-                            Toast.makeText(this, "You already scanned this QR code.", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            addQR();
-                            Intent intent = new Intent(this, PictureActivity.class);
-                            intent.putExtra("qrHash", qrCodeHash);
-                            intent.putExtra("userID", userID);
-                            startActivity(intent);
-                            finish();
-                        }
-                    }
-                });
+                    });
+                }
+            } else {
+                Toast.makeText(this, "Scanning was canceled", Toast.LENGTH_SHORT).show();
+                finish();
             }
         }
     }
@@ -148,6 +160,7 @@ public class ScanActivity extends AppCompatActivity {
      * If the user wishes to add the location to the database on FireStore, they can do so;
      * however if they do not wish to add the location to the database on FireStore, they can opt out.
      * The user will be prompted to decide to add the location or not.
+     *
      * @see FirebaseFirestore
      * @see UserProfileActivity
      * @see UserHomeActivity
@@ -206,6 +219,97 @@ public class ScanActivity extends AppCompatActivity {
                 db.collection("users").document(userID).update("totalScore", newScore);
             }
         });
+    }
+
+
+    /**
+     * Handles the requestPermission dialog for Location & Camera permissions
+     *
+     * @param requestCode  The request code passed
+     * @param permissions  The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *                     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *                     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Handle the permission dialog for location
+        if (requestCode == LOCATION_REQUEST_CODE) {
+            handleLocationRequestCode(grantResults);
+            // Handle the permission dialog result for camera
+        } else if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            handleCameraRequestCode(grantResults);
+        }
+    }
+
+    /**
+     * Initiates the scanning procedure using IntentIntegrator. Assumes that the app has Camera
+     * permission
+     *
+     * @throws AssertionError when the app doesn't have cameraPermission.
+     */
+    public void initiateScanning() throws AssertionError {
+        assert ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED;
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
+        integrator.setPrompt("Scan a QR code");
+        integrator.setOrientationLocked(false);
+        integrator.initiateScan();
+    }
+
+
+    /**
+     * Handles the location request code
+     *
+     * @param grantResults: The grant results for the corresponding permissions
+     */
+    public void handleLocationRequestCode(@NonNull int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // If permissions are granted, call addQR() again to update the QR code's location
+            addQR();
+        } else {
+            // Handle permission denied error
+            Toast.makeText(this, "Location permissions denied.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Handles the camera request code
+     *
+     * @param grantResults: The grant results for the corresponding permissions
+     */
+    public void handleCameraRequestCode(@NonNull int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Permission granted, start scanning
+            initiateScanning();
+            // Permission not granted. Ask user to manually change it in app settings and finish
+            // this activity
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Camera permission required");
+            builder.setMessage("Please grant camera permission manually in app settings and then try to scan again");
+            builder.setPositiveButton("Go to settings", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Open app settings screen
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.fromParts("package", getPackageName(), null));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(ScanActivity.this, "Permission denied. Scanning canceled", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+            builder.show();
+        }
     }
 }
 
