@@ -35,7 +35,7 @@
             android:id="@+id/username_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="lwismer"
+            android:text="NA"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="30sp"
@@ -47,7 +47,7 @@
             android:id="@+id/user_email_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="lwismer@ualberta.ca"
+            android:text="NA"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -69,7 +69,7 @@
             android:id="@+id/user_total_score_txt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="5263"
+            android:text="NA"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="45sp"
@@ -98,7 +98,7 @@
                 android:id="@+id/global_user_rank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="148"
+                android:text="NA"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -117,7 +117,7 @@
                 android:id="@+id/friend_user_rank"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="8"
+                android:text="NA"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -144,7 +144,7 @@
                 android:id="@+id/user_total_qr_codes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="234"
+                android:text="NA"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -163,14 +163,16 @@
 
 
         <!-- Table for top QR Codes -->
-        <TableLayout
-            android:layout_width="270dp"
+        <LinearLayout
+            android:layout_width="350dp"
             android:layout_height="220dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
+
             android:background="@drawable/table_background">
 
             <TableRow
+                android:id="@+id/qr_code_row_1"
                 android:layout_width="240dp"
                 android:layout_height="37dp"
                 android:background="@drawable/table_row_background"
@@ -211,7 +213,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="QRCode1"
+                        android:text="NA"
                         android:textColor="#000000"
                         android:textSize="18sp"
                         android:layout_gravity="center"
@@ -223,7 +225,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="1232"
+                        android:text="NA"
                         android:textAlignment="center"
                         android:textColor="#000000"
                         android:textSize="22sp"
@@ -234,6 +236,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/qr_code_row_2"
                 android:layout_width="240dp"
                 android:layout_height="37dp"
                 android:background="@drawable/table_row_background"
@@ -273,7 +276,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="QRCode2"
+                        android:text="NA"
                         android:textColor="#000000"
                         android:textSize="18sp"
                         android:layout_gravity="center"
@@ -285,7 +288,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="898"
+                        android:text="NA"
                         android:textAlignment="center"
                         android:textColor="#000000"
                         android:textSize="22sp"
@@ -296,6 +299,7 @@
             </TableRow>
 
             <TableRow
+                android:id="@+id/qr_code_row_3"
                 android:layout_width="240dp"
                 android:layout_height="37dp"
                 android:background="@drawable/table_row_background"
@@ -335,7 +339,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="QRCode3"
+                        android:text="NA"
                         android:textColor="#000000"
                         android:textSize="18sp"
                         android:layout_gravity="center"
@@ -347,7 +351,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="765"
+                        android:text="NA"
                         android:textAlignment="center"
                         android:textColor="#000000"
                         android:textSize="22sp"
@@ -357,24 +361,23 @@
                 </LinearLayout>
             </TableRow>
 
-            <TableRow
-                android:layout_width="240dp"
-                android:layout_height="37dp"
-                android:layout_marginVertical="10dp"
-                android:layout_marginHorizontal="15dp">
 
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/view_all_btn"
-                    android:layout_width="130dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:background="@drawable/table_button_background"
-                    android:text="View All"
-                    android:textColor="#000000"
-                    android:onClick="onViewAllClick"/>
-            </TableRow>
-        </TableLayout>
+                />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/add_friend_btn"
+            android:layout_gravity="center"
+            android:layout_width="300dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Add Friend"
+            android:background="@drawable/green_round_btn"
+            android:textAlignment="center"
+            android:textSize="12sp" />
+
 
         <!-- Button Icons -->
         <LinearLayout

@@ -33,6 +33,18 @@ public class Hash {
     }
 
     /**
+     * TESTING: CONSTRUCTOR FOR QR CODE RETRIEVED FROM DB
+     * TO BE REMOVED
+     * Implemented by akhadeli
+     */
+    public Hash(String hash, String name, String face, int score) {
+        this.hash = hash;
+        this.name = name;
+        this.face = face;
+        this.score = score;
+    }
+
+    /**
      * @return The score of the hash
      */
     public int getScore() {

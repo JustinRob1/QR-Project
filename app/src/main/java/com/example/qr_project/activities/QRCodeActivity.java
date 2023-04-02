@@ -4,10 +4,14 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +25,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -40,6 +46,7 @@ public class QRCodeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrcode);
+        String qr_code = getIntent().getStringExtra("qr_code_hash");
     }
 
     /**
@@ -108,41 +115,160 @@ public class QRCodeActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
+    public void seePhoto(View view) {
+        db = FirebaseFirestore.getInstance();
+        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+        String userID = sharedPref.getString("user_id", null);
+
+        String qrCodeHash = getIntent().getStringExtra("hash");
+
+        DocumentReference userRef = db.collection("users").document(userID);
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                if (qrCodes != null) {
+                    for (Map<String, Object> qrCode : qrCodes) {
+                        String hash = (String) qrCode.get("hash");
+                        if (hash != null && hash.equals(qrCodeHash)) {
+                            String photoUrl = (String) qrCode.get("photo");
+                            if (photoUrl != null) {
+                                // Load the photo using Picasso
+                                Picasso.get().load(photoUrl).into(new Target() {
+                                    @Override
+                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                        // Display the photo in a dialog
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
+                                        ImageView imageView = new ImageView(QRCodeActivity.this);
+                                        imageView.setImageBitmap(bitmap);
+                                        builder.setView(imageView);
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    }
+
+                                    @Override
+                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                        // Handle the error
+                                        Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                        // Show a progress bar or placeholder image
+                                    }
+                                });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }).addOnFailureListener(e -> {
+            // Handle the error
+            Toast.makeText(getApplicationContext(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    public void seeLocation(View view) {
+        db = FirebaseFirestore.getInstance();
+        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+        String userID = sharedPref.getString("user_id", null);
+
+        String qrCodeHash = getIntent().getStringExtra("hash");
+
+        DocumentReference userRef = db.collection("users").document(userID);
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document != null && document.exists()) {
+                    List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) document.get("qrcodes");
+                    if (qrCodes != null) {
+                        for (Map<String, Object> qrCode : qrCodes) {
+                            String hash = (String) qrCode.get("hash");
+                            if (hash.equals(qrCodeHash)) {
+                                GeoPoint location = (GeoPoint) qrCode.get("location");
+                                if (location != null) {
+                                    Intent intent = new Intent(this, MapActivity.class);
+                                    intent.putExtra("latitude", location.getLatitude());
+                                    intent.putExtra("longitude", location.getLongitude());
+                                    startActivity(intent);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                Log.d(TAG, "Error getting document: ", task.getException());
+            }
+        });
+    }
+
+
     
     /*
     just a demo, not fully completed yet
     please build on
      */
     
-        public void AddComment() {
-            // Create a new QR code document
-            Map<String, Object> qrCode = new HashMap<>();
-            qrCode.put("comment", "This is a comment");
-            qrCode.put("timestamp", new Date());
-            qrCode.put("location", new GeoPoint(37.4219999, -122.0840575));
-            db.collection("QR Codes").document("<QR code ID>").set(qrCode);
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-            // Query the QR code document by ID
-            Task<DocumentSnapshot> documentSnapshotTask = db.collection("QR Codes").document("<QR code ID>").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            // Retrieve the comment and display it in the UI
-                            String comment = document.getString("comment");
-                            AddComment().getText(comment);
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
+    public void AddComment() {
+        // Create a new QR code document
+        Map<String, Object> qrCode = new HashMap<>();
+        qrCode.put("comment", "This is a comment");
+        qrCode.put("timestamp", new Date());
+        qrCode.put("location", new GeoPoint(37.4219999, -122.0840575));
+        db.collection("QR Codes").document("<QR code ID>").set(qrCode);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Query the QR code document by ID
+        Task<DocumentSnapshot> documentSnapshotTask = db.collection("QR Codes").document("<QR code ID>").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Retrieve the comment and display it in the UI
+                        String comment = document.getString("comment");
+                        // AddComment().getText(comment);
                     } else {
-                        Log.d(TAG, "get failed with ", task.getException());
+                        Log.d(TAG, "No such document");
                     }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
                 }
-            });
-        }
+            }
+        });
     }
-
-
 }
+
+
+//        public void AddComment() {
+//            // Create a new QR code document
+//            Map<String, Object> qrCode = new HashMap<>();
+//            qrCode.put("comment", "This is a comment");
+//            qrCode.put("timestamp", new Date());
+//            qrCode.put("location", new GeoPoint(37.4219999, -122.0840575));
+//            db.collection("QR Codes").document("<QR code ID>").set(qrCode);
+//            FirebaseFirestore db = FirebaseFirestore.getInstance();
+//
+//            // Query the QR code document by ID
+//            Task<DocumentSnapshot> documentSnapshotTask = db.collection("QR Codes").document("<QR code ID>").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                @Override
+//                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                    if (task.isSuccessful()) {
+//                        DocumentSnapshot document = task.getResult();
+//                        if (document.exists()) {
+//                            // Retrieve the comment and display it in the UI
+//                            String comment = document.getString("comment");
+//                            AddComment().getText(comment);
+//                        } else {
+//                            Log.d(TAG, "No such document");
+//                        }
+//                    } else {
+//                        Log.d(TAG, "get failed with ", task.getException());
+//                    }
+//                }
+//            });
+//        }
+
