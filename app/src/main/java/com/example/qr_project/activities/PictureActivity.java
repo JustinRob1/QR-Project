@@ -1,6 +1,7 @@
 package com.example.qr_project.activities;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -22,6 +23,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -73,7 +76,6 @@ public class PictureActivity extends AppCompatActivity {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
     }
-
 
     @Override
     public void onBackPressed() {
@@ -147,9 +149,11 @@ public class PictureActivity extends AppCompatActivity {
                     imageRef.getDownloadUrl()
                             .addOnSuccessListener(uri -> {
                                 saveImageUrlToFirestore(uri.toString());
+                                finish();
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                                finish();
                             });
                 })
                 .addOnFailureListener(e -> {
@@ -190,15 +194,39 @@ public class PictureActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private Uri getImageUri(Context context, Bitmap imageBitmap) {
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, 640, 480, true);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), resizedBitmap, "Title", null);
-        return Uri.parse(path);
+        boolean success = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, bytes);
+        if (!success) {
+            Log.e("MY tag", "Failed to compress bitmap");
+            return null;
+        }
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "Title");
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Description");
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        if (uri == null) {
+            Log.e("MY tag", "Failed to insert image into media store");
+            return null;
+        }
+        OutputStream outputStream;
+        try {
+            outputStream = context.getContentResolver().openOutputStream(uri);
+            if (outputStream == null) {
+                Log.e("MY tag", "Failed to get output stream for uri");
+                return null;
+            }
+            bytes.writeTo(outputStream);
+            outputStream.close();
+            bytes.close();
+        } catch (IOException e) {
+            Log.e("MY tag", "Failed to write image to media store");
+            return null;
+        }
+        return uri;
     }
 }
-
