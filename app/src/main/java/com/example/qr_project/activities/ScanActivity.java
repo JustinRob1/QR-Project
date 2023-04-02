@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -18,15 +17,13 @@ import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-
 
 import java.util.List;
 import java.util.Map;
@@ -209,21 +206,6 @@ public class ScanActivity extends AppCompatActivity {
                 db.collection("users").document(userID).update("totalScore", newScore);
             }
         });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == LOCATION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // If permissions are granted, call addQR() again to update the QR code's location
-                addQR();
-            } else {
-                // Handle permission denied error
-                Toast.makeText(this, "Location permissions denied.", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 }
 

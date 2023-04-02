@@ -183,7 +183,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // Show the user's current location on the map
             showCurrentLocation();
         }
+
+        // Check if there are extras for latitude and longitude
+        Bundle extras = getIntent().getExtras();
+        if (extras != null && extras.containsKey("latitude") && extras.containsKey("longitude")) {
+            // Move the camera to the QR code's location
+            double latitude = extras.getDouble("latitude");
+            double longitude = extras.getDouble("longitude");
+            LatLng qrCodeLocation = new LatLng(latitude, longitude);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(qrCodeLocation, 15));
+        }
     }
+
 
     private void showCurrentLocation() {
         if (mMap == null) {
