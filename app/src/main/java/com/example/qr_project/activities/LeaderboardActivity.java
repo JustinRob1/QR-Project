@@ -236,6 +236,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                             String name = (String) qrCode.get("name");
                             Long score = (Long) qrCode.get("score");
                             String hash = (String) qrCode.get("hash");
+                            String face = (String) qrCode.get("face");
 
 
 
@@ -245,7 +246,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                                                                                                 rank,
                                                                                                 hash,
                                                                                                 R.drawable.leaderboard_row_item,
-                                                                                                R.drawable.logo,
+                                                                                                face,
                                                                                                 R.drawable.arrow_right_solid,
                                                                                                 new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", hash)));
 
@@ -301,7 +302,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     1,
                     null,
                     R.drawable.leaderboard_row_item,
-                    R.drawable.logo,
+                    "",
                     R.drawable.arrow_right_solid,
                     new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
 
@@ -311,7 +312,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     1,
                     null,
                     R.drawable.leaderboard_row_item,
-                    R.drawable.logo,
+                    "",
                     R.drawable.arrow_right_solid,
                     new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", "")));
 
@@ -373,7 +374,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                                 i+1,
                                 null,
                                 R.drawable.leaderboard_row_item,
-                                R.drawable.logo,
+                                "",
                                 R.drawable.arrow_right_solid,
                                 new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", userData.get(0))));
                     }
@@ -419,7 +420,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                                             1,
                                             null,
                                             R.drawable.leaderboard_row_item,
-                                            R.drawable.logo,
+                                            "",
                                             R.drawable.arrow_right_solid,
                                             new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
                         rank++;
