@@ -13,7 +13,6 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,15 +21,13 @@ import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-
 
 import java.util.List;
 import java.util.Map;
@@ -223,6 +220,7 @@ public class ScanActivity extends AppCompatActivity {
             }
         });
     }
+
 
     /**
      * Handles the requestPermission dialog for Location & Camera permissions
