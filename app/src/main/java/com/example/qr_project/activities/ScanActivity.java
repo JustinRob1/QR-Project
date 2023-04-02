@@ -1,6 +1,8 @@
 package com.example.qr_project.activities;
 
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,12 +26,16 @@ import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -195,6 +201,14 @@ public class ScanActivity extends AppCompatActivity {
                                     });
                         } else {
                             // Handle location not found error
+                            qrCode.setLocation(null);
+                            db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
+                                    .addOnSuccessListener(aVoid -> {
+                                        Log.d("MY TAG", "QR code added to user's document in DB");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
+                                    });
                             Toast.makeText(this, "Unable to retrieve location.", Toast.LENGTH_SHORT).show();
                         }
                     })
@@ -205,6 +219,14 @@ public class ScanActivity extends AppCompatActivity {
                     });
         } else {
             // If permissions are not granted, request them from the user
+            qrCode.setLocation(null);
+            db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d("MY TAG", "QR code added to user's document in DB");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
+                    });
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
         }
 
@@ -219,6 +241,34 @@ public class ScanActivity extends AppCompatActivity {
                 db.collection("users").document(userID).update("totalScore", newScore);
             }
         });
+
+        String qrCodeHash = qrCode.getHash();
+
+        // Check if QR code already exists in the Firestore collection
+        DocumentReference qrCodeRef = db.collection("qrcodes").document(qrCodeHash);
+        qrCodeRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    // QR code already exists, add the user ID to the 'users' array field
+                    qrCodeRef.update("users", FieldValue.arrayUnion(userID));
+                } else {
+                    // QR code does not exist, add a new document with the 'users' array field
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("users", Arrays.asList(userID));
+                    qrCodeRef.set(data).addOnCompleteListener(setTask -> {
+                        if (setTask.isSuccessful()) {
+                            Log.d(TAG, "Added new QR code document with hash: " + qrCodeHash);
+                        } else {
+                            Log.e(TAG, "Failed to add new QR code document", setTask.getException());
+                        }
+                    });
+                }
+            } else {
+                Log.e(TAG, "Failed to retrieve QR code document", task.getException());
+            }
+        });
+
     }
 
 

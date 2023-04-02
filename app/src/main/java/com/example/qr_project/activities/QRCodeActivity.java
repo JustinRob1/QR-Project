@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import com.google.firebase.firestore.GeoPoint;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,11 +44,37 @@ public class QRCodeActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
 
+    private TextView totalScans;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrcode);
-        String qr_code = getIntent().getStringExtra("qr_code_hash");
+
+        db = FirebaseFirestore.getInstance();
+
+        String qr_code_hash = getIntent().getStringExtra("hash");
+        DocumentReference qrCodeRef = db.collection("qrcodes").document(qr_code_hash);
+
+        totalScans = findViewById(R.id.total_scans);
+
+        // Attach a listener to the QR code document to update the number of times it was scanned
+        qrCodeRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                Log.w("MY TAG", "Listen failed.", e);
+                return;
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                // Get the users array from the QR code document
+                ArrayList<String> users = (ArrayList<String>) snapshot.get("users");
+
+                // Update the TextView for the number of times the QR code was scanned
+                totalScans.setText(String.valueOf(users.size()));
+            } else {
+                Log.d("MY TAG", "Current data: null");
+            }
+        });
     }
 
     /**
