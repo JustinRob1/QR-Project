@@ -3,6 +3,7 @@ package com.example.qr_project.utils;
 import static android.content.ContentValues.TAG;
 
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 
@@ -15,14 +16,18 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class UserManager {
     private static volatile UserManager instance;
+
+
     private String username; // Stores the username
     private String email; // Stores the users email
     private String userID; // Stores the userID
@@ -221,6 +226,60 @@ public class UserManager {
         });
     }
 
+    public void getTop3FriendsSorted(DatabaseResultCallback<List<Friend>> callback){
+        getDB("friends", new DatabaseResultCallback<Object>() {
+            @Override
+            public void onSuccess(Object result) {
+                if (result instanceof List) {
+                    List<Map<String, Object>> friendsData = (List<Map<String, Object>>) result;
+                    List<Friend> friendsList = new ArrayList<>();
+                    AtomicInteger remainingFriends = new AtomicInteger(friendsData.size());
+
+                    for (Map<String, Object> friendData : friendsData) {
+                        String userId = (String) friendData.get("userID");
+                        dbHelper.getDocument("users", userId, new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                Friend friend = new Friend((String) documentSnapshot.get("username"), Math.toIntExact((long) documentSnapshot.get("totalScore")), userId);
+                                friendsList.add(friend);
+
+                                if (remainingFriends.decrementAndGet() == 0) {
+                                    Collections.sort(friendsList, new Comparator<Friend>() {
+                                        @Override
+                                        public int compare(Friend f1, Friend f2) {
+                                            // Assuming the Friend class has a `getScore()` method
+                                            return Integer.compare(f2.getScore(), f1.getScore());
+                                        }
+                                    });
+
+                                    List<Friend> top3Friends = friendsList.subList(0, Math.min(3, friendsList.size()));
+                                    callback.onSuccess(top3Friends);
+                                }
+                            }
+                        }, new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                remainingFriends.decrementAndGet();
+                                Log.e(TAG, "Failed to get friend data for user_id: " + userId, e);
+                            }
+                        });
+                    }
+                } else {
+                    callback.onFailure(new Exception("Friends list is not a valid List type."));
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+
+    public void getPerson(DatabaseResultCallback<List<Map<String, Object>>> callback){
+
+    }
 
     public void getTotalScore(DatabaseResultCallback<Integer> callback) {
         getDB("totalScore", new DatabaseResultCallback<Object>() {

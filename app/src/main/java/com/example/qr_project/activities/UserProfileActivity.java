@@ -8,9 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.TableRow;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,17 +19,15 @@ import androidx.appcompat.widget.AppCompatButton;
 
 import com.example.qr_project.R;
 import com.example.qr_project.models.DatabaseResultCallback;
-import com.example.qr_project.utils.UserManager;
 import com.example.qr_project.utils.Hash;
 import com.example.qr_project.utils.QR_Adapter;
 import com.example.qr_project.utils.QR_Code;
+import com.example.qr_project.utils.UserManager;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +73,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private ArrayList<Map<String, Object>> friends;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,7 +98,7 @@ public class UserProfileActivity extends AppCompatActivity {
         globalRankTxt = findViewById(R.id.global_user_rank);
         friendRankTxt = findViewById(R.id.friend_user_rank);
         totalQrCodesTxt = findViewById(R.id.user_total_qr_codes);
-        qrCode1NameTxt = findViewById(R.id.qr_code_name_1);
+        /*qrCode1NameTxt = findViewById(R.id.qr_code_name_1);
         qrCode2NameTxt = findViewById(R.id.qr_code_name_2);
         qrCode3NameTxt = findViewById(R.id.qr_code_name_3);
         qrCode1ScoreTxt = findViewById(R.id.qr_code_score_1);
@@ -107,9 +106,16 @@ public class UserProfileActivity extends AppCompatActivity {
         qrCode3ScoreTxt = findViewById(R.id.qr_code_score_3);
         qrCode1Row = findViewById(R.id.qr_code_row_1);
         qrCode2Row = findViewById(R.id.qr_code_row_2);
-        qrCode3Row = findViewById(R.id.qr_code_row_3);
+        qrCode3Row = findViewById(R.id.qr_code_row_3);*/
         tableTitleText = findViewById(R.id.table_header);
         addFriendBtn = findViewById(R.id.add_friend_btn);
+
+
+
+        rankedQRCodes_list = new ArrayList<>();
+        rankedQRCodes_adapter = new QR_Adapter(this, rankedQRCodes_list);
+        rankedQRCodes_view = findViewById(R.id.top_qr_table);
+        rankedQRCodes_view.setAdapter(rankedQRCodes_adapter);
 
 
         userManager.getFriends(new DatabaseResultCallback<List<Map<String, Object>>>() {
@@ -203,6 +209,47 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             });
 
+            userManager.getTop3QRCodesSorted(new DatabaseResultCallback<List<Map<String, Object>>>() {
+                @Override
+                public void onSuccess(List<Map<String, Object>> result) {
+                    if (!result.isEmpty()) {
+                        int rank = 1;
+                        for (Map<String, Object> qrCode : result) {
+                            if (rank > 3) break;
+
+                            // Creating QR_Code object for the adapter
+                            String name = String.valueOf(qrCode.get("name"));
+
+                            // POTENTIAL ERROR
+                            int score = qrCode.get("score") instanceof String ? Integer.parseInt((String) qrCode.get("score")) : Math.toIntExact((long) qrCode.get("score"));
+
+                            // IDENTIFIED ERROR POINT
+                            // Not all qr codes in the db have a face,
+                            // so this call will fail for the older docs in docRef
+                            String face = (String) qrCode.get("face");
+
+                            Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+
+                            // adding QR_Code obj to the list
+                            rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
+
+                            rank++;
+                        }
+
+                        // Notify adapter to update dataset
+                        rankedQRCodes_adapter.notifyDataSetChanged();
+
+                        Log.d("DOCSNAP", result.toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Log.d(TAG, "Error getting top 3 codes: ", e);
+                }
+            });
+
+
         } else {
 
             addFriendBtn.setVisibility(View.VISIBLE);
@@ -271,96 +318,6 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             });
 
-            otherUserManager.getTop3QRCodesSorted(new DatabaseResultCallback<List<Map<String, Object>>>() {
-                @Override
-                public void onSuccess(List<Map<String, Object>> result) {
-                    if (!result.isEmpty()) {
-                        if (result.size() > 2){
-                            Map<String, Object> firstQRCode = result.get(0);
-                            qrCode1NameTxt.setText(firstQRCode.get("name").toString().length() > 6 ? firstQRCode.get("name").toString().substring(0, 7)+ "..": firstQRCode.get("name").toString());
-                            qrCode1ScoreTxt.setText(String.valueOf(firstQRCode.get("score")));
-                            qrCode1Row.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
-                                    intent.putExtra("qr_code_hash", String.valueOf(firstQRCode.get("hash")));
-                                    startActivity(intent);
-                                }
-                            });
-
-                            Map<String, Object> secondQRCode = result.get(1);
-                            qrCode2NameTxt.setText(secondQRCode.get("name").toString().length() > 6 ? secondQRCode.get("name").toString().substring(0, 7)+ "..": secondQRCode.get("name").toString());
-                            qrCode2ScoreTxt.setText(String.valueOf(secondQRCode.get("score")));
-                            qrCode2Row.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
-                                    intent.putExtra("qr_code_hash", String.valueOf(secondQRCode.get("hash")));
-                                    startActivity(intent);
-                                }
-                            });
-
-                            Map<String, Object> thirdQRCode = result.get(2);
-                            qrCode3NameTxt.setText(thirdQRCode.get("name").toString().length() > 6 ? thirdQRCode.get("name").toString().substring(0, 7)+ "..": thirdQRCode.get("name").toString());
-                            qrCode3ScoreTxt.setText(String.valueOf(thirdQRCode.get("score")));
-                            qrCode3Row.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
-                                    intent.putExtra("qr_code_hash", String.valueOf(thirdQRCode.get("hash")));
-                                    startActivity(intent);
-                                }
-                            });
-
-                        } else if (result.size() == 2){
-                            Map<String, Object> firstQRCode = result.get(0);
-                            qrCode1NameTxt.setText(firstQRCode.get("name").toString().length() > 6 ? firstQRCode.get("name").toString().substring(0, 7)+ "..": firstQRCode.get("name").toString());
-                            qrCode1ScoreTxt.setText(String.valueOf(firstQRCode.get("score")));
-                            qrCode1Row.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
-                                    intent.putExtra("qr_code_hash", String.valueOf(firstQRCode.get("hash")));
-                                    startActivity(intent);
-                                }
-                            });
-
-
-                            Map<String, Object> secondQRCode = result.get(1);
-                            qrCode2NameTxt.setText(secondQRCode.get("name").toString().length() > 6 ? secondQRCode.get("name").toString().substring(0, 7)+ "..": secondQRCode.get("name").toString());
-                            qrCode2ScoreTxt.setText(String.valueOf(secondQRCode.get("score")));
-                            qrCode2Row.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
-                                    intent.putExtra("qr_code_hash", String.valueOf(secondQRCode.get("hash")));
-                                    startActivity(intent);
-                                }
-                            });
-                        } else if (result.size() == 1){
-                            Map<String, Object> firstQRCode = result.get(0);
-                            qrCode1NameTxt.setText(firstQRCode.get("name").toString().length() > 6 ? firstQRCode.get("name").toString().substring(0, 7)+ "..": firstQRCode.get("name").toString());
-                            qrCode1ScoreTxt.setText(String.valueOf(firstQRCode.get("score")));
-                            qrCode1Row.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    Intent intent = new Intent(UserProfileActivity.this, QRCodeActivity.class);
-                                    intent.putExtra("qr_code_hash", String.valueOf(firstQRCode.get("hash")));
-                                    startActivity(intent);
-                                }
-                            });
-                        }
-
-                    } else {
-                        Log.d(TAG, "No QR codes found");
-                    }
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Log.e(TAG, "Failed to get QR codes", e);
-                }
-            });
             otherUserManager.getTotalQRCodes(new DatabaseResultCallback<Integer>() {
                 @Override
                 public void onSuccess(Integer result) {
@@ -373,8 +330,45 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             });
 
+            otherUserManager.getTop3QRCodesSorted(new DatabaseResultCallback<List<Map<String, Object>>>() {
+                @Override
+                public void onSuccess(List<Map<String, Object>> result) {
+                    if (!result.isEmpty()) {
+                        int rank = 1;
+                        for (Map<String, Object> qrCode : result) {
+                            if (rank > 3) break;
 
+                            // Creating QR_Code object for the adapter
+                            String name = String.valueOf(qrCode.get("name"));
 
+                            // POTENTIAL ERROR
+                            int score = qrCode.get("score") instanceof String ? Integer.parseInt((String) qrCode.get("score")) : Math.toIntExact((long) qrCode.get("score"));
+
+                            // IDENTIFIED ERROR POINT
+                            // Not all qr codes in the db have a face,
+                            // so this call will fail for the older docs in docRef
+                            String face = (String) qrCode.get("face");
+
+                            Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+
+                            // adding QR_Code obj to the list
+                            rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
+
+                            rank++;
+                        }
+
+                        // Notify adapter to update dataset
+                        rankedQRCodes_adapter.notifyDataSetChanged();
+
+                        Log.d("DOCSNAP", result.toString());
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Log.d(TAG, "Error getting top 3 codes: ", e);
+                }
+            });
 
         }
     }
