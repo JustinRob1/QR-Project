@@ -2,6 +2,7 @@ package com.example.qr_project.utils;
 
 import static android.content.ContentValues.TAG;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -326,7 +327,7 @@ public class QRCodeManager {
     private QR_Code createQRCodeObject(Map<String, Object> selectedQRCode, boolean foundWithUser) {
         int score = Math.toIntExact((Long) selectedQRCode.get("score"));
         String name = (String) selectedQRCode.get("name");
-        String face = (String) selectedQRCode.get("face");
+        Bitmap face = (Bitmap) selectedQRCode.get("face");
         String photoUrl = (String) selectedQRCode.get("photo");
         GeoPoint location = (GeoPoint) selectedQRCode.get("location");
         String hash = (String) selectedQRCode.get("hash");

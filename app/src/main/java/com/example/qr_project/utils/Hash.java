@@ -1,5 +1,9 @@
 package com.example.qr_project.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 
 import java.math.BigInteger;
@@ -16,10 +20,16 @@ import java.util.Map;
 public class Hash {
     private String hash;
     private String name;
-    private String face;
+    private Bitmap face;
 
     private int score;
     private final static String TAG = "HASH";
+
+    private static final int IMAGE_SIZE = 256; // the size of the generated image
+    private static final int BACKGROUND_COLOR = Color.WHITE;
+    private static final int EYE_COLOR = Color.BLACK;
+    private static final int NOSE_COLOR = Color.RED;
+    private static final int MOUTH_COLOR = Color.BLUE;
 
     /**
      * Creates an instance of Hash object.
@@ -37,7 +47,7 @@ public class Hash {
      * TO BE REMOVED
      * Implemented by akhadeli
      */
-    public Hash(String hash, String name, String face, int score) {
+    public Hash(String hash, String name, Bitmap face, int score) {
         this.hash = hash;
         this.name = name;
         this.face = face;
@@ -68,7 +78,7 @@ public class Hash {
     /**
      * @return face generated from hash
      */
-    public String getFace() {
+    public Bitmap getFace() {
         return face;
     }
 
@@ -145,103 +155,49 @@ public class Hash {
 
     /**
      * Generates a face based on the hash
-     * @param hashStr a hash string
      * @return a face
      */
-    private static String generateFace(String hashStr) {
-        // Choose eyes
-        Map<Character, String> hex2Eyes = new HashMap<>();
-        hex2Eyes.put('0', "$ $");
-        hex2Eyes.put('1', "* *");
-        hex2Eyes.put('2', "O O");
-        hex2Eyes.put('3', "^ ^");
-        hex2Eyes.put('4', "~ ~");
-        hex2Eyes.put('5', "U U");
-        hex2Eyes.put('6', "' '");
-        hex2Eyes.put('7', "X X");
-        hex2Eyes.put('8', "> <");
-        hex2Eyes.put('9', "# #");
-        hex2Eyes.put('a', "- -");
-        hex2Eyes.put('b', ". .");
-        hex2Eyes.put('c', "F U");
-        hex2Eyes.put('d', "= =");
-        hex2Eyes.put('e', "$ $");
-        hex2Eyes.put('f', "♥ ♥");
+    public static Bitmap generateFace(String hash) {
+        // convert the hash into a set of parameters for the face-like image
+        int eyeSize = Math.abs(hash.hashCode()) % 50 + 50;
+        int noseSize = Math.abs(hash.hashCode() / 3) % 30 + 20;
+        int mouthSize = Math.abs(hash.hashCode() / 7) % 50 + 20;
+        int eyeOffsetX = Math.abs(hash.hashCode() / 11) % 50 - 25;
+        int eyeOffsetY = Math.abs(hash.hashCode() / 13) % 50 - 25;
+        int noseOffsetX = Math.abs(hash.hashCode() / 17) % 50 - 25;
+        int noseOffsetY = Math.abs(hash.hashCode() / 19) % 50 - 25;
+        int mouthOffsetX = Math.abs(hash.hashCode() / 23) % 50 - 25;
+        int mouthOffsetY = Math.abs(hash.hashCode() / 29) % 50 - 25;
 
+        // create a new bitmap for the image
+        Bitmap bitmap = Bitmap.createBitmap(IMAGE_SIZE, IMAGE_SIZE, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
 
+        // draw the background
+        canvas.drawColor(BACKGROUND_COLOR);
 
-        // Choose ears
-        Map<Character, String> hex2Ears = new HashMap<>();
-        hex2Ears.put('0', "$$");      // dollar ears (high score)
-        hex2Ears.put('1', "oo");   // round ears
-        hex2Ears.put('2', "||");   // long ears
-        hex2Ears.put('3', "[]");   // bat ears
-        hex2Ears.put('4', "/\\");   // pointy ears
-        hex2Ears.put('5', "()");   // elf ears
-        hex2Ears.put('6', "!!");   // floppy ears
-        hex2Ears.put('7', "@@");   // antenna ears
-        hex2Ears.put('8', "\\/");   // wing ears
-        hex2Ears.put('9', "~~");   // cat ears
-        hex2Ears.put('a', "><");  // robot ears
-        hex2Ears.put('b', "**");  // elephant ears
-        hex2Ears.put('c', "<>");  // arrow ears
-        hex2Ears.put('d', "==");  // rabbit ears
-        hex2Ears.put('e', "__");  // devil ears
-        hex2Ears.put('f', "##");  // short ears
+        Paint eyePaint = new Paint();
+        eyePaint.setColor(EYE_COLOR);
 
+        Paint nosePaint = new Paint();
+        nosePaint.setColor(NOSE_COLOR);
 
-        // Choose nose
-        Map<Character, String> hex2Nose = new HashMap<>();
-        hex2Nose.put('0', " $ ");    // dollar nose (high score)
-        hex2Nose.put('1', " , ");   // small nose
-        hex2Nose.put('2', " | ");   // straight nose
-        hex2Nose.put('3', " /\\");   // curved nose
-        hex2Nose.put('4', " | ");    // button nose
-        hex2Nose.put('5', ". .");   // pig nose
-        hex2Nose.put('6', "\\/ ");   // flared nostrils
-        hex2Nose.put('7', "/\\_");   // hawk nose
-        hex2Nose.put('8', "\\__");  // upturned nose
-        hex2Nose.put('9', "\\\\\\");  // pointed nose
-        hex2Nose.put('a', "<=>");   // wide nose
-        hex2Nose.put('b', "(((");   // bulbous nose
-        hex2Nose.put('c', " 0 ");   // Circle nose
-        hex2Nose.put('d', "(_)");   // pudgy nose
-        hex2Nose.put('e', " V ");  // ski slope nose
-        hex2Nose.put('f', " + ");   // cleft nose
+        Paint mouthPaint = new Paint();
+        mouthPaint.setColor(MOUTH_COLOR);
 
-        // Choose mouth
-        Map<Character, String> hex2Mouth = new HashMap<>();
-        hex2Mouth.put('0', "$$$");      // dollar mouth (high score)
-        hex2Mouth.put('1', " o ");   // small mouth
-        hex2Mouth.put('2', " O ");   // oval mouth
-        hex2Mouth.put('3', " ^ ");   // triangle mouth
-        hex2Mouth.put('4', " U ");   // square mouth
-        hex2Mouth.put('5', " V ");   // trapezoid mouth
-        hex2Mouth.put('6', " | ");   // vertical line mouth
-        hex2Mouth.put('7', "---");   // horizontal line mouth
-        hex2Mouth.put('8', " S ");   // smile mouth
-        hex2Mouth.put('9', " D ");   // frown mouth
-        hex2Mouth.put('a', " 3 ");  // surprised mouth
-        hex2Mouth.put('b', " P ");  // puckered mouth
-        hex2Mouth.put('c', "___");  // neutral mouth
-        hex2Mouth.put('d', " @ ");  // kissing mouth
-        hex2Mouth.put('e', " X ");  // lips together mouth
-        hex2Mouth.put('f', " + ");  // smirk mouth
+        // draw the eyes
+        canvas.drawCircle(IMAGE_SIZE / 2 + eyeOffsetX - eyeSize, IMAGE_SIZE / 2 + eyeOffsetY, eyeSize, eyePaint);
+        canvas.drawCircle(IMAGE_SIZE / 2 + eyeOffsetX + eyeSize, IMAGE_SIZE / 2 + eyeOffsetY, eyeSize, eyePaint);
 
+        // draw the nose
+        canvas.drawCircle(IMAGE_SIZE / 2 + noseOffsetX, IMAGE_SIZE / 2 + noseOffsetY, noseSize, nosePaint);
 
-        // Build head
-        String eyes = hex2Eyes.get(hashStr.charAt(0));
-        String ears = hex2Ears.get(hashStr.charAt(1));
-        String nose = hex2Nose.get(hashStr.charAt(2));
-        String mouth = hex2Mouth.get(hashStr.charAt(3));
-        String head =
-                "  /‾‾‾‾‾\\ \n" +
-                        ears.charAt(0) + "|  " + eyes + "  |" + ears.charAt(1) + " \n" +
-                        " |   " + nose + " | \n" +
-                        " |  " + mouth + "  |\n" +
-                        "  \\_____/ ";
+        // draw the mouth
+        canvas.drawRect(IMAGE_SIZE / 2 + mouthOffsetX - mouthSize, IMAGE_SIZE / 2 + mouthOffsetY,
+                IMAGE_SIZE / 2 + mouthOffsetX + mouthSize, IMAGE_SIZE / 2 + mouthOffsetY + mouthSize / 2,
+                mouthPaint);
 
-        return head;
+        return bitmap;
     }
 
     /**

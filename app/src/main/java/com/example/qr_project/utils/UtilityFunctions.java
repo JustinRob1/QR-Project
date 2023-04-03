@@ -2,8 +2,10 @@ package com.example.qr_project.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
@@ -12,6 +14,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.example.qr_project.R;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 public class UtilityFunctions {
 
@@ -51,13 +55,27 @@ public class UtilityFunctions {
         rankTextView.setPadding(10, 0, 0, 0);
 
         // Create a new ImageView for the TableRow
-        TextView nameFaceView = new TextView(context);
-        nameFaceView .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
-        nameFaceView .setText(face);
-        nameFaceView .setTextColor(Color.BLACK);
-        nameFaceView .setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        nameFaceView .setGravity(Gravity.CENTER);
-        nameFaceView .setPadding(15, 0, 0, 0);
+        ImageView faceImageView = new ImageView(context);
+        faceImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
+        Picasso.get()
+                .load(face)
+                .into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        faceImageView.setImageBitmap(bitmap);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        // Handle errors here
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                        // Handle placeholder here
+                    }
+                });
+        faceImageView.setPadding(0, 0, 0, 0);
 
         // Create a new TextView for the TableRow
         TextView nameTextView = new TextView(context);
@@ -86,7 +104,7 @@ public class UtilityFunctions {
 
 
         linearLayout.addView(rankTextView);
-        linearLayout.addView(nameFaceView);
+        linearLayout.addView(faceImageView);
         linearLayout.addView(nameTextView);
         linearLayout.addView(scoreTextView);
         linearLayout.addView(arrowImageView);

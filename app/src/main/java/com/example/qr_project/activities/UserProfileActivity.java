@@ -5,6 +5,7 @@ import static android.view.View.GONE;
 import static com.example.qr_project.utils.UserManager.containsUserID;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -225,7 +226,7 @@ public class UserProfileActivity extends AppCompatActivity {
                             // IDENTIFIED ERROR POINT
                             // Not all qr codes in the db have a face,
                             // so this call will fail for the older docs in docRef
-                            String face = (String) qrCode.get("face");
+                            Bitmap face = (Bitmap) qrCode.get("face");
 
                             Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
@@ -346,7 +347,7 @@ public class UserProfileActivity extends AppCompatActivity {
                             // IDENTIFIED ERROR POINT
                             // Not all qr codes in the db have a face,
                             // so this call will fail for the older docs in docRef
-                            String face = (String) qrCode.get("face");
+                            Bitmap face = (Bitmap) qrCode.get("face");
 
                             Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 

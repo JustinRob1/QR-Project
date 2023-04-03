@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -34,6 +35,7 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +47,8 @@ public class ScanActivity extends AppCompatActivity {
     QR_Code qrCode;
     FirebaseFirestore db;
     private static final int LOCATION_REQUEST_CODE = 100;
+
+    Bitmap face;
 
     /**
      * Defining the cameralauncher ready to scan the QR_Code
@@ -124,6 +128,8 @@ public class ScanActivity extends AppCompatActivity {
                     String qrCodeHash = qrCode.getHash();
                     // Retrieve the user's information
                     String userID = sharedPref.getString("user_id", null);
+                    face = qrCode.getFace();
+                    qrCode.setFace();
                     db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
                         // Check if the document exists
                         if (documentSnapshot.exists()) {
@@ -146,6 +152,12 @@ public class ScanActivity extends AppCompatActivity {
                                 Intent intent = new Intent(this, PictureActivity.class);
                                 intent.putExtra("qrHash", qrCodeHash);
                                 intent.putExtra("userID", userID);
+                                // Convert the bitmap to a byte array
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                face.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                byte[] byteArray = stream.toByteArray();
+                                intent.putExtra("face", byteArray);
+                                startActivity(intent);
                                 startActivity(intent);
                                 finish();
                             }
