@@ -18,6 +18,7 @@ android {
         // Fot UI tests:
         // https://developer.android.com/training/testing/espresso/setup#groovy
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {

@@ -5,15 +5,20 @@ import android.graphics.Bitmap;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class QR_Code {
     private Hash hash; // Stores the hash
+
+    private String hash_code;
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
-    private String face; // Stores the QR code face
+    private Bitmap face; // Stores the QR code face
     private Bitmap photo; // Stores the photo taken
     private GeoPoint location;
+
+    private String photo_url;
+
+    private boolean scannedByUser;
 
     /**
      * Constructor for QR Code without photo and location.
@@ -28,6 +33,24 @@ public class QR_Code {
         this.photo = null;
         this.location = null;
     }
+
+    public QR_Code(int score, String name, Bitmap face, String photo, GeoPoint location, String hash_code, boolean scannedByUser){
+        this.score = score;
+        this.name = name;
+        this.face = face;
+        this.photo_url = photo;
+        this.location = location;
+        this.hash_code = hash_code;
+        this.scannedByUser = scannedByUser;
+    }
+
+    public QR_Code(int score, String name, String face, String hash_code){
+        this.score = score;
+        this.name = name;
+        this.face = face;
+        this.hash_code = hash_code;
+    }
+
 
     /**
      * Constructor for QR Code with photo and location.
@@ -50,7 +73,7 @@ public class QR_Code {
      * TO BE REMOVED
      * Implemented by akhadeli
      */
-    public QR_Code(Hash hash, int score, String name, String face) {
+    public QR_Code(Hash hash, int score, String name, Bitmap face) {
         this.hash = hash;
         this.score = score;
         this.name = name;
@@ -72,12 +95,21 @@ public class QR_Code {
         return this.hash.getHash();
     }
 
+    public String getHash_code(){return this.hash_code;}
+
     /**
      *
      * @return generated face string from generated hash
      */
-    public String getFace() {
+    public Bitmap getFace() {
         return face;
+    }
+
+    /**
+     *
+     */
+    public void setFace() {
+        this.face = null;
     }
 
 

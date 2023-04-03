@@ -9,10 +9,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -22,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -34,6 +37,7 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +49,8 @@ public class ScanActivity extends AppCompatActivity {
     QR_Code qrCode;
     FirebaseFirestore db;
     private static final int LOCATION_REQUEST_CODE = 100;
+
+    Bitmap face;
 
     /**
      * Defining the cameralauncher ready to scan the QR_Code
@@ -68,6 +74,8 @@ public class ScanActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        View loadingScreen = getLayoutInflater().inflate(R.layout.loading_screen, null);
+        setContentView(loadingScreen);
         db = FirebaseFirestore.getInstance();
 
         // Permission was not granted
@@ -124,6 +132,8 @@ public class ScanActivity extends AppCompatActivity {
                     String qrCodeHash = qrCode.getHash();
                     // Retrieve the user's information
                     String userID = sharedPref.getString("user_id", null);
+                    face = qrCode.getFace();
+                    qrCode.setFace();
                     db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
                         // Check if the document exists
                         if (documentSnapshot.exists()) {
@@ -143,10 +153,19 @@ public class ScanActivity extends AppCompatActivity {
                                 finish();
                             } else {
                                 addQR();
-                                Intent intent = new Intent(this, PictureActivity.class);
-                                intent.putExtra("qrHash", qrCodeHash);
-                                intent.putExtra("userID", userID);
-                                startActivity(intent);
+                                Intent faceIntent = new Intent(this, FaceActivity.class);
+                                faceIntent.putExtra("qrHash", qrCodeHash);
+                                faceIntent.putExtra("userID", userID);
+                                // Convert the bitmap to a byte array
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                face.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+                                byte[] byteArray = stream.toByteArray();
+                                faceIntent.putExtra("face", byteArray);
+                                startActivity(faceIntent);
+                                Intent photoIntent = new Intent(this, PictureActivity.class);
+                                photoIntent.putExtra("qrHash", qrCodeHash);
+                                photoIntent.putExtra("userID", userID);
+                                startActivity(photoIntent);
                                 finish();
                             }
                         }
@@ -256,6 +275,7 @@ public class ScanActivity extends AppCompatActivity {
                     // QR code does not exist, add a new document with the 'users' array field
                     Map<String, Object> data = new HashMap<>();
                     data.put("users", Arrays.asList(userID));
+                    data.put("comments", null);
                     qrCodeRef.set(data).addOnCompleteListener(setTask -> {
                         if (setTask.isSuccessful()) {
                             Log.d(TAG, "Added new QR code document with hash: " + qrCodeHash);

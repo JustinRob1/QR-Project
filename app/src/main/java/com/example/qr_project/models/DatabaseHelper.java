@@ -4,6 +4,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.Map;
@@ -30,5 +31,14 @@ public interface DatabaseHelper {
                                  OnSuccessListener<Void> successListener,
                                  OnFailureListener failureListener);
 
+    void getCollection(String collectionName,
+                       OnSuccessListener<QuerySnapshot> successListener,
+                       OnFailureListener failureListener);
+
+    void setDocumentSnapshotListener(String collectionName, String documentId,
+                                     EventListener<DocumentSnapshot> eventListener);
+
+    void setCollectionSnapshotListener(String collectionName,
+                                       EventListener<QuerySnapshot> eventListener);
 }
 

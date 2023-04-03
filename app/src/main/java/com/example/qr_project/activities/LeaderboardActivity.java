@@ -2,15 +2,14 @@ package com.example.qr_project.activities;
 
 import static android.content.ContentValues.TAG;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,16 +19,17 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 
 import com.example.qr_project.R;
+import com.example.qr_project.models.DatabaseResultCallback;
+import com.example.qr_project.utils.Friend;
+import com.example.qr_project.utils.Hash;
+import com.example.qr_project.utils.LeaderboardManager;
+import com.example.qr_project.utils.QR_Adapter;
+import com.example.qr_project.utils.QR_Code;
+import com.example.qr_project.utils.Score_Adapter;
+import com.example.qr_project.utils.UserManager;
 import com.example.qr_project.utils.UtilityFunctions;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -38,16 +38,11 @@ public class LeaderboardActivity extends AppCompatActivity {
     public TextView qr_code_filter;
     public TextView ovr_score_filter;
 
-    FirebaseFirestore db;
+    public ListView leaderboard_view;
 
-    public TableLayout user_qr_leaderboard;
-    public TableLayout friend_qr_leaderboard;
-    public TableLayout global_qr_leaderboard;
+//    public TextView user_codes_title;
 
-    public TableLayout friend_ovr_leaderboard;
-    public TableLayout global_ovr_leaderboard;
-
-    public TextView user_codes_title;
+    public TextView leaderboardScore;
 
     public LinearLayout leaderboard_dial_filters;
 
@@ -57,18 +52,38 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     public AppCompatButton btn_filter_global;
 
-    boolean isFilterChanged = false;
-    boolean isUser= false;
-    boolean isFriend = true;
-    boolean isGlobal = false;
+    public ArrayList<QR_Code> userQRCodes_list;
 
-    boolean isUserAdded = false;
-    boolean isFriendAdded=false;
-    boolean isGlobalAdded= false;
+    public ArrayAdapter<QR_Code> userQRCodes_adapter;
+
+    // TODO
+    // Implement friend filters
+    public ArrayList<Friend> friendScores_list;
+    public ArrayList<QR_Code> friendQRCodes_list;
+
+    public ArrayAdapter<Friend> friendScores_adapter;
+    public ArrayAdapter<QR_Code> friendQRCodes_adapter;
+
+    public ArrayList<Friend> globalScores_list;
+    public ArrayList<QR_Code> globalQRCodes_list;
+
+    public ArrayAdapter<Friend> globalScores_adapter;
+    public ArrayAdapter<QR_Code> globalQRCodes_adapter;
+
+    public Boolean is_overall_scores;
+    public Boolean is_qr_codes;
+    public String curr_view;
+
+    public String TAG = "LeaderboardActivity";
+
+    UserManager userManager;
+    LeaderboardManager leaderboardManager;
+
 
     /**
-     * Finds and fetches the right ID's for all the buttons
-     * @param savedInstanceState   Fetching the ID's of the button and their function
+     * This LeaderBoardManager is to manage the leaderboard in ranking among friends and even global
+     * Populate the leaderboard through filter
+     * @param savedInstanceState
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,60 +92,212 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
+        initViews();
+
+        userManager = UserManager.getInstance();
+        leaderboardManager = new LeaderboardManager();
+
+        // starting listeners
+        totalScoreListener();
+        userTopQRCodesListener();
+        globalTopQRCodesListener();
+        globalTopTotalScoresListener();
+
+        // TODO
+        // Implement friend listeners
+
+        String filter = intent.getStringExtra("filter");
+        curr_view = filter;
+
+        populateData(filter);
+    }
+
+    // This is to initalize the View in leaderboard
+    // Fetching all the ids from the xml files
+    private void initViews(){
+        leaderboard_view = findViewById(R.id.leaderboard_listview);
+
+        // Setting up lists and adapters
+        userQRCodes_list = new ArrayList<>();
+        userQRCodes_adapter = new QR_Adapter(this, userQRCodes_list);
+
+        friendScores_list = new ArrayList<>();
+        friendQRCodes_list = new ArrayList<>();
+        friendScores_adapter = new Score_Adapter(this, friendScores_list);
+        friendQRCodes_adapter = new QR_Adapter(this, friendQRCodes_list);
+
+        globalScores_list = new ArrayList<>();
+        globalQRCodes_list = new ArrayList<>();
+        globalScores_adapter = new Score_Adapter(this, globalScores_list);
+        globalQRCodes_adapter = new QR_Adapter(this, globalQRCodes_list);
+
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
-        user_qr_leaderboard = findViewById(R.id.user_qr_leaderboard_table);
-        friend_qr_leaderboard = findViewById(R.id.friend_qr_leaderboard_table);
-        global_qr_leaderboard = findViewById(R.id.global_qr_leaderboard_table);
-        friend_ovr_leaderboard= findViewById(R.id.friend_ovr_leaderboard_table);
-        global_ovr_leaderboard= findViewById(R.id.global_ovr_leaderboard_table);
 
         leaderboard_dial_filters = findViewById(R.id.leaderboard_dial_filter_layout);
-        user_codes_title = findViewById(R.id.title_user_qr_codes);
+//        user_codes_title = findViewById(R.id.title_user_qr_codes);
 
         btn_filter_global = findViewById(R.id.btn_filter_global);
         btn_filter_friends = findViewById(R.id.btn_filter_friends);
         btn_filter_user = findViewById(R.id.btn_filter_you);
+        leaderboardScore = findViewById(R.id.leaderboard_score);
 
-
-
-        // Hide all other tables other than friends
-        user_qr_leaderboard.setVisibility(View.GONE);
-        global_qr_leaderboard.setVisibility(View.GONE);
-        friend_ovr_leaderboard.setVisibility(View.GONE);
-        global_ovr_leaderboard.setVisibility(View.GONE);
-        user_codes_title.setVisibility(View.GONE);
-        friend_qr_leaderboard.setVisibility(View.VISIBLE);
-
-
-        String filter = intent.getStringExtra("filter");
-        if (filter != null && filter.equals("user")){
-            user_codes_title.setVisibility(View.VISIBLE);
-            leaderboard_dial_filters.setVisibility(View.GONE);
-            btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
-            btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
-            btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
-            isUser = true;
-            isFriend = false;
-            isGlobal = false;
-        }
+        is_overall_scores = true;
+        is_qr_codes = false;
     }
 
+
+    private void populateData(String filter){
+        if (filter.equals("user")) {
+            onUserLeaderboardView(null);
+
+        } else if (filter.equals("friends")){
+            onFriendLeaderboardView(null);
+
+        } else {
+            onGlobalLeaderboardView(null);
+
+        }
+
+    }
+
+    // Listener functions
+    private void totalScoreListener() {
+        userManager.getRealtimeTotalScore(new DatabaseResultCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                leaderboardScore.setText(result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                leaderboardScore.setText("N/A");
+            }
+        });  // does score at the top
+    }
+
+    private void userTopQRCodesListener() {
+        leaderboardManager.getRealtimeTopUserQRCodes(new DatabaseResultCallback<List<Map<String, Object>>>() {
+            @Override
+
+            public void onSuccess(List<Map<String, Object>> result) {
+                userQRCodes_list.clear();
+                for (Map<String, Object> qrCode : result) {
+
+                    // Creating QR_Code object for the adapter
+                    String name = String.valueOf(qrCode.get("name"));
+
+                    // POTENTIAL ERROR
+                    int score = Math.toIntExact((Long) qrCode.get("score"));
+
+                    String face = (String) qrCode.get("face");
+
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+
+                    // adding QR_Code obj to the list
+                    userQRCodes_list.add(new QR_Code(hash, score, name, face));
+
+                }
+
+                userQRCodes_adapter.notifyDataSetChanged();
+
+            }
+            /**
+             * The function throws an exception if there exists an error with global's codes
+             * @param e
+             * @throws Exception
+             */
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+    }
+
+    private void globalTopQRCodesListener() {
+        leaderboardManager.getRealtimeTopGlobalQRCodes(new DatabaseResultCallback<List<Map<String, Object>>>() {
+
+            @Override
+            public void onSuccess(List<Map<String, Object>> result) {
+                for (Map<String, Object> qrCode : result) {
+
+                    // Creating QR_Code object for the adapter
+                    String name = String.valueOf(qrCode.get("name"));
+
+                    // POTENTIAL ERROR
+                    int score = Math.toIntExact((Long) qrCode.get("score"));
+
+                    String face = (String) qrCode.get("face");
+
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+
+                    // adding QR_Code obj to the list
+                    globalQRCodes_list.add(new QR_Code(hash, score, name, face));
+                }
+
+                globalQRCodes_adapter.notifyDataSetChanged();
+            }
+            /**
+             * The function throws an exception if there exists an error with friends' codes
+             * @param e
+             * @throws Exception
+             */
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+    }
+
+    private void globalTopTotalScoresListener() {
+        leaderboardManager.getRealtimeGlobalTotalScores(new DatabaseResultCallback<List<Friend>>() {
+
+            @Override
+            public void onSuccess(List<Friend> result) {
+                for (Friend score : result) {
+                    globalScores_list.add(score);
+                }
+
+                globalScores_adapter.notifyDataSetChanged();
+            }
+            /**
+             * The function throws an exception if there exists an error with globals codes
+             * @param e
+             * @throws Exception
+             */
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+    }
+
+
+    // Common functions
+    
     /**
-     * When the user clicks the camera button, this method will be called
-     * and will open the camera to scan a QR or barcode
-     *
-     * @param view The text view which is pressed
+     * This is the camera function
+     * This allows user to interact with the camera button on the app
+     * This allows user to open the camera right on the app
+     * @see ScanActivity
+     * @see QRCodeActivity
+     * @see MapActivity
+     * @see PictureActivity
+     * @param view
      */
     public void onCameraClick(View view) {
         Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
     }
 
+
     /**
-     * Dummy method for map button
+     * This is the map function
+     * This allows user to interact with the map button on the app
+     * This allows user to open the map location right on the app
+     * @see MapActivity
+     * @see PictureActivity
      * @param view
-     * The text view which is pressed
      */
     public void onMapClick(View view) {
         Intent intent = new Intent(this, MapActivity.class);
@@ -138,316 +305,116 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     * Called when the user clicks the back button
+     * This is when the user is done with their command and actions
+     * Return finish() function
      * @param view
-     * The text view which is pressed
+     * @return finish()
      */
     public void onClickBack(View view){
         finish();
     }
 
+    /**
+     * This function is to take the user back to the leaderboard scree
+     * Once the user is done with the map and camera, they can always return to the leaderboard screen
+     * If the user is already on the leaderboard screen, the app knows about it and will tell the user
+     * that "Already at leaderboard".
+     * @param view
+     */
     public void onLeaderboardClick(View view){
         Toast.makeText(this, "Already at leaderboard", Toast.LENGTH_SHORT).show();
     }
 
+    // View update functions
     /**
-     * Called when the user clicks the QR code button
-     * Getting the user's ID and their information about the QR_Codes and their scores
-     * Fetching the information stored on the FireBase FireStore Cloud
-     *
-     * After getting all the needed information, the code can now calculate
-     * the points of the user's and also their friends' to populate the leaderboard.
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for UserLeaderboardView
      * @param view
-     * The text view which is pressed
      */
     public void onUserLeaderboardView(View view) {
-        user_codes_title.setVisibility(View.VISIBLE);
+//        user_codes_title.setVisibility(View.VISIBLE);
+        curr_view = "user";
         leaderboard_dial_filters.setVisibility(View.GONE);
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
         btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
 
-
+        leaderboard_view.setAdapter(userQRCodes_adapter);
         // Hide all other tables other than friends
-        user_qr_leaderboard.setVisibility(View.VISIBLE);
-        global_qr_leaderboard.setVisibility(View.GONE);
-        friend_ovr_leaderboard.setVisibility(View.GONE);
-        global_ovr_leaderboard.setVisibility(View.GONE);
-        friend_qr_leaderboard.setVisibility(View.GONE);
-        user_codes_title.setVisibility(View.VISIBLE);
-        leaderboard_dial_filters.setVisibility(View.GONE);
-
-        isUser = true;
-        isFriend = false;
-        isGlobal = false;
-
-        db = FirebaseFirestore.getInstance();
-
-        // Get the current user's ID
-        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
-
-        // Retrieve the user's information
-        String userID = sharedPref.getString("user_id", null);
-
-        // Get a reference to the user's document in Firestore
-        DocumentReference userRef = db.collection("users").document(userID);
-
-        // Populate the leaderboard
-        if (!isUserAdded) {
-            userRef.addSnapshotListener((documentSnapshot, e) -> {
-                if (e != null) {
-                    Log.e(TAG, "Error getting user document", e);
-                    return;
-                }
-
-                // Check if the document exists
-                if (documentSnapshot.exists()) {
-                    // Get the qrcodes array from the document data
-                    List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
-
-                    // Use the qrCodes array to populate the leaderboard
-                    // Check the contents of the qrCodes array
-
-                    if (qrCodes != null) {
-                        user_qr_leaderboard.removeAllViews(); // Clear the current leaderboard
-                        int rank = 1;
-                        // Loop through the array
-                        for (Map<String, Object> qrCode : qrCodes) {
-                            String name = (String) qrCode.get("name");
-                            Long score = (Long) qrCode.get("score");
-                            String hash = (String) qrCode.get("hash");
-
-
-
-                            user_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
-                                                                                                name,
-                                                                                                Long.toString(score),
-                                                                                                rank,
-                                                                                                hash,
-                                                                                                R.drawable.leaderboard_row_item,
-                                                                                                R.drawable.logo,
-                                                                                                R.drawable.arrow_right_solid,
-                                                                                                new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", hash)));
-
-                            rank++;
-                        }
-
-                    } else {
-                        Log.d(TAG, "User has no QR codes");
-                    }
-
-                } else {
-                    Log.d(TAG, "User document does not exist");
-                }
-            });
-            isUserAdded = true;
-        }
+//        user_codes_title.setVisibility(View.VISIBLE);
     }
 
 
     /**
-     * Called when the user clicks the friends button
-     * Allows the user to see their friends' profile(s)
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for FriendLeaderboardView
      * @param view
-     * The text view which is pressed
      */
     public void onFriendLeaderboardView(View view){
-        user_codes_title.setVisibility(View.GONE);
+//        user_codes_title.setVisibility(View.GONE);
+        curr_view = "friends";
         leaderboard_dial_filters.setVisibility(View.VISIBLE);
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
 
-        // Hide all other tables other than friends
-        user_qr_leaderboard.setVisibility(View.GONE);
-        global_qr_leaderboard.setVisibility(View.GONE);
-        friend_ovr_leaderboard.setVisibility(View.GONE);
-        global_ovr_leaderboard.setVisibility(View.GONE);
-        friend_qr_leaderboard.setVisibility(View.VISIBLE);
-        user_codes_title.setVisibility(View.GONE);
-        leaderboard_dial_filters.setVisibility(View.VISIBLE);
-
-        isUser = false;
-        isFriend = true;
-        isGlobal = false;
-
-        onFilterChange(view);
-
-        // TODO: TESTING DATA FOR QR CODE
-        if (!isFriendAdded){
-            friend_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
-                    "Dummy",
-                    Integer.toString(1000),
-                    1,
-                    null,
-                    R.drawable.leaderboard_row_item,
-                    R.drawable.logo,
-                    R.drawable.arrow_right_solid,
-                    new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
-
-            friend_ovr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
-                    "Dummy2",
-                    Integer.toString(10000),
-                    1,
-                    null,
-                    R.drawable.leaderboard_row_item,
-                    R.drawable.logo,
-                    R.drawable.arrow_right_solid,
-                    new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", "")));
-
-            isFriendAdded = true;
+//        user_codes_title.setVisibility(View.GONE);
+        if (is_overall_scores) {
+            ovr_score_filter.setTypeface(null, Typeface.BOLD);
+            qr_code_filter.setTypeface(null, Typeface.NORMAL);
+            leaderboard_view.setAdapter(friendScores_adapter);
+        } else {
+            ovr_score_filter.setTypeface(null, Typeface.NORMAL);
+            qr_code_filter.setTypeface(null, Typeface.BOLD);
+            leaderboard_view.setAdapter(friendQRCodes_adapter);
         }
+
     }
 
+
     /**
-     * Called when the user clicks the global button
-     * Moving on the global leaderboard afterward
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for GlobalLeaderboardView
      * @param view
-     * The text view which is pressed
      */
     public void onGlobalLeaderboardView(View view) {
-        Log.d(TAG, "onGlobalLeaderboardView() called with: view = [" + view + "]");
-        user_codes_title.setVisibility(View.GONE);
+//        user_codes_title.setVisibility(View.GONE);
+        curr_view = "global";
         leaderboard_dial_filters.setVisibility(View.VISIBLE);
         btn_filter_user.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_friends.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns));
         btn_filter_global.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.leaderboard_filter_btns_selected));
 
-        // Hide all other tables other than friends
-        user_qr_leaderboard.setVisibility(View.GONE);
-        global_qr_leaderboard.setVisibility(View.VISIBLE);
-        friend_ovr_leaderboard.setVisibility(View.GONE);
-        global_ovr_leaderboard.setVisibility(View.GONE);
-        friend_qr_leaderboard.setVisibility(View.GONE);
-        user_codes_title.setVisibility(View.GONE);
-        leaderboard_dial_filters.setVisibility(View.VISIBLE);
+//        user_codes_title.setVisibility(View.GONE);
 
-        isUser = false;
-        isFriend = false;
-        isGlobal = true;
-
-        db = FirebaseFirestore.getInstance();
-
-        ArrayList<ArrayList<String>> topUsers = new ArrayList<>();
-
-        // TODO: Make sure this works with real data
-
-        // Populate the leaderboard
-        if (!isGlobalAdded) {
-            CollectionReference userRef = db.collection("users");
-
-            userRef.orderBy("totalScore", Query.Direction.DESCENDING).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()){
-                    for (QueryDocumentSnapshot document : task.getResult()){
-                        ArrayList<String> user = new ArrayList<>();
-                        user.add((String) document.get("userID"));
-                        user.add((String) document.get("username"));
-                        user.add(String.valueOf(document.get("totalScore")));
-                        topUsers.add(user);
-                    }
-                    for (int i=0; i < topUsers.size(); i++){
-                        ArrayList<String> userData = topUsers.get(i);
-                        global_ovr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
-                                userData.get(1),
-                                userData.get(2),
-                                i+1,
-                                null,
-                                R.drawable.leaderboard_row_item,
-                                R.drawable.logo,
-                                R.drawable.arrow_right_solid,
-                                new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", userData.get(0))));
-                    }
-                } else {
-                    Log.w("Firestore", "Error getting top 10 documens", task.getException());
-                }
-
-
-            });
-
-            userRef.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    // For QR Codes
-                    List<Pair<String, Integer>> scores = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        Map<String, Object> data = document.getData();
-                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
-                        if (qrCodes != null) {
-                            for (Map<String, Object> qrCode : qrCodes) {
-                                String username = (String) data.get("username");
-                                Integer score = ((Long) qrCode.get("score")).intValue();
-                                Pair<String, Integer> scorePair = new Pair<>(username, score);
-                                scores.add(scorePair);
-                            }
-                        }
-                    }
-
-                    Collections.sort(scores, new Comparator<Pair<String, Integer>>() {
-                        @Override
-                        public int compare(Pair<String, Integer> pair1, Pair<String, Integer> pair2) {
-                            return pair2.second.compareTo(pair1.second); // sort in descending order
-                        }
-                    });
-
-
-                    // Iterate through the collection and show a toast of the scores
-                    int rank = 1;
-                    for (Pair<String, Integer> score : scores) {
-                        // TODO: Fix the hash
-                        global_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
-                                            "Dummy",
-                                            Integer.toString(1000),
-                                            1,
-                                            null,
-                                            R.drawable.leaderboard_row_item,
-                                            R.drawable.logo,
-                                            R.drawable.arrow_right_solid,
-                                            new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
-                        rank++;
-                    }
-                    isGlobalAdded = true;
-
-                } else {
-                    Log.d(TAG, "Error getting documents: ", task.getException());
-                }
-
-            });
-
+        if (is_overall_scores) {
+            ovr_score_filter.setTypeface(null, Typeface.BOLD);
+            qr_code_filter.setTypeface(null, Typeface.NORMAL);
+            leaderboard_view.setAdapter(globalScores_adapter);
+        } else {
+            ovr_score_filter.setTypeface(null, Typeface.NORMAL);
+            qr_code_filter.setTypeface(null, Typeface.BOLD);
+            leaderboard_view.setAdapter(globalQRCodes_adapter);
         }
     }
 
     /**
-     * Called when the user clicks the filter button
+     * This filterChange functionality is to change the setting of the visibility
      * @param view
-     * The text view which is pressed
      */
     public void onFilterChange(View view) {
-        if (isFilterChanged) {
-            qr_code_filter.setTypeface(null, Typeface.BOLD);
-            ovr_score_filter.setTypeface(null, Typeface.NORMAL);
-
-            if (isFriend){
-                friend_qr_leaderboard.setVisibility(View.VISIBLE);
-                friend_ovr_leaderboard.setVisibility(View.GONE);
-            } else if(isGlobal){
-                global_qr_leaderboard.setVisibility(View.VISIBLE);
-                global_ovr_leaderboard.setVisibility(View.GONE);
-            }
-            isFilterChanged = false;
+        Log.d(TAG, "filter change");
+        if (is_overall_scores) {
+            is_overall_scores = false;
+            is_qr_codes = true;
         } else {
-            qr_code_filter.setTypeface(null, Typeface.NORMAL);
-            ovr_score_filter.setTypeface(null, Typeface.BOLD);
-
-            if (isFriend){
-                friend_qr_leaderboard.setVisibility(View.GONE);
-                friend_ovr_leaderboard.setVisibility(View.VISIBLE);
-            } else if(isGlobal){
-                global_qr_leaderboard.setVisibility(View.GONE);
-                global_ovr_leaderboard.setVisibility(View.VISIBLE);
-            }
-
-            isFilterChanged = true;
+            is_overall_scores = true;
+            is_qr_codes = false;
         }
-
+        populateData(curr_view);
     }
 
 
