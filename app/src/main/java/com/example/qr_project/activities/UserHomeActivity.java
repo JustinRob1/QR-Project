@@ -85,7 +85,7 @@ public class UserHomeActivity extends AppCompatActivity {
 
         initViews();
 
-        // TO DO
+        // TODO
         // Since we have decided to do things in realtime
         // The current method of calling these functions
         // in the onResume lifecycle function
@@ -186,6 +186,7 @@ public class UserHomeActivity extends AppCompatActivity {
      */
     public void onLeaderboardClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);
+        intent.putExtra("filter", "user");
         startActivity(intent);
     }
 
