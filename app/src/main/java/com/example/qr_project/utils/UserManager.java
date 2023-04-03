@@ -3,8 +3,10 @@ package com.example.qr_project.utils;
 import static android.content.ContentValues.TAG;
 
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.qr_project.models.DatabaseResultCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -12,6 +14,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -241,6 +245,35 @@ public class UserManager {
         });
     }
 
+    public void getRealtimeTop3QRCodesSorted(DatabaseResultCallback<List<Map<String, Object>>> callback) {
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(new Exception("Listen Failed"));
+                }
+
+                if (value != null && value.exists()) {
+                    Map<String, Object> data = value.getData();
+                    if (data != null){
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
+                        if (qrCodes != null) {
+                            // Sort QR codes based on score
+                            qrCodes.sort((a,b) -> ( (Long) b.get("score")).compareTo(( (Long) a.get("score")) ));
+
+                            List<Map<String, Object>> topQRCodes = qrCodes.size() >= 3
+                                    ? qrCodes.subList(0, 3)
+                                    : qrCodes;
+                            callback.onSuccess(topQRCodes);
+                        }
+                    }
+                } else {
+                    callback.onFailure(new Exception("QR codes are not in a valid list format"));
+                }
+            }
+        });
+    }
+
     /**
      * Retrieves the user's friends list from the database and returns it through the provided callback.
      *
@@ -339,6 +372,26 @@ public class UserManager {
                 Log.d(TAG, "Error", e);
                 totalScore = 0;
                 callback.onFailure(e);
+            }
+        });
+    }
+
+    public void getRealtimeTotalScore(DatabaseResultCallback<String> callback) {
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(new Exception("Listen Failed"));
+                }
+
+                if (value != null && value.exists()) {
+                    Map<String, Object> data = value.getData();
+                    if (data != null) {
+                        callback.onSuccess(String.valueOf(data.get("totalScore")));
+                    } else {
+                        callback.onFailure(new Exception("Retrieval of totalScore failed"));
+                    }
+                }
             }
         });
     }
@@ -460,6 +513,44 @@ public class UserManager {
                     Log.d(TAG, "Unsuccessful query", task.getException());
                     globalRanking = 0;
                     callback.onFailure(task.getException());
+                }
+            }
+        });
+    }
+
+    public void getRealtimeGlobalRanking(DatabaseResultCallback<String> callback) {
+        dbHelper.setCollectionSnapshotListener("users", new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(new Exception("Listen Failed"));
+                }
+
+                if (value != null) {
+                    ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
+
+                    for (QueryDocumentSnapshot doc : value) {
+                        Map<String, Integer> userId_score_pair = new HashMap<>();
+                        Object totalScoreObj = doc.get("totalScore");
+                        if (totalScoreObj != null) {
+                            Long totalScoreLong = (Long) totalScoreObj;
+                            userId_score_pair.put(doc.getId(), Math.toIntExact(totalScoreLong));
+                            rankings.add(userId_score_pair);
+                        }
+                    }
+
+                    rankings.sort(Comparator.comparing(x -> x.entrySet().iterator().next().getValue()));
+                    String rank;
+                    int counter = rankings.size();
+                    for (Map<String, Integer> x : rankings) {
+                        if (x.containsKey(userID)) {
+                            callback.onSuccess(String.valueOf(counter));
+                        }
+                        counter--;
+                    }
+
+                } else {
+                    callback.onFailure(new Exception("Users collection is empty"));
                 }
             }
         });
