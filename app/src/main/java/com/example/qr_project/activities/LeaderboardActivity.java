@@ -203,6 +203,12 @@ public class LeaderboardActivity extends AppCompatActivity {
         leaderboardManager.getTopFriendsQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
             @Override
             /**
+             * This is the ranking system in FRIENDS in the leaderboard
+             * Ranking
+             * The ranking uses hash function to get the user with the highest score
+             * Then returns the user's name and user's score on the app
+             * Putting the information in a row
+             * And then the rank will increase from the top 1 to top 2 and to top 3 and keep going
              * @param result
              */
             public void onSuccess(List<QR_Code> result) {
@@ -226,8 +232,9 @@ public class LeaderboardActivity extends AppCompatActivity {
             }
 
             /**
-             *
+             * The function throws an exception if there exists an error with friends' codes
              * @param e
+             * @throws Exception
              */
             @Override
             public void onFailure(Exception e) {
@@ -239,6 +246,12 @@ public class LeaderboardActivity extends AppCompatActivity {
         leaderboardManager.getTopGlobalQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
             @Override
             /**
+             * This is the ranking system in GLOBAL in the leaderboard
+             * Ranking
+             * The ranking uses hash function to get the user with the highest score
+             * Then returns the user's name and user's score on the app
+             * Putting the information in a row
+             * And then the rank will increase from the top 1 to top 2 and to top 3
              * @param result
              */
             public void onSuccess(List<QR_Code> result) {
@@ -261,14 +274,25 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
             }
-
+            /**
+             * The function throws an exception if there exists an error with global's codes
+             * @param e
+             * @throws Exception
+             */
             @Override
             public void onFailure(Exception e) {
                 globalCodes = null;
                 Log.d(TAG, "Error with global codes", e);
             }
         });
-
+        // The leaderboardManager gets the data and put in an array list.
+        // This includes friends and their scores
+        // Then the app will return in the ranking from highest on top to the lowest below.
+        /**
+         * The result of the ranking is now returned
+         * This is for leaderboard and ranking among FRIENDS
+         * @param result
+         */
         leaderboardManager.getTopFriendsTotalScores(new DatabaseResultCallback<List<Friend>>() {
             @Override
             public void onSuccess(List<Friend> result) {
@@ -292,7 +316,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
             }
-
+            /**
+             * The function throws an exception if there exists an error with friends' codes
+             * @param e
+             * @throws Exception
+             */
             @Override
             public void onFailure(Exception e) {
                 friendScores = null;
@@ -300,6 +328,14 @@ public class LeaderboardActivity extends AppCompatActivity {
             }
         });
 
+        // The leaderboardManager gets the data and put in an array list.
+        // This includes global players and their scores
+        // Then the app will return in the ranking from highest on top to the lowest below.
+        /**
+         * The result of the ranking is now returned
+         * This is for leaderboard and ranking in GLOBAL
+         * @param result
+         */
         leaderboardManager.getTopGlobalTotalScores(new DatabaseResultCallback<List<Friend>>() {
             @Override
             public void onSuccess(List<Friend> result) {
@@ -322,7 +358,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
             }
-
+            /**
+             * The function throws an exception if there exists an error with globals codes
+             * @param e
+             * @throws Exception
+             */
             @Override
             public void onFailure(Exception e) {
                 globalScores = null;
@@ -332,7 +372,13 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This is the camera function
+     * This allows user to interact with the camera button on the app
+     * This allows user to open the camera right on the app
+     * @see ScanActivity
+     * @see QRCodeActivity
+     * @see MapActivity
+     * @see PictureActivity
      * @param view
      */
     public void onCameraClick(View view) {
@@ -341,7 +387,11 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This is the map function
+     * This allows user to interact with the map button on the app
+     * This allows user to open the map location right on the app
+     * @see MapActivity
+     * @see PictureActivity
      * @param view
      */
     public void onMapClick(View view) {
@@ -350,15 +400,20 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This is when the user is done with their command and actions
+     * Return finish() function
      * @param view
+     * @return finish()
      */
     public void onClickBack(View view){
         finish();
     }
 
     /**
-     *
+     * This function is to take the user back to the leaderboard scree
+     * Once the user is done with the map and camera, they can always return to the leaderboard screen
+     * If the user is already on the leaderboard screen, the app knows about it and will tell the user
+     * that "Already at leaderboard".
      * @param view
      */
     public void onLeaderboardClick(View view){
@@ -366,7 +421,9 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for UserLeaderboardView
      * @param view
      */
     public void onUserLeaderboardView(View view) {
@@ -393,7 +450,9 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for FriendLeaderboardView
      * @param view
      */
     public void onFriendLeaderboardView(View view){
@@ -421,7 +480,9 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for GlobalLeaderboardView
      * @param view
      */
     public void onGlobalLeaderboardView(View view) {
@@ -449,7 +510,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This filterChange functionality is to change the setting of the visibility
      * @param view
      */
     public void onFilterChange(View view) {
