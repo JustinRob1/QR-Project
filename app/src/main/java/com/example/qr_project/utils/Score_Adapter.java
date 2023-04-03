@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.example.qr_project.R;
 import com.example.qr_project.activities.QRCodeActivity;
+import com.example.qr_project.activities.UserProfileActivity;
 
 import java.util.ArrayList;
 
@@ -41,19 +42,19 @@ public class Score_Adapter extends ArrayAdapter<Friend> {
         TextView rankTextView = view.findViewById(R.id.qr_code_rank_1);
 
 
-//        qrCodeNameTextView.setText(qrCode.getName());
-//        scoreTextView.setText(String.valueOf(qrCode.getScore()));
-//        String rank = (position + 1) +".";
-//        rankTextView.setText(rank);
-//
-//        view.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(context, QRCodeActivity.class);
-//                intent.putExtra("hash", qrCode.getHash());
-//                context.startActivity(intent);
-//            }
-//        });
+        qrCodeNameTextView.setText(score.getName());
+        scoreTextView.setText(String.valueOf(score.getScore()));
+        String rank = (position + 1) +".";
+        rankTextView.setText(rank);
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, UserProfileActivity.class);
+                intent.putExtra("UserId", score.getId());
+                context.startActivity(intent);
+            }
+        });
 
         return view;
     }
