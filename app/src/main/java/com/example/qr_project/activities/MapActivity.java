@@ -1,6 +1,7 @@
 package com.example.qr_project.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -50,6 +51,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LocationManager mLocationManager;
     FirebaseFirestore db;
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,12 +103,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 location = (GeoPoint) locationObject;
                             }
                             if (location != null) {
+                                // Add a small random offset to the latitude and longitude
+                                double lat = location.getLatitude() + Math.random() * 0.00001;
+                                double lng = location.getLongitude() + Math.random() * 0.00001;
                                 MarkerOptions markerOptions = new MarkerOptions()
-                                        .position(new LatLng(location.getLatitude(), location.getLongitude()));
+                                        .position(new LatLng(lat, lng));
                                 Marker marker = mMap.addMarker(markerOptions);
                                 // Store the qrCode object as a tag of the marker
                                 marker.setTag(qrCode);
                             }
+
                         }
                     }
                 }
