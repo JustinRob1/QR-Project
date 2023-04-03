@@ -81,7 +81,8 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
     /**
-     *
+     * This LeaderBoardManager is to manage the leaderboard in ranking among friends and even global
+     * Populate the leaderboard through filter
      * @param savedInstanceState
      */
     @Override
@@ -104,7 +105,8 @@ public class LeaderboardActivity extends AppCompatActivity {
         populateInitialLeaderboard(filter);
     }
 
-
+    // This is to initalize the View in leaderboard
+    // Fetching all the id
     private void initViews(){
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
