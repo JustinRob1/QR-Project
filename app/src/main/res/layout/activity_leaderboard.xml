@@ -24,6 +24,7 @@
             android:onClick="onClickBack"
             app:srcCompat="@drawable/circle_left_solid"/>
 
+        <!-- Leaderboard Title -->
         <TextView
             android:id="@+id/leaderboard_title"
             android:layout_width="match_parent"
@@ -37,6 +38,7 @@
 
         </TextView>
 
+        <!-- Leaderboard Score -->
         <TextView
             android:id="@+id/leaderboard_score"
             android:layout_width="match_parent"
@@ -45,7 +47,7 @@
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="50sp"
-            android:textStyle="bold"></TextView>
+            android:textStyle="bold"/>
 
         <!-- Leaderboard Filter Buttons -->
         <LinearLayout
@@ -83,17 +85,18 @@
 
 
         <!--Main data -->
+
+        <!-- Leaderboard Layout -->
         <LinearLayout
             android:id="@+id/leaderboard_border_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="400dp"
             android:minHeight="420dp"
             android:layout_marginBottom="30dp"
             android:orientation="vertical"
             android:background="@drawable/leaderboard_border"
             android:layout_gravity="center"
             android:layout_marginHorizontal="30dp">
-
 
             <!-- Filter layout -->
             <LinearLayout
@@ -140,12 +143,21 @@
                     android:layout_weight="1"
                     />
 
-
-
-
             </LinearLayout>
 
-            <!-- User Codes Title -->
+            <ListView
+                android:id="@+id/leaderboard_listview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:dividerHeight="5dp"
+                android:divider="@color/zxing_transparent"
+                />
+
+            <!-- Below is Lukes implementation
+                 commented out -->
+
+            <!-- User Codes Title
             <TextView
                 android:id="@+id/title_user_qr_codes"
                 android:layout_width="wrap_content"
@@ -156,9 +168,9 @@
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:layout_marginTop="15dp"/>
+            -->
 
-
-            <!-- Table Layout for Friends QR Codes  -->
+            <!-- Table Layout for Users QR Codes
             <TableLayout
                 android:id="@+id/user_qr_leaderboard_table"
                 android:layout_width="match_parent"
@@ -166,7 +178,7 @@
                 android:layout_weight="1"
                 android:layout_marginTop="15dp">
 
-                <!-- Test
+                Test
                 <TableRow
                     android:id="@+id/qr_leaderboard_1_item"
                     android:layout_width="match_parent"
@@ -300,10 +312,12 @@
 
                     </LinearLayout>
 
-                </TableRow> -->
+                </TableRow>
 
             </TableLayout>
+            -->
 
+            <!-- Table Layout for Friends QR Codes
             <TableLayout
                 android:id="@+id/friend_qr_leaderboard_table"
                 android:layout_width="match_parent"
@@ -312,7 +326,9 @@
                 android:layout_marginTop="15dp">
 
             </TableLayout>
+            -->
 
+            <!--
             <TableLayout
                 android:id="@+id/global_qr_leaderboard_table"
                 android:layout_width="match_parent"
@@ -321,8 +337,9 @@
                 android:layout_marginTop="15dp">
 
             </TableLayout>
+            -->
 
-            <!-- Table Layout for Friends OVR Scores -->
+            <!-- Table Layout for Friends OVR Scores
             <TableLayout
                 android:id="@+id/friend_ovr_leaderboard_table"
                 android:layout_width="match_parent"
@@ -330,7 +347,7 @@
                 android:layout_weight="1"
                 android:layout_marginTop="15dp">
 
-                <!-- Dont need dummy data
+                Dont need dummy data
                 <TableRow
                     android:id="@+id/ovr_leaderboard_1_item"
                     android:layout_width="match_parent"
@@ -468,10 +485,12 @@
 
                     </LinearLayout>
 
-                </TableRow> -->
+                </TableRow>
 
             </TableLayout>
+            -->
 
+            <!--
             <TableLayout
                 android:id="@+id/global_ovr_leaderboard_table"
                 android:layout_width="match_parent"
@@ -480,7 +499,7 @@
                 android:layout_marginTop="15dp">
 
             </TableLayout>
-
+            -->
 
         </LinearLayout>
 

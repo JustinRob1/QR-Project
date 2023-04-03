@@ -44,6 +44,13 @@ public class QR_Code {
         this.scannedByUser = scannedByUser;
     }
 
+    public QR_Code(int score, String name, String face, String hash_code){
+        this.score = score;
+        this.name = name;
+        this.face = face;
+        this.hash_code = hash_code;
+    }
+
 
     /**
      * Constructor for QR Code with photo and location.
@@ -87,6 +94,8 @@ public class QR_Code {
     public String getHash(){
         return this.hash.getHash();
     }
+
+    public String getHash_code(){return this.hash_code;}
 
     /**
      *

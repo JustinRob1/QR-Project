@@ -145,4 +145,7 @@ public class Player {
         QRCodes.remove(qrCode);
         totalScore = totalScore - qrCode.getScore();
     }
+
+    public void addQRCode(QR_Code qrCode) {
+    }
 }

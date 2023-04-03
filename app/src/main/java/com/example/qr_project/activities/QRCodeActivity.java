@@ -76,13 +76,24 @@ public class QRCodeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qrcode);
 
-        db = FirebaseFirestore.getInstance();
 
         String qr_code_hash = getIntent().getStringExtra("hash");
         qrCodeManager = new QRCodeManager(qr_code_hash);
 
-        DocumentReference qrCodeRef = db.collection("qrcodes").document(qr_code_hash);
+        initViews();
 
+
+        updateQRCode();
+    }
+
+    @Override
+    protected void onResume (){
+        super.onResume();
+
+        updateQRCode();
+    }
+
+    private void initViews(){
         totalScans = findViewById(R.id.total_scans);
         qrCodeName = findViewById(R.id.qr_code_name);
         qrCodeScore = findViewById(R.id.qr_code_score);
@@ -94,15 +105,6 @@ public class QRCodeActivity extends AppCompatActivity {
         RemoveQRRow = findViewById(R.id.remove_qr_row);
         RemoveQRRow.setVisibility(View.GONE);
         QRFace = findViewById(R.id.image_face);
-
-        updateQRCode();
-    }
-
-    @Override
-    protected void onResume (){
-        super.onResume();
-
-        updateQRCode();
     }
 
 
@@ -383,10 +385,6 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
 
-    /*
-    just a demo, not fully completed yet
-    please build on
-     */
     
 
     public void AddComment() {

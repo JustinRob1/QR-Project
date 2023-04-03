@@ -2,10 +2,8 @@ package com.example.qr_project.utils;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
@@ -14,16 +12,32 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.example.qr_project.R;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
+/**
+ * A utility class containing methods for creating and manipulating UI elements.
+ */
 public class UtilityFunctions {
 
-    UtilityFunctions(){
+    // Private constructor to prevent instantiation
+    private UtilityFunctions(){
 
     }
 
-    public static TableRow createNewRow(Context context, String name, String score, int rank, String hash, int rowBackgroundDrawable, Bitmap face, int arrowDrawable, Intent intent){
+    /**
+     * Creates a new TableRow with the specified data.
+     *
+     * @param context              The context to use for creating UI elements.
+     * @param name                 The name of the user.
+     * @param score                The item's score.
+     * @param rank                 The item's rank.
+     * @param hash                 The item's hash.
+     * @param rowBackgroundDrawable The background drawable for the row.
+     * @param face                 The item's face.
+     * @param arrowDrawable        The arrow drawable for the row.
+     * @param intent               The intent to be executed when the row is clicked.
+     * @return A new TableRow with the specified data.
+     */
+    public static TableRow createNewRow(Context context, String name, String score, int rank, String hash, int rowBackgroundDrawable, String face, int arrowDrawable, Intent intent){
         // Create a new TableRow
 
         TableRow row = new TableRow(context);
@@ -55,10 +69,13 @@ public class UtilityFunctions {
         rankTextView.setPadding(10, 0, 0, 0);
 
         // Create a new ImageView for the TableRow
-        ImageView faceImageView = new ImageView(context);
-        faceImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
-        faceImageView.setImageBitmap(face);
-        faceImageView.setPadding(0, 0, 0, 0);
+        TextView nameFaceView = new TextView(context);
+        nameFaceView .setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        nameFaceView .setText(face);
+        nameFaceView .setTextColor(Color.BLACK);
+        nameFaceView .setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        nameFaceView .setGravity(Gravity.CENTER);
+        nameFaceView .setPadding(15, 0, 0, 0);
 
         // Create a new TextView for the TableRow
         TextView nameTextView = new TextView(context);
@@ -87,7 +104,7 @@ public class UtilityFunctions {
 
 
         linearLayout.addView(rankTextView);
-        linearLayout.addView(faceImageView);
+        linearLayout.addView(nameFaceView);
         linearLayout.addView(nameTextView);
         linearLayout.addView(scoreTextView);
         linearLayout.addView(arrowImageView);
@@ -98,5 +115,8 @@ public class UtilityFunctions {
 
         return row;
     }
+
+
+
 
 }

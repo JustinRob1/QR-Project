@@ -42,7 +42,7 @@
             android:name=".activities.UserProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SignActivity"
+            android:name=".activities.SignUpActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
