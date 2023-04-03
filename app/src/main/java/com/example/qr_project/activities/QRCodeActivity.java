@@ -385,10 +385,6 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
 
-    /*
-    just a demo, not fully completed yet
-    please build on
-     */
     
 
     public void AddComment() {
