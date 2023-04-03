@@ -44,12 +44,14 @@ public class FirestoreDBHelper implements DatabaseHelper {
                                String documentId,
                                Map<String, Object> updates,
                                OnSuccessListener<Void> successListener,
-                               OnFailureListener failureListener) {
+                               OnFailureListener failureListener,
+                               OnCompleteListener<Void> onCompleteListener) {
         firebaseFirestore.collection(collectionName)
                 .document(documentId)
                 .update(updates)
                 .addOnSuccessListener(successListener)
-                .addOnFailureListener(failureListener);
+                .addOnFailureListener(failureListener)
+                .addOnCompleteListener(onCompleteListener);
     }
 
 

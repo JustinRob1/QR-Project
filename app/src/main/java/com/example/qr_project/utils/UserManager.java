@@ -733,7 +733,7 @@ public class UserManager {
      */
     public void clearQRCodes(){
         Map<String, Object> updates = new HashMap<>();
-        updates.put(QRCODES_FIELD, FieldValue.delete());
+        updates.put(QRCODES_FIELD, new ArrayList<>());
         dbHelper.updateDocument(
                 USERS_COLLECTION,
                 userID,
@@ -741,9 +741,31 @@ public class UserManager {
                 aVoid -> {
                     Log.d(TAG, "Deletion was successful");
                 },
-                e -> Log.d(TAG, "Error clearing QR Codes", e)
+                e -> Log.d(TAG, "Error clearing QR Codes", e),
+                task -> Log.d(TAG, "Task completed")
         );
     }
+
+    /**
+     *
+     * @param onCompleteListener: a listener called when task is completed. Used by Espresso
+     *                            idling resources.
+     */
+    public void clearQRCodes(OnCompleteListener<Void> onCompleteListener){
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(QRCODES_FIELD, new ArrayList<>());
+        dbHelper.updateDocument(
+                USERS_COLLECTION,
+                userID,
+                updates,
+                aVoid -> {
+                    Log.d(TAG, "Deletion was successful");
+                },
+                e -> Log.d(TAG, "Error clearing QR Codes", e),
+                onCompleteListener
+        );
+    }
+
 
     /**
      * Adds the given qrCode to the user's account
@@ -759,7 +781,31 @@ public class UserManager {
                 aVoid -> {
                     Log.d(TAG, "Addition was successful");
                 },
-                e -> Log.d(TAG, "Error adding a QR Code", e)
+                e -> Log.d(TAG, "Error adding a QR Code", e),
+                task -> {
+                    Log.d(TAG, "Task completed");
+                }
+        );
+    }
+
+    /**
+     * Adds the given qrCode to the user's account
+     * @param qrCode: QR Code to be added
+     * @param onCompleteListener: a listener called when task is completed. Used by Espresso
+     *                            idling resources.
+     */
+    public void addQRCode(QR_Code qrCode, OnCompleteListener<Void> onCompleteListener){
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(QRCODES_FIELD, FieldValue.arrayUnion(qrCode));
+        dbHelper.updateDocument(
+                USERS_COLLECTION,
+                userID,
+                updates,
+                aVoid -> {
+                    Log.d(TAG, "Addition was successful");
+                },
+                e -> Log.d(TAG, "Error adding a QR Code", e),
+                onCompleteListener
         );
     }
 }
