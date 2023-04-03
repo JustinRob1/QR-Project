@@ -138,12 +138,12 @@
             android:background="@drawable/table_background"
             android:orientation="vertical">
             <ListView
-                android:layout_marginTop="15dp"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginBottom="5dp"
                 android:id="@+id/user_top_qr_table"
                 android:layout_width="match_parent"
                 android:layout_height="170dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="5dp"
                 android:dividerHeight="5dp"
                 android:divider="@color/zxing_transparent"
                 />
