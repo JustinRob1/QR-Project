@@ -110,10 +110,14 @@ public class FirestoreDBHelper implements DatabaseHelper {
     public void setDocumentSnapshotListener(String collectionName,
                                             String documentId,
                                             EventListener<DocumentSnapshot> eventListener) {
+        if (documentId == null) {
+            throw new IllegalArgumentException("Document ID must not be null");
+        }
         firebaseFirestore.collection(collectionName)
                 .document(documentId)
                 .addSnapshotListener(eventListener);
     }
+
 
     @Override
     public void setCollectionSnapshotListener(String collectionName,

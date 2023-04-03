@@ -205,7 +205,7 @@ public class QRCodeActivity extends AppCompatActivity {
         });
     }
 
-    public void onSeeScanners(){
+    public void onSeeScanners(View view){
         qrCodeManager.getAllUsers(new DatabaseResultCallback<List<Friend>>() {
             @Override
             public void onSuccess(List<Friend> result) {
