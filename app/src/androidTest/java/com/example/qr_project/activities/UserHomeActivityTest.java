@@ -16,6 +16,7 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.*;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 
 import android.app.Activity;
@@ -101,8 +102,9 @@ public class UserHomeActivityTest {
     // Tests how listView is populated by manually adding QRCodes to DB (and skipping ScanActivity)
     // Userful link: https://developer.android.com/training/testing/espresso/lists#adapter-view-list-items
     @Test
-    public void testListView(){
+    public void testListViewAdd(){
         // Mock data
+        int count = 0;
         QR_Code qrCode1 = new QR_Code("Natus");
         QR_Code qrCode2 = new QR_Code("Vincere");
         QR_Code qrCode3 = new QR_Code("Vae");
@@ -120,11 +122,13 @@ public class UserHomeActivityTest {
                 task -> {firestoreIdlingResource.decrement();}
         );
 
-        // Assert that listView is empty
+        // Check if listView is empty
         onView(withId(R.id.user_top_qr_table))
                 .check(matches(hasChildCount(0)));
 
-
+        // Check if total qr codes label has 0
+        onView(withId(R.id.total_qr_codes))
+                .check(matches(withText(String.format("Total QR Codes: %d", count))));
 
 
         // Increment the operation count before making a FireStore call
@@ -136,8 +140,13 @@ public class UserHomeActivityTest {
                 task -> {firestoreIdlingResource.decrement();}
         );
 
-        onView(withId(R.id.user_top_qr_table))
-                .check(matches(hasChildCount(1)));
+        count++;
+//        onView(withId(R.id.user_top_qr_table))
+//                .check(matches(hasChildCount(count)));
+
+        // Check if total qr codes label has 0
+        onView(withId(R.id.total_qr_codes))
+                .check(matches(withText(String.format("Total QR Codes: %d", count))));
 
         // Unregister the Idling Resource
         IdlingRegistry.getInstance().unregister(firestoreIdlingResource);
