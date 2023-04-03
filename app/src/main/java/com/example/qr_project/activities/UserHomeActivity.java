@@ -6,6 +6,7 @@ import static com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -435,12 +436,12 @@ public class UserHomeActivity extends AppCompatActivity {
                         // IDENTIFIED ERROR POINT
                         // Not all qr codes in the db have a face,
                         // so this call will fail for the older docs in docRef
-                        String face = (String) qrCode.get("face");
-
-                        Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+//                        Bitmap face = (Bitmap) qrCode.get("face");
+//
+//                        Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                         // adding QR_Code obj to the list
-                        rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
+                        //rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
 
                         rank++;
                     }

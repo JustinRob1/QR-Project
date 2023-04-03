@@ -2,6 +2,9 @@ package com.example.qr_project.utils;
 
 import static android.content.ContentValues.TAG;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -395,7 +398,16 @@ public class QRCodeManager {
             photo = null;
         }
 
-        return new QR_Code(score, name, face, photo, location, hash, foundWithUser);
+        Bitmap faceBitmap = null;
+        try {
+            byte[] decodedString = Base64.decode(face, Base64.DEFAULT);
+            faceBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new QR_Code(score, name, faceBitmap, photo, location, hash, foundWithUser);
     }
+
 
 }

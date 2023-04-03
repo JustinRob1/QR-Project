@@ -393,7 +393,7 @@ public class QRCodeActivity extends AppCompatActivity {
             public void onSuccess(QR_Code result) {
                 qrCodeName.setText(result.getName());
                 qrCodeScore.setText(String.valueOf(result.getScore()));
-                QRFace.setText(result.getFace());
+                //QRFace.setText(result.getFace());
             }
 
             @Override

@@ -12,7 +12,7 @@ public class QR_Code {
     private String hash_code;
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
-    private String face; // Stores the QR code face
+    private Bitmap face; // Stores the QR code face
     private Bitmap photo; // Stores the photo taken
     private GeoPoint location;
 
@@ -34,7 +34,7 @@ public class QR_Code {
         this.location = null;
     }
 
-    public QR_Code(int score, String name, String face, String photo, GeoPoint location, String hash_code, boolean scannedByUser){
+    public QR_Code(int score, String name, Bitmap face, String photo, GeoPoint location, String hash_code, boolean scannedByUser){
         this.score = score;
         this.name = name;
         this.face = face;
@@ -73,7 +73,7 @@ public class QR_Code {
      * TO BE REMOVED
      * Implemented by akhadeli
      */
-    public QR_Code(Hash hash, int score, String name, String face) {
+    public QR_Code(Hash hash, int score, String name, Bitmap face) {
         this.hash = hash;
         this.score = score;
         this.name = name;
@@ -101,8 +101,15 @@ public class QR_Code {
      *
      * @return generated face string from generated hash
      */
-    public String getFace() {
+    public Bitmap getFace() {
         return face;
+    }
+
+    /**
+     *
+     */
+    public void setFace() {
+        this.face = null;
     }
 
 

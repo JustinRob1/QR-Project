@@ -150,7 +150,7 @@ public class UserSearchActivity extends AppCompatActivity {
                     i+1,
                     null,
                     R.drawable.leaderboard_row_item,
-                    "",
+                    null,
                     R.drawable.arrow_right_solid,
                     new Intent(UserSearchActivity.this, UserProfileActivity.class).putExtra("userId", userData.get(0))));
         }

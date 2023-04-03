@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -35,29 +36,12 @@ public class PictureActivity extends AppCompatActivity {
 
     private String qrHash;
     private String userID;
-    private Uri imageUri;
+    private Uri photoUri;
 
     private StorageReference storageReference;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
-    /**
-     * Implemented with the camera button and camera functionality to take photos
-     * Also connects to the FireStore database to store the the photo(s) taken
-     * Every image will be automatically converted to the .jpg file format and in an acceptable size
-     * Every image will also be converted to the right size at 640 x 480 per image
-     * The photo will then be stored to the database FireStore collection
-     * The photo will also come with the URL for future reference if the user wishes to get the url
-     * of the photo
-     * @param savedInstanceState
-     * @see FirebaseFirestore
-     * @see LeaderboardActivity
-     * @see UserProfileActivity
-     * @see UserHomeActivity
-     * @see ScanActivity
-     * @see QRCodeActivity
-     * @see com.example.qr_project.utils.Hash
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,22 +73,11 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
-    // Request to use the camera function and to take photo
-    // This function takes care of the implememtation of taking photos and more
     private void takePicture() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
     }
 
-    /**
-     *  Get the QR code hash and user ID from the intent
-     *  Delete the QR code from the database
-     *  When the photo is removed on the app, it will also be removed on the FireStore database collection
-     * @see com.example.qr_project.utils.Hash
-     * @see java.util.HashMap
-     * @see java.util.Hashtable
-     * @see FirebaseFirestore
-     */
     @Override
     public void onBackPressed() {
         // Get the QR code hash and user ID from the intent
@@ -156,54 +129,45 @@ public class PictureActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Request to use the camera
-     * The camera can be used if the permission has been granted to the app
-     * Then, the user can user the camera to take photo
-     * The photo will then be uploaded and stored onto the FireStore database under their userID
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
-            imageUri = getImageUri(getApplicationContext(), imageBitmap);
-            uploadImageToStorage();
+
+            // Upload the photo to storage
+            photoUri = getImageUri(getApplicationContext(), imageBitmap);
+            StorageReference photoRef = storageReference.child(userID).child(qrHash).child("photo");
+            photoRef.putFile(photoUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        photoRef.getDownloadUrl()
+                                .addOnSuccessListener(uri -> {
+                                    saveImageUrlToFirestore(uri.toString());
+                                    finish(); // Finish activity once the image is uploaded
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
         } else {
             Toast.makeText(this, "Error: Image capture failed.", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
-    // Uploading image and photo taken to the storage in the collection on the database
-    private void uploadImageToStorage() {
-        // Every image will be automatically converted to the .jpg file format and in an acceptable size
-        StorageReference imageRef = storageReference.child(userID).child(qrHash + ".jpg");
-        imageRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    imageRef.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                saveImageUrlToFirestore(uri.toString());
-                                finish();
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                                finish();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                });
-    }
-    // Save Image URL to FireStore databse
+
+
     private void saveImageUrlToFirestore(String imageUrl) {
         if (imageUrl != null) {
-            Log.d("My Tag", "saveImageUrlToFirestore() called with: imageUrl = [" + imageUrl + "]");
+            Log.d("My Tag", "Picture Activity called with: imageUrl = [" + imageUrl + "]");
         } else {
             Toast.makeText(PictureActivity.this, "Image URI is null or empty", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
@@ -215,28 +179,24 @@ public class PictureActivity extends AppCompatActivity {
                 for (Map<String, Object> qrCode : qrCodes) {
                     String hash = (String) qrCode.get("hash");
                     if (Objects.equals(hash, qrHash)) {
-                        // Update the photo of the QR code with the imageUrl
+                        // Update the photo or image of the QR code with the imageUrl
                         qrCode.put("photo", imageUrl);
 
                         // Update the document in Firestore with the modified qrcodes array
                         db.collection("users").document(userID).update("qrcodes", qrCodes)
                                 .addOnSuccessListener(aVoid -> {
-                                    finish();
+
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
                                 });
-
-                        break;
                     }
                 }
             }
         });
     }
 
-    // Allows user to get the image and its url from the database collection
     private Uri getImageUri(Context context, Bitmap imageBitmap) {
-        // The size of every photo will be converted at 640 x 480 and in the right format
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, 640, 480, true);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         boolean success = resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, bytes);
