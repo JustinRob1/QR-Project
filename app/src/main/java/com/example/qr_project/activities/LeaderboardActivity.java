@@ -61,20 +61,29 @@ public class LeaderboardActivity extends AppCompatActivity {
     boolean isGlobalCodeAdded= false;
     boolean isGlobalOvrAdded=false;
 
+    // Array List of QR_Code of user
     List<QR_Code> userCodes;
 
+    // Array List of QR_Code of user's friends
     List<QR_Code> friendCodes;
 
+    // Array List of QR_Code of global
     List<QR_Code> globalCodes;
 
+    // Array List of the scores of player's friend(s)
     List<Friend> friendScores;
 
+    // Array List of the scores of player's friend(s) in global ranking
     List<Friend> globalScores;
 
     UserManager userManager;
     LeaderboardManager leaderboardManager;
 
 
+    /**
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,7 +123,10 @@ public class LeaderboardActivity extends AppCompatActivity {
         leaderboardScore = findViewById(R.id.leaderboard_score);
     }
 
-
+    /**
+     *
+     * @param filter
+     */
     private void populateInitialLeaderboard(String filter){
         userManager.getTotalScore(new DatabaseResultCallback<Integer>() {
             @Override
@@ -187,6 +199,9 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         leaderboardManager.getTopFriendsQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
             @Override
+            /**
+             * @param result
+             */
             public void onSuccess(List<QR_Code> result) {
                 if (isFriendCodeAdded== false){
                     int rank = 1;
@@ -207,6 +222,10 @@ public class LeaderboardActivity extends AppCompatActivity {
                 }
             }
 
+            /**
+             *
+             * @param e
+             */
             @Override
             public void onFailure(Exception e) {
                 friendCodes = null;
@@ -216,6 +235,9 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         leaderboardManager.getTopGlobalQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
             @Override
+            /**
+             * @param result
+             */
             public void onSuccess(List<QR_Code> result) {
                 int rank = 1;
                 if (isGlobalCodeAdded == false){
@@ -306,27 +328,44 @@ public class LeaderboardActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     *
+     * @param view
+     */
     public void onCameraClick(View view) {
         Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
     }
 
-
+    /**
+     *
+     * @param view
+     */
     public void onMapClick(View view) {
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
     }
 
-
+    /**
+     *
+     * @param view
+     */
     public void onClickBack(View view){
         finish();
     }
 
+    /**
+     *
+     * @param view
+     */
     public void onLeaderboardClick(View view){
         Toast.makeText(this, "Already at leaderboard", Toast.LENGTH_SHORT).show();
     }
 
-
+    /**
+     *
+     * @param view
+     */
     public void onUserLeaderboardView(View view) {
         user_codes_title.setVisibility(View.VISIBLE);
         leaderboard_dial_filters.setVisibility(View.GONE);
@@ -350,7 +389,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     *
+     * @param view
+     */
     public void onFriendLeaderboardView(View view){
         user_codes_title.setVisibility(View.GONE);
         leaderboard_dial_filters.setVisibility(View.VISIBLE);
@@ -375,7 +417,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     *
+     * @param view
+     */
     public void onGlobalLeaderboardView(View view) {
         Log.d(TAG, "onGlobalLeaderboardView() called with: view = [" + view + "]");
         user_codes_title.setVisibility(View.GONE);
@@ -400,7 +445,10 @@ public class LeaderboardActivity extends AppCompatActivity {
         onFilterChange(view);
     }
 
-
+    /**
+     *
+     * @param view
+     */
     public void onFilterChange(View view) {
         if (isFilterChanged) {
             qr_code_filter.setTypeface(null, Typeface.BOLD);
