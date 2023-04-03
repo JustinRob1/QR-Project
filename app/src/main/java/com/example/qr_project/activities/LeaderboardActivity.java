@@ -103,13 +103,23 @@ public class LeaderboardActivity extends AppCompatActivity {
         globalTopQRCodesListener();
         globalTopTotalScoresListener();
 
-        // TODO
-        // Implement friend listeners
+        // non realtime
+        friendsTopQRCodesListener();
+        friendsTopTotalScoresListener();
+
 
         String filter = intent.getStringExtra("filter");
         curr_view = filter;
 
         populateData(filter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        friendsTopQRCodesListener();
+        friendsTopTotalScoresListener();
     }
 
     // This is to initalize the View in leaderboard
@@ -192,10 +202,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     String face = (String) qrCode.get("face");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
 
                     // adding QR_Code obj to the list
-                    userQRCodes_list.add(new QR_Code(hash, score, name, face));
+                    userQRCodes_list.add(new QR_Code(hash, score, name));
 
                 }
 
@@ -229,10 +239,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     String face = (String) qrCode.get("face");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
 
                     // adding QR_Code obj to the list
-                    globalQRCodes_list.add(new QR_Code(hash, score, name, face));
+                    globalQRCodes_list.add(new QR_Code(hash, score, name));
                 }
 
                 globalQRCodes_adapter.notifyDataSetChanged();
@@ -272,6 +282,41 @@ public class LeaderboardActivity extends AppCompatActivity {
         });
     }
 
+    private void friendsTopTotalScoresListener() {
+        leaderboardManager.getTopFriendsTotalScores(new DatabaseResultCallback<List<Friend>>() {
+            @Override
+            public void onSuccess(List<Friend> result) {
+                for (Friend score : result) {
+                    friendScores_list.add(score);
+                }
+
+                friendScores_adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+    }
+
+    private void friendsTopQRCodesListener() {
+        leaderboardManager.getTopFriendsQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
+            @Override
+            public void onSuccess(List<QR_Code> result) {
+                for (QR_Code q : result) {
+                    friendQRCodes_list.add(q);
+                }
+
+                friendQRCodes_adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+    }
 
     // Common functions
     

@@ -48,7 +48,7 @@ public class LeaderboardManager {
                                 int score = (Math.toIntExact((Long) qrCodeMap.get("score")));
                                 String hash = (String) qrCodeMap.get("hash");
                                 String face = (String) qrCodeMap.get("face");
-                                QR_Code qrCode = new QR_Code(score, name, face, hash);
+                                QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, name);
                                 qrCodes.add(qrCode);
                             }
                             // Sort the QR codes by score in descending order
@@ -87,7 +87,7 @@ public class LeaderboardManager {
                         int score = (Math.toIntExact((Long) code.get("score")));
                         String hash = (String) code.get("hash");
                         String face = (String) code.get("face");
-                        QR_Code qrCode = new QR_Code(score, name, face, hash);
+                        QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, name);
                         topUserCodes.add(qrCode);
                     }
                     // Sort the QR codes by score in descending order
@@ -140,7 +140,7 @@ public class LeaderboardManager {
                                             int score = Math.toIntExact((Long) code.get("score"));
                                             String hash = (String) code.get("hash");
                                             String face = (String) code.get("face");
-                                            QR_Code qrCode = new QR_Code(score, name, face, hash);
+                                            QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, name);
                                             allQRCodes.add(qrCode);
                                         }
                                     }
@@ -326,7 +326,7 @@ public class LeaderboardManager {
     }
 
     // TODO
-    public void getRealtimeTopFriendsTotalScores(DatabaseResultCallback<List<QR_Code>> callback) {
+    public void getRealtimeTopFriendsTotalScores(DatabaseResultCallback<List<Friend>> callback) {
 
     }
 
