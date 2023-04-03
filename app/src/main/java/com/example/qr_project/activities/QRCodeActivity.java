@@ -10,8 +10,16 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,12 +27,14 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.qr_project.R;
 import com.example.qr_project.models.DatabaseResultCallback;
+import com.example.qr_project.utils.Comment;
+import com.example.qr_project.utils.CommentAdapter;
 import com.example.qr_project.utils.QRCodeManager;
 import com.example.qr_project.utils.QR_Code;
+import com.example.qr_project.utils.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -61,15 +71,36 @@ public class QRCodeActivity extends AppCompatActivity {
 
     private TextView globalRankNum;
 
-    private TextView codeDescription;
 
     private TextView hasUserScannedCode;
 
     private TableRow RemoveQRRow;
 
     private TextView QRFace;
+    private ListView commentListView;
+
+    private LinearLayout qrRow1;
+    private LinearLayout qrRow2;
+    private LinearLayout qrRow3;
+    private LinearLayout qrRow4;
+
+    private TableRow addCommentRow;
+    private TextView seeCommentsText;
+
+    private TableRow seeCommentsRow;
+
+    ArrayList<Comment> commentList;
+    ArrayAdapter<Comment> commentList_adapter;
+
+    private TableLayout bottomButtons;
+
+    private LinearLayout qrDetailsBorder;
 
     QRCodeManager qrCodeManager;
+
+    UserManager userManager;
+
+    String qr_code_hash;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +108,13 @@ public class QRCodeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_qrcode);
 
 
-        String qr_code_hash = getIntent().getStringExtra("hash");
+        qr_code_hash = getIntent().getStringExtra("hash");
         qrCodeManager = new QRCodeManager(qr_code_hash);
+        userManager = UserManager.getInstance();
 
         initViews();
 
+        getComments();
 
         updateQRCode();
     }
@@ -94,17 +127,78 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     private void initViews(){
+        commentList = new ArrayList<>();
+        commentList_adapter = new CommentAdapter(this, commentList, new Intent(QRCodeActivity.this, QRCodeActivity.class).putExtra("hash", qr_code_hash));
+        commentListView = findViewById(R.id.comment_table);
+        commentListView.setAdapter(commentList_adapter);
+        commentListView.setVisibility(View.GONE);
+
+
         totalScans = findViewById(R.id.total_scans);
         qrCodeName = findViewById(R.id.qr_code_name);
         qrCodeScore = findViewById(R.id.qr_code_score);
         yourRankNum = findViewById(R.id.your_rank_num);
         friendRankNum = findViewById(R.id.friend_rank_num);
         globalRankNum = findViewById(R.id.global_rank_num);
-        codeDescription = findViewById(R.id.code_description);
         hasUserScannedCode = findViewById(R.id.user_scanned_already_txt);
         RemoveQRRow = findViewById(R.id.remove_qr_row);
         RemoveQRRow.setVisibility(View.GONE);
         QRFace = findViewById(R.id.image_face);
+        commentListView = findViewById(R.id.comment_table);
+        bottomButtons = findViewById(R.id.bottom_buttons);
+        setBottomButtonsMargin(80);
+
+
+        qrDetailsBorder = findViewById(R.id.qr_code_details_border);
+        addCommentRow = findViewById(R.id.add_comment_row);
+        addCommentRow.setVisibility(View.GONE);
+        seeCommentsRow = findViewById(R.id.see_comment_row);
+
+        seeCommentsRow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onSeeComments(view);
+            }
+        });
+        seeCommentsText= findViewById(R.id.see_comments_text);
+
+        qrRow1= findViewById(R.id.row_1);
+        qrRow2= findViewById(R.id.row_2);
+        qrRow3= findViewById(R.id.row_3);
+        qrRow4= findViewById(R.id.row_4);
+    }
+
+    private void setBottomButtonsMargin(int margin){
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) bottomButtons.getLayoutParams();
+
+        int newTopMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, margin, getResources().getDisplayMetrics());
+        layoutParams.topMargin = newTopMargin;
+        bottomButtons.setLayoutParams(layoutParams);
+    }
+
+    public void getComments(){
+        qrCodeManager.getAllComments(new DatabaseResultCallback<List<Map<String, Object>>>() {
+            @Override
+            public void onSuccess(List<Map<String, Object>> result) {
+                commentList.clear();
+                if (result!= null && !result.isEmpty()){
+                    for (Map<String, Object> comment: result){
+                        String username = (String) comment.get("username");
+                        String commentText = (String) comment.get("commentText");
+
+                        Comment newcomment = new Comment(userManager.getUserID(), username, commentText, qr_code_hash);
+                        commentList.add(newcomment);
+                    }
+
+                    commentList_adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error getting comments", e);
+            }
+        });
     }
 
 
@@ -385,65 +479,85 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
 
-    
+    public void onSeeComments(View view){
+        qrRow1.setVisibility(View.GONE);
+        qrRow2.setVisibility(View.GONE);
+        qrRow3.setVisibility(View.GONE);
+        qrRow4.setVisibility(View.GONE);
 
-    public void AddComment() {
-        // Create a new QR code document
-        Map<String, Object> qrCode = new HashMap<>();
-        qrCode.put("comment", "This is a comment");
-        qrCode.put("timestamp", new Date());
-        qrCode.put("location", new GeoPoint(37.4219999, -122.0840575));
-        db.collection("QR Codes").document("<QR code ID>").set(qrCode);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        commentListView.setVisibility(View.VISIBLE);
+        addCommentRow.setVisibility(View.VISIBLE);
 
-        // Query the QR code document by ID
-        Task<DocumentSnapshot> documentSnapshotTask = db.collection("QR Codes").document("<QR code ID>").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        seeCommentsText.setText("See Stats");
+        setBottomButtonsMargin(20);
+        seeCommentsRow.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        // Retrieve the comment and display it in the UI
-                        String comment = document.getString("comment");
-                        // AddComment().getText(comment);
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
+            public void onClick(View view) {
+                reloadActivity();
             }
         });
     }
+
+    public void addComment(View view) {
+        // Inflate the custom layout for the dialog
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_add_comment, null);
+        EditText commentText = dialogView.findViewById(R.id.comment_text);
+
+        // Create and show the AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Comment")
+                .setView(dialogView)
+                .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Get the entered comment text and call the method to save it
+                        String text = commentText.getText().toString();
+                        saveComment(text);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Close the dialog without doing anything
+                        dialog.cancel();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    public void saveComment(String text) {
+        // Your existing code to save the comment to the database
+        Map<String, Object> comment = new HashMap<>();
+
+        userManager.getUsername(new DatabaseResultCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                comment.put("username", result);
+                comment.put("commentText", text);
+                comment.put("userID", userManager.getUserID());
+                qrCodeManager.addComment(comment);
+                getComments();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error getting username: ", e);
+            }
+        });
+    }
+
+
+    private void reloadActivity(){
+        Intent intent = new Intent(this, QRCodeActivity.class);
+        intent.putExtra("hash", qr_code_hash);
+        finish();
+        startActivity(intent);
+    }
+
 }
 
 
-//        public void AddComment() {
-//            // Create a new QR code document
-//            Map<String, Object> qrCode = new HashMap<>();
-//            qrCode.put("comment", "This is a comment");
-//            qrCode.put("timestamp", new Date());
-//            qrCode.put("location", new GeoPoint(37.4219999, -122.0840575));
-//            db.collection("QR Codes").document("<QR code ID>").set(qrCode);
-//            FirebaseFirestore db = FirebaseFirestore.getInstance();
-//
-//            // Query the QR code document by ID
-//            Task<DocumentSnapshot> documentSnapshotTask = db.collection("QR Codes").document("<QR code ID>").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                @Override
-//                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                    if (task.isSuccessful()) {
-//                        DocumentSnapshot document = task.getResult();
-//                        if (document.exists()) {
-//                            // Retrieve the comment and display it in the UI
-//                            String comment = document.getString("comment");
-//                            AddComment().getText(comment);
-//                        } else {
-//                            Log.d(TAG, "No such document");
-//                        }
-//                    } else {
-//                        Log.d(TAG, "get failed with ", task.getException());
-//                    }
-//                }
-//            });
-//        }
+
 
