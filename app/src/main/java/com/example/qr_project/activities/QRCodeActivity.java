@@ -479,10 +479,6 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
 
-    /*
-    just a demo, not fully completed yet
-    please build on
-     */
 
     public void onSeeComments(View view){
         qrRow1.setVisibility(View.GONE);
@@ -560,34 +556,6 @@ public class QRCodeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void AddComment() {
-        // Create a new QR code document
-        Map<String, Object> qrCode = new HashMap<>();
-        qrCode.put("comment", "This is a comment");
-        qrCode.put("timestamp", new Date());
-        qrCode.put("location", new GeoPoint(37.4219999, -122.0840575));
-        db.collection("QR Codes").document("<QR code ID>").set(qrCode);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        // Query the QR code document by ID
-        Task<DocumentSnapshot> documentSnapshotTask = db.collection("QR Codes").document("<QR code ID>").get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        // Retrieve the comment and display it in the UI
-                        String comment = document.getString("comment");
-                        // AddComment().getText(comment);
-                    } else {
-                        Log.d(TAG, "No such document");
-                    }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
-                }
-            }
-        });
-    }
 }
 
 
