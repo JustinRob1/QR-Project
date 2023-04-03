@@ -255,7 +255,7 @@ public class UserManager {
 
                 if (value != null && value.exists()) {
                     Map<String, Object> data = value.getData();
-                    if (data != null){
+                    if (data != null) {
                         List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
                         if (qrCodes != null) {
                             // Sort QR codes based on score
@@ -270,7 +270,7 @@ public class UserManager {
                         callback.onFailure(new Exception("No data in given document"));
                     }
                 } else {
-                    callback.onFailure(new Exception("QR codes are not in a valid list format"));
+                    callback.onFailure(new Exception("Document does not exist"));
                 }
             }
         });
@@ -530,7 +530,7 @@ public class UserManager {
                     callback.onFailure(error);
                 }
 
-                if (value != null) {
+                if (value != null && !value.isEmpty()) {
                     ArrayList<Map<String, Integer>> rankings = new ArrayList<>();
 
                     for (QueryDocumentSnapshot doc : value) {
