@@ -23,7 +23,7 @@ public class UtilityFunctions {
 
     }
 
-    public static TableRow createNewRow(Context context, String name, String score, int rank, String hash, int rowBackgroundDrawable, String face, int arrowDrawable, Intent intent){
+    public static TableRow createNewRow(Context context, String name, String score, int rank, String hash, int rowBackgroundDrawable, Bitmap face, int arrowDrawable, Intent intent){
         // Create a new TableRow
 
         TableRow row = new TableRow(context);
@@ -57,24 +57,7 @@ public class UtilityFunctions {
         // Create a new ImageView for the TableRow
         ImageView faceImageView = new ImageView(context);
         faceImageView.setLayoutParams(new LinearLayout.LayoutParams(75, 75, 1.0f));
-        Picasso.get()
-                .load(face)
-                .into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        faceImageView.setImageBitmap(bitmap);
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                        // Handle errors here
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                        // Handle placeholder here
-                    }
-                });
+        faceImageView.setImageBitmap(face);
         faceImageView.setPadding(0, 0, 0, 0);
 
         // Create a new TextView for the TableRow

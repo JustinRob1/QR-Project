@@ -5,7 +5,6 @@ import static android.view.View.GONE;
 import static com.example.qr_project.utils.UserManager.containsUserID;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -226,12 +225,12 @@ public class UserProfileActivity extends AppCompatActivity {
                             // IDENTIFIED ERROR POINT
                             // Not all qr codes in the db have a face,
                             // so this call will fail for the older docs in docRef
-                            Bitmap face = (Bitmap) qrCode.get("face");
+                            String face = (String) qrCode.get("face");
 
-                            Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+                            //Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                             // adding QR_Code obj to the list
-                            rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
+                            //rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
 
                             rank++;
                         }
@@ -347,12 +346,12 @@ public class UserProfileActivity extends AppCompatActivity {
                             // IDENTIFIED ERROR POINT
                             // Not all qr codes in the db have a face,
                             // so this call will fail for the older docs in docRef
-                            Bitmap face = (Bitmap) qrCode.get("face");
+                            String face = (String) qrCode.get("face");
 
-                            Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+                            //Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                             // adding QR_Code obj to the list
-                            rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
+                            //rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
 
                             rank++;
                         }

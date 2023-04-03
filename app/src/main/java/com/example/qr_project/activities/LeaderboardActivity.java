@@ -5,7 +5,9 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -28,6 +30,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -230,32 +234,45 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     if (qrCodes != null) {
                         user_qr_leaderboard.removeAllViews(); // Clear the current leaderboard
-                        int rank = 1;
                         // Loop through the array
-                        for (Map<String, Object> qrCode : qrCodes) {
+                        for (int i = 0; i < qrCodes.size(); i++) {
+                            final int rank = i + 1;
+                            Map<String, Object> qrCode = qrCodes.get(i);
                             String name = (String) qrCode.get("name");
                             Long score = (Long) qrCode.get("score");
                             String hash = (String) qrCode.get("hash");
                             String face = (String) qrCode.get("face");
 
+                            // Load the image with Picasso and pass it to createNewRow method
+                            Picasso.get().load(face).into(new Target() {
+                                @Override
+                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                    user_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
+                                            name,
+                                            Long.toString(score),
+                                            rank,
+                                            hash,
+                                            R.drawable.leaderboard_row_item,
+                                            bitmap,
+                                            R.drawable.arrow_right_solid,
+                                            new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", hash)));
+                                }
 
+                                @Override
+                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                    // Handle errors here
+                                }
 
-                            user_qr_leaderboard.addView(UtilityFunctions.createNewRow(LeaderboardActivity.this,
-                                                                                                name,
-                                                                                                Long.toString(score),
-                                                                                                rank,
-                                                                                                hash,
-                                                                                                R.drawable.leaderboard_row_item,
-                                                                                                face,
-                                                                                                R.drawable.arrow_right_solid,
-                                                                                                new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", hash)));
-
-                            rank++;
+                                @Override
+                                public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                    // Handle placeholder here
+                                }
+                            });
                         }
-
                     } else {
                         Log.d(TAG, "User has no QR codes");
                     }
+
 
                 } else {
                     Log.d(TAG, "User document does not exist");
@@ -302,7 +319,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     1,
                     null,
                     R.drawable.leaderboard_row_item,
-                    "",
+                    null,
                     R.drawable.arrow_right_solid,
                     new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
 
@@ -312,7 +329,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     1,
                     null,
                     R.drawable.leaderboard_row_item,
-                    "",
+                    null,
                     R.drawable.arrow_right_solid,
                     new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", "")));
 
@@ -374,7 +391,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                                 i+1,
                                 null,
                                 R.drawable.leaderboard_row_item,
-                                "",
+                                null,
                                 R.drawable.arrow_right_solid,
                                 new Intent(LeaderboardActivity.this, UserProfileActivity.class).putExtra("userId", userData.get(0))));
                     }
@@ -420,7 +437,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                                             1,
                                             null,
                                             R.drawable.leaderboard_row_item,
-                                            "",
+                                       null,
                                             R.drawable.arrow_right_solid,
                                             new Intent(LeaderboardActivity.this, QRCodeActivity.class).putExtra("hash", "")));
                         rank++;

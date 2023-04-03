@@ -142,51 +142,55 @@ public class PictureActivity extends AppCompatActivity {
         if (requestCode == CAMERA_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            // Upload the photo to storage
             photoUri = getImageUri(getApplicationContext(), imageBitmap);
+            StorageReference photoRef = storageReference.child(userID).child(qrHash);
+            photoRef.putFile(photoUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        photoRef.getDownloadUrl()
+                                .addOnSuccessListener(uri -> {
+                                    saveImageUrlToFirestore(uri.toString(), "photo");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                    });
+
+            // Upload the face to storage
             faceUri = getImageUri(getApplicationContext(), face);
-
-            // Upload image to photo field
-            StorageReference photoRef = storageReference.child(userID).child(qrHash + "-photo.jpg");
-            uploadImageToStorage(photoUri, photoRef);
-
-            // Upload image to image field
-            StorageReference faceRef = storageReference.child(userID).child(qrHash + "-face.jpg");
-            uploadImageToStorage(faceUri, faceRef);
+            StorageReference faceRef = storageReference.child(userID).child(qrHash);
+            faceRef.putFile(faceUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        faceRef.getDownloadUrl()
+                                .addOnSuccessListener(uri -> {
+                                    saveImageUrlToFirestore(uri.toString(), "face");
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                    });
             finish();
-
         } else {
             Toast.makeText(this, "Error: Image capture failed.", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
-
-    private void uploadImageToStorage(Uri imageUri, StorageReference storageRef) {
-        storageRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    storageRef.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                saveImageUrlToFirestore(uri.toString(), storageRef.getName());
-                                finish();
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e("My Tag", "Failed to get download URL", e);
-                                Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                            });
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("My Tag", "Failed to upload image", e);
-                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
-    }
-
-
     private void saveImageUrlToFirestore(String imageUrl, String fieldName) {
         if (imageUrl != null) {
             Log.d("My Tag", "saveImageUrlToFirestore() called with: imageUrl = [" + imageUrl + "]");
         } else {
             Toast.makeText(PictureActivity.this, "Image URI is null or empty", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
@@ -199,28 +203,28 @@ public class PictureActivity extends AppCompatActivity {
                     String hash = (String) qrCode.get("hash");
                     if (Objects.equals(hash, qrHash)) {
                         // Update the photo or image of the QR code with the imageUrl
-                        if (fieldName.contains("-photo.jpg")) {
+                        if (fieldName.equals("photo")) {
                             qrCode.put("photo", imageUrl);
-                        } else if (fieldName.contains("-face.jpg")) {
+                        } else if (fieldName.equals("face")) {
                             qrCode.put("face", imageUrl);
                         }
 
                         // Update the document in Firestore with the modified qrcodes array
                         db.collection("users").document(userID).update("qrcodes", qrCodes)
                                 .addOnSuccessListener(aVoid -> {
-                                    finish();
+
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                                    finish();
                                 });
 
-                        break;
                     }
                 }
             }
         });
     }
+
+
 
     private Uri getImageUri(Context context, Bitmap imageBitmap) {
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, 640, 480, true);

@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -23,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.qr_project.R;
 import com.example.qr_project.utils.Player;
 import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -72,6 +74,8 @@ public class ScanActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        View loadingScreen = getLayoutInflater().inflate(R.layout.loading_screen, null);
+        setContentView(loadingScreen);
         db = FirebaseFirestore.getInstance();
 
         // Permission was not granted
@@ -154,10 +158,9 @@ public class ScanActivity extends AppCompatActivity {
                                 intent.putExtra("userID", userID);
                                 // Convert the bitmap to a byte array
                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                                face.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                                face.compress(Bitmap.CompressFormat.JPEG, 50, stream);
                                 byte[] byteArray = stream.toByteArray();
                                 intent.putExtra("face", byteArray);
-                                startActivity(intent);
                                 startActivity(intent);
                                 finish();
                             }
