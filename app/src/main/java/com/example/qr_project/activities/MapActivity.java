@@ -1,29 +1,26 @@
 package com.example.qr_project.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.R;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -31,6 +28,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -38,7 +39,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,32 +51,39 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private LocationManager mLocationManager;
     FirebaseFirestore db;
 
-    /**
-     * The MapActivity allows user to interact with the map
-     * The geolocation of the map can be stored on the FireStore database as the user wishes
-     * The user has a choice to reveal their location or not.
-     * Extend to the part that the user can even choose to reveal their location once
-     * The user has a choice and ability to chance the setting of their location reveal preferences
-     * The QRCodes scanned within a location; and that location can be added to the database
-     * The location also works with the QRCode
-     * The connection to the database allows user to check for the geolocation of the QRCodes later
-     * on the app if they want to see
-     * The geolocation also allows the user to check for their friends' QRCodes and where the QRCodes
-     * have scanned at the exact location on the geolocation map
-     * @param savedInstanceState
-     * @see FirebaseFirestore
-     * @see QRCodeActivity
-     * @see PictureActivity
-     * @see UserHomeActivity
-     * @see UserProfileActivity
-     */
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        Places.initialize(getApplicationContext(), "AIzaSyBUux3nV7NYGBVtaRY4ZFmyppzqAm40zLU");
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+
+        // Set the fields to return for the autocomplete results
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
+
+        // Set up a PlaceSelectionListener to handle the selected place
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // Get the location of the selected place
+                LatLng latLng = place.getLatLng();
+
+                // Move the camera to the selected location
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+            }
+
+            @Override
+            public void onError(Status status) {
+                // Handle the error
+            }
+        });
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -95,12 +103,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                 location = (GeoPoint) locationObject;
                             }
                             if (location != null) {
+                                // Add a small random offset to the latitude and longitude
+                                double lat = location.getLatitude() + Math.random() * 0.00001;
+                                double lng = location.getLongitude() + Math.random() * 0.00001;
                                 MarkerOptions markerOptions = new MarkerOptions()
-                                        .position(new LatLng(location.getLatitude(), location.getLongitude()));
+                                        .position(new LatLng(lat, lng));
                                 Marker marker = mMap.addMarker(markerOptions);
                                 // Store the qrCode object as a tag of the marker
                                 marker.setTag(qrCode);
                             }
+
                         }
                     }
                 }
@@ -120,8 +132,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             // Download the photo using Picasso and convert it to a Bitmap
                             Picasso.get().load(photoUrl).into(new Target() {
                                 @Override
-                                // Use Bitmap and Picasso for the location app
-                                // Use the image of the location and the image of the photo
                                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                                     imageView.setImageBitmap(bitmap);
                                 }
@@ -151,62 +161,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Log.d("My Tag", "Error getting documents: ", task.getException());
             }
         });
-
-
-
-        // Initialize search bar
-        SearchView searchView = findViewById(R.id.searchView);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            /**
-             * This Query is to get the location information from the search query
-             * This also gets the exact address of the geolocation of the user when opening the QRCodes
-             * This too gets the exact address of the geolocation of the scanned QRCodes
-             * Getting the exact address through its longitude and latitude
-             * @param query
-             * @return true
-             * @return
-             */
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // Hide the keyboard after search query submitted
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-
-                // Use Geocoder to get location information from search query
-                Geocoder geocoder = new Geocoder(MapActivity.this);
-                try {
-                    List<Address> addresses = geocoder.getFromLocationName(query, 1);
-                    if (!addresses.isEmpty()) {
-                        // Getting the address of the geolocation
-                        Address address = addresses.get(0);
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                    } else {
-                        Toast.makeText(MapActivity.this, "No results found for \"" + query + "\"", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
     }
 
 
     @Override
-    /**
-     * This functionality checks for the permission to access user's location implemented with googleMap
-     * Set the map type to hybrid
-     * Check if the user has granted location permission
-     * Request location permission
-     * Show the user's current location on the map
-     * @param googleMap
-     */
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
@@ -263,13 +221,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     @Override
-    /**
-     * Show the current location of the user
-     * Get the permission from the user on their location
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
