@@ -27,6 +27,10 @@ public class QR_Adapter extends ArrayAdapter<QR_Code> {
         this.context = context;
     }
 
+    public void setList(ArrayList<QR_Code> qrCodes) {
+        this.qrCodes = qrCodes;
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
