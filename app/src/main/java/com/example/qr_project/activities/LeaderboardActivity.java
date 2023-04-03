@@ -106,7 +106,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     // This is to initalize the View in leaderboard
-    // Fetching all the id
+    // Fetching all the ids from the xml files
     private void initViews(){
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
@@ -126,7 +126,8 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This getTotalScore function is to get and calculate of the total score of the player(s)
+     * Getting all the number then calculate the total score and return the total score to the user
      * @param filter
      */
     private void populateInitialLeaderboard(String filter){
