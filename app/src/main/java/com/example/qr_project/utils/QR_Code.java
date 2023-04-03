@@ -80,6 +80,12 @@ public class QR_Code {
         this.face = face;
     }
 
+    public QR_Code(Hash hash, int score, String name) {
+        this.hash = hash;
+        this.score = score;
+        this.name = name;
+    }
+
 
     /**
      * @return Score of the QR Code

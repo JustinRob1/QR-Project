@@ -61,6 +61,12 @@ public class Hash {
         this.score = score;
     }
 
+    public Hash(String hash, String name, int score) {
+        this.hash = hash;
+        this.name = name;
+        this.score = score;
+    }
+
     /**
      * @return The score of the hash
      */
