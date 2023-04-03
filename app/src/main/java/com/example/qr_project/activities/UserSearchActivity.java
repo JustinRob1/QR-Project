@@ -61,6 +61,8 @@ public class UserSearchActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
+        initViews();
+
         search_string = intent.getStringExtra("userSearch");
 
         searchUsers(searchResults -> {
