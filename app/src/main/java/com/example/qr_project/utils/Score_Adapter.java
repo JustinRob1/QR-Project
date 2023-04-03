@@ -37,12 +37,12 @@ public class Score_Adapter extends ArrayAdapter<Friend> {
 
         Friend score = scores.get(position);
 
-        TextView qrCodeNameTextView = view.findViewById(R.id.qr_code_name_1);
-        TextView scoreTextView = view.findViewById(R.id.qr_code_score_1);
+        TextView userNameTextView = view.findViewById(R.id.username);
+        TextView scoreTextView = view.findViewById(R.id.user_total_score);
         TextView rankTextView = view.findViewById(R.id.qr_code_rank_1);
 
 
-        qrCodeNameTextView.setText(score.getName());
+        userNameTextView.setText(score.getName());
         scoreTextView.setText(String.valueOf(score.getScore()));
         String rank = (position + 1) +".";
         rankTextView.setText(rank);
