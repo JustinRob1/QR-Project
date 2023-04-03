@@ -132,7 +132,7 @@ public class UserProfileActivity extends AppCompatActivity {
             addFriendBtn.setVisibility(GONE);
             handleUserData(userManager);
 
-
+        // Otherwise, this is the case of the other player's profile
         } else {
             otherUserManager.getUsername(new DatabaseResultCallback<String>() {
                 @Override
@@ -302,7 +302,6 @@ public class UserProfileActivity extends AppCompatActivity {
     /**
      * When the user clicks the camera button, this method will be called
      * and will open the camera to scan a QR or barcode
-     *
      * @param view The text view which is pressed
      */
     public void onCameraClick(View view) {
@@ -313,7 +312,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
     /**
      * For the use and the feature of the map button
-     *
      * @param view The text view which is pressed
      */
     public void onMapClick(View view) {
