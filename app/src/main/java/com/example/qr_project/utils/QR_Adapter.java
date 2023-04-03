@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,8 @@ import androidx.annotation.Nullable;
 
 import com.example.qr_project.R;
 import com.example.qr_project.activities.QRCodeActivity;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -41,10 +44,12 @@ public class QR_Adapter extends ArrayAdapter<QR_Code> {
 
         QR_Code qrCode = qrCodes.get(position);
 
+        TextView faceView = view.findViewById(R.id.qr_code_img_1);
+        faceView.setText(qrCode.getFace());
+
         TextView qrCodeNameTextView = view.findViewById(R.id.qr_code_name_1);
         TextView scoreTextView = view.findViewById(R.id.qr_code_score_1);
         TextView rankTextView = view.findViewById(R.id.qr_code_rank_1);
-
 
         qrCodeNameTextView.setText(qrCode.getName());
         scoreTextView.setText(String.valueOf(qrCode.getScore()));

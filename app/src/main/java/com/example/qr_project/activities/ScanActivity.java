@@ -50,8 +50,6 @@ public class ScanActivity extends AppCompatActivity {
     FirebaseFirestore db;
     private static final int LOCATION_REQUEST_CODE = 100;
 
-    Bitmap face;
-
     /**
      * Defining the cameralauncher ready to scan the QR_Code
      * The camera can scan and take a photo of the QR_Code being presented to it
@@ -131,9 +129,7 @@ public class ScanActivity extends AppCompatActivity {
 
                     String qrCodeHash = qrCode.getHash();
                     // Retrieve the user's information
-                    String userID = sharedPref.getString("user_id", null);
-                    face = qrCode.getFace();
-                    qrCode.setFace();
+                    String userID = sharedPref.getString("user_id", null);;
                     db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
                         // Check if the document exists
                         if (documentSnapshot.exists()) {
@@ -153,15 +149,6 @@ public class ScanActivity extends AppCompatActivity {
                                 finish();
                             } else {
                                 addQR();
-                                Intent faceIntent = new Intent(this, FaceActivity.class);
-                                faceIntent.putExtra("qrHash", qrCodeHash);
-                                faceIntent.putExtra("userID", userID);
-                                // Convert the bitmap to a byte array
-                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                                face.compress(Bitmap.CompressFormat.JPEG, 50, stream);
-                                byte[] byteArray = stream.toByteArray();
-                                faceIntent.putExtra("face", byteArray);
-                                startActivity(faceIntent);
                                 Intent photoIntent = new Intent(this, PictureActivity.class);
                                 photoIntent.putExtra("qrHash", qrCodeHash);
                                 photoIntent.putExtra("userID", userID);

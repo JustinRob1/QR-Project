@@ -30,7 +30,9 @@ import com.example.qr_project.utils.QR_Adapter;
 import com.example.qr_project.utils.QR_Code;
 import com.example.qr_project.utils.UserManager;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

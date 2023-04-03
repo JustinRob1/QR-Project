@@ -21,11 +21,12 @@
         android:layout_marginRight="5dp"
         android:layout_gravity="center"/>
 
-    <ImageView
+    <TextView
         android:id="@+id/qr_code_img_1"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_weight="1"
+        android:textSize="6dp"
         android:src="@drawable/avatar"
         android:layout_gravity="center"
         android:layout_marginRight="5dp"

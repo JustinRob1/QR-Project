@@ -449,15 +449,7 @@ public class QRCodeManager {
             photo = null;
         }
 
-        Bitmap faceBitmap = null;
-        try {
-            byte[] decodedString = Base64.decode(face, Base64.DEFAULT);
-            faceBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return new QR_Code(score, name, faceBitmap, photo, location, hash, foundWithUser);
+        return new QR_Code(score, name, face, photo, location, hash, foundWithUser);
     }
 
 
