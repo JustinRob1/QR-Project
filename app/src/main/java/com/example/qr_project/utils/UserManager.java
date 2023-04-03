@@ -14,8 +14,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+
+import com.google.firebase.firestore.FieldValue;
+
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -32,6 +36,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A singleton class for managing user data, such as username, email, user ID, phone number, and more.
  */
 public class UserManager {
+
+    // Constants from Firestore for collections/documents/fields etc
+
+    // Collection names
+    private final String USERS_COLLECTION = "users";
+    // user fields
+    private final String QRCODES_FIELD = "qrcodes";
+
+    private final String TAG = "UserManager";
 
     private static volatile UserManager instance; // Singleton instance of UserManager
 
@@ -713,5 +726,40 @@ public class UserManager {
                     callback.onFailure(e);
                 }
             });
+    }
+
+    /**
+     * Clears all QRCodes from account, if there are any
+     */
+    public void clearQRCodes(){
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(QRCODES_FIELD, FieldValue.delete());
+        dbHelper.updateDocument(
+                USERS_COLLECTION,
+                userID,
+                updates,
+                aVoid -> {
+                    Log.d(TAG, "Deletion was successful");
+                },
+                e -> Log.d(TAG, "Error clearing QR Codes", e)
+        );
+    }
+
+    /**
+     * Adds the given qrCode to the user's account
+     * @param qrCode: QR Code to be added
+     */
+    public void addQRCode(QR_Code qrCode){
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(QRCODES_FIELD, FieldValue.arrayUnion(qrCode));
+        dbHelper.updateDocument(
+                USERS_COLLECTION,
+                userID,
+                updates,
+                aVoid -> {
+                    Log.d(TAG, "Addition was successful");
+                },
+                e -> Log.d(TAG, "Error adding a QR Code", e)
+        );
     }
 }

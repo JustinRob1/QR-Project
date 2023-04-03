@@ -37,6 +37,10 @@ public class LandingPageActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
+                /**
+                 * On the landing page, getting anc creating the unique userId for player(s)
+                 * @param result
+                 */
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == 0) {
                         Intent intent = result.getData();

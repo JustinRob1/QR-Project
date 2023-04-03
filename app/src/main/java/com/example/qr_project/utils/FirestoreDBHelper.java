@@ -31,12 +31,36 @@ public class FirestoreDBHelper implements DatabaseHelper {
                 .addOnFailureListener(failureListener);
     }
 
+    /**
+     * Attempts to update a document with the given updates (key value pairs to be stored in the
+     * document)
+     * @param collectionName
+     * @param documentId
+     * @param updates
+     * @param successListener
+     * @param failureListener
+     */
+    public void updateDocument(String collectionName,
+                               String documentId,
+                               Map<String, Object> updates,
+                               OnSuccessListener<Void> successListener,
+                               OnFailureListener failureListener) {
+        firebaseFirestore.collection(collectionName)
+                .document(documentId)
+                .update(updates)
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
+    }
+
+
     public void getAllDocuments(String collectionName,
                                 OnCompleteListener<QuerySnapshot> completeListener) {
         firebaseFirestore.collection(collectionName)
                 .get()
                 .addOnCompleteListener(completeListener);
     }
+
+
 
     public void getAllDocumentsOrdered(String collectionName, String orderBy, boolean ascending,
                                        OnCompleteListener<QuerySnapshot> completeListener) {

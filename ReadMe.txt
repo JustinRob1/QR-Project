@@ -6,7 +6,6 @@ Name: Abdullah Khadeli                CCID: akhadeli
       Paul Startsev                         pstartse
 
                
-     We have closed 20 User Stories.  <<Updated on April 3rd>>
 
 
 CRC Cards Updates:

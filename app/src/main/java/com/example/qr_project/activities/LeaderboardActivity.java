@@ -80,6 +80,11 @@ public class LeaderboardActivity extends AppCompatActivity {
     LeaderboardManager leaderboardManager;
 
 
+    /**
+     * This LeaderBoardManager is to manage the leaderboard in ranking among friends and even global
+     * Populate the leaderboard through filter
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +112,8 @@ public class LeaderboardActivity extends AppCompatActivity {
         populateData(filter);
     }
 
-
+    // This is to initalize the View in leaderboard
+    // Fetching all the id
     private void initViews(){
         leaderboard_view = findViewById(R.id.leaderboard_listview);
 
@@ -190,6 +196,9 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         leaderboardManager.getTopFriendsQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
             @Override
+            /**
+             * @param result
+             */
             public void onSuccess(List<QR_Code> result) {
                 if (isFriendCodeAdded== false){
                     int rank = 1;
@@ -210,6 +219,10 @@ public class LeaderboardActivity extends AppCompatActivity {
                 }
             }
 
+            /**
+             *
+             * @param e
+             */
             @Override
             public void onFailure(Exception e) {
                 friendCodes = null;
@@ -219,6 +232,9 @@ public class LeaderboardActivity extends AppCompatActivity {
 
         leaderboardManager.getTopGlobalQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
             @Override
+            /**
+             * @param result
+             */
             public void onSuccess(List<QR_Code> result) {
                 int rank = 1;
                 if (isGlobalCodeAdded == false){
@@ -308,7 +324,6 @@ public class LeaderboardActivity extends AppCompatActivity {
             }
         });
     }
-
 
      */
 
@@ -409,26 +424,47 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
     // Common functions
+    
+    /**
+     *
+     * @param view
+     */
     public void onCameraClick(View view) {
         Intent intent = new Intent(this, ScanActivity.class);
         startActivity(intent);
     }
 
+
+    /**
+     *
+     * @param view
+     */
     public void onMapClick(View view) {
         Intent intent = new Intent(this, MapActivity.class);
         startActivity(intent);
     }
 
+    /**
+     *
+     * @param view
+     */
     public void onClickBack(View view){
         finish();
     }
 
+    /**
+     *
+     * @param view
+     */
     public void onLeaderboardClick(View view){
         Toast.makeText(this, "Already at leaderboard", Toast.LENGTH_SHORT).show();
     }
 
-
     // View update functions
+    /**
+     *
+     * @param view
+     */
     public void onUserLeaderboardView(View view) {
 //        user_codes_title.setVisibility(View.VISIBLE);
         curr_view = "user";
@@ -442,6 +478,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 //        user_codes_title.setVisibility(View.VISIBLE);
     }
 
+
+    /**
+     *
+     * @param view
+     */
     public void onFriendLeaderboardView(View view){
 //        user_codes_title.setVisibility(View.GONE);
         curr_view = "friends";
@@ -463,6 +504,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     }
 
+
+    /**
+     *
+     * @param view
+     */
     public void onGlobalLeaderboardView(View view) {
 //        user_codes_title.setVisibility(View.GONE);
         curr_view = "global";
@@ -484,7 +530,10 @@ public class LeaderboardActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     *
+     * @param view
+     */
     public void onFilterChange(View view) {
         Log.d(TAG, "filter change");
         if (is_overall_scores) {
