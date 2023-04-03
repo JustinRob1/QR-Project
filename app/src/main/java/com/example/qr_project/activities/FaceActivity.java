@@ -68,16 +68,17 @@ public class FaceActivity extends AppCompatActivity {
                     faceRef.getDownloadUrl()
                             .addOnSuccessListener(uri -> {
                                 saveImageUrlToFirestore(uri.toString());
+                                finish(); // move finish() here
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                                finish();
+                                finish(); // add a finish() call here as well
                             });
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                    finish(); // add a finish() call here as well
                 });
-        finish();
     }
 
     private void saveImageUrlToFirestore(String imageUrl) {
@@ -103,7 +104,7 @@ public class FaceActivity extends AppCompatActivity {
                         // Update the document in Firestore with the modified qrcodes array
                         db.collection("users").document(userID).update("qrcodes", qrCodes)
                                 .addOnSuccessListener(aVoid -> {
-
+                                    // do nothing here, or add a success message if you'd like
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
@@ -113,6 +114,7 @@ public class FaceActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private Uri getImageUri(Context context, Bitmap imageBitmap) {
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, 640, 480, true);

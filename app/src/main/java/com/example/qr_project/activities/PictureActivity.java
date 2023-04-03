@@ -144,6 +144,7 @@ public class PictureActivity extends AppCompatActivity {
                         photoRef.getDownloadUrl()
                                 .addOnSuccessListener(uri -> {
                                     saveImageUrlToFirestore(uri.toString());
+                                    finish(); // Finish activity once the image is uploaded
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
@@ -152,13 +153,14 @@ public class PictureActivity extends AppCompatActivity {
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                        finish();
                     });
-            finish();
         } else {
             Toast.makeText(this, "Error: Image capture failed.", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
+
 
     private void saveImageUrlToFirestore(String imageUrl) {
         if (imageUrl != null) {

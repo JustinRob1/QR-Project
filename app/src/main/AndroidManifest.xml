@@ -20,8 +20,15 @@
         tools:targetApi="31"
         tools:ignore="ExtraText">
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBUux3nV7NYGBVtaRY4ZFmyppzqAm40zLU"/>
+
         <activity
             android:name=".activities.PictureActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.FaceActivity"
             android:exported="false" />
         <activity
             android:name=".activities.QRCodeActivity"
@@ -57,9 +64,9 @@
         <activity android:name=".activities.ScanActivity" />
 
         <activity
-        android:name="com.journeyapps.barcodescanner.CaptureActivity"
-        android:screenOrientation="fullSensor"
-        tools:replace="screenOrientation"
-        tools:ignore="MissingClass,WrongManifestParent" />
-        </application>
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation"
+            tools:ignore="MissingClass,WrongManifestParent" />
+    </application>
 </manifest>
