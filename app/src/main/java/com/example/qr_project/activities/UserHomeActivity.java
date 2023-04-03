@@ -85,24 +85,44 @@ public class UserHomeActivity extends AppCompatActivity {
 
         initViews();
 
+        // TODO
+        // Since we have decided to do things in realtime
+        // The current method of calling these functions
+        // in the onResume lifecycle function
+        // won't do
+        // To fix we must implement snapshot listeners
+        // within the current implementation
+        // and remove these updates
+
         updateFriendRanking();
-        updateGlobalRanking();
+
+        //updateGlobalRanking();
+        realtimeGlobalRanking();
+
         updateTop3Friends();
-        updateTop3QRCodes();
-        updateTotalScore();
-        updateTotalQRCodes();
+
+        //updateTop3QRCodes();
+        realtimeTop3QRCodes();
+
+        //updateTotalScore();
+        realtimeTotalScore();
+
+        //updateTotalQRCodes();
+        realtimeTotalQRCodes();
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // See notes in onCreate method
         updateFriendRanking();
-        updateGlobalRanking();
+        //updateGlobalRanking();
         updateTop3Friends();
-        updateTop3QRCodes();
-        updateTotalScore();
-        updateTotalQRCodes();
+        //updateTop3QRCodes();
+        //updateTotalScore();
+        //updateTotalQRCodes();
     }
 
     private void initViews(){
@@ -166,6 +186,7 @@ public class UserHomeActivity extends AppCompatActivity {
      */
     public void onLeaderboardClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);
+        intent.putExtra("filter", "user");
         startActivity(intent);
     }
 
@@ -310,6 +331,20 @@ public class UserHomeActivity extends AppCompatActivity {
         });
     }
 
+    private void realtimeTotalScore() {
+        userManager.getRealtimeTotalScore(new DatabaseResultCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                totalScore.setText(result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                totalScore.setText("N/A");
+            }
+        });
+    }
+
     private void updateGlobalRanking(){
         userManager.getGlobalRanking(new DatabaseResultCallback<Integer>() {
             @Override
@@ -320,6 +355,20 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 globalRank.setText("N/A");
+            }
+        });
+    }
+
+    private void realtimeGlobalRanking() {
+        userManager.getRealtimeGlobalRanking(new DatabaseResultCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                globalRank.setText("Global Rank: " + result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                globalRank.setText("Global Rank: N/A");
             }
         });
     }
@@ -343,6 +392,20 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Integer result) {
                 totalQrCodes.setText("Total QR Codes: " + String.valueOf(result));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                totalQrCodes.setText("Total QR Codes: N/A");
+            }
+        });
+    }
+
+    private void realtimeTotalQRCodes() {
+        userManager.getRealtimeTotalQRCodes(new DatabaseResultCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                totalQrCodes.setText("Total QR Codes: " + result);
             }
 
             @Override
@@ -392,6 +455,46 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 Log.d(TAG, "Error getting top 3 codes: ", e);
+            }
+        });
+    }
+
+    private void realtimeTop3QRCodes() {
+        userManager.getRealtimeTop3QRCodesSorted(new DatabaseResultCallback<List<Map<String, Object>>>() {
+            @Override
+            public void onSuccess(List<Map<String, Object>> result) {
+                // Clear old version of the list
+                rankedQRCodes_list.clear();
+
+                for (Map<String, Object> qrCode : result) {
+
+                    // Creating QR_Code object for the adapter
+                    String name = String.valueOf(qrCode.get("name"));
+
+                    // POTENTIAL ERROR
+                    int score = Math.toIntExact((Long) qrCode.get("score"));
+
+                    // IDENTIFIED ERROR POINT
+                    // Not all qr codes in the db have a face,
+                    // so this call will fail for the older docs in docRef
+                    String face = (String) qrCode.get("face");
+
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
+
+                    // adding QR_Code obj to the list
+                    rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
+                }
+
+                // Make view all button visible
+                viewAllBtn.setVisibility(View.VISIBLE);
+
+                // Notify adapter to update dataset
+                rankedQRCodes_adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
             }
         });
     }

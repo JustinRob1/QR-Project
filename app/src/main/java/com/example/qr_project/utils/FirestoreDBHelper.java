@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -103,7 +104,20 @@ public class FirestoreDBHelper implements DatabaseHelper {
                 .addOnFailureListener(failureListener);
     }
 
+    @Override
+    public void setDocumentSnapshotListener(String collectionName,
+                                            String documentId,
+                                            EventListener<DocumentSnapshot> eventListener) {
+        firebaseFirestore.collection(collectionName)
+                .document(documentId)
+                .addSnapshotListener(eventListener);
+    }
 
-
+    @Override
+    public void setCollectionSnapshotListener(String collectionName,
+                                              EventListener<QuerySnapshot> eventListener) {
+        firebaseFirestore.collection(collectionName)
+                .addSnapshotListener(eventListener);
+    }
 }
 
