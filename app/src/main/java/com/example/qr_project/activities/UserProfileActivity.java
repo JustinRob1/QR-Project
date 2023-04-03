@@ -12,7 +12,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -383,8 +382,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     userManager.removeFriend(otherUserManager.getUserID());
-                    addFriendBtn.setBackgroundResource(R.drawable.green_round_btn);
-                    addFriendBtn.setText("Add friend");
+                    reloadActivity();
                 }
             });
         } else {
@@ -394,8 +392,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     userManager.addFriend(otherUserManager.getUserID());
-                    addFriendBtn.setBackgroundResource(R.drawable.red_round_btn);
-                    addFriendBtn.setText("Remove friend");
+                    reloadActivity();
                 }
             });
         }
@@ -441,6 +438,13 @@ public class UserProfileActivity extends AppCompatActivity {
      */
     public void onLeaderboardClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);
+        startActivity(intent);
+    }
+
+    private void reloadActivity(){
+        Intent intent = new Intent(this, UserProfileActivity.class);
+        intent.putExtra("userId", otherUserManager.getUserID());
+        finish();
         startActivity(intent);
     }
 }

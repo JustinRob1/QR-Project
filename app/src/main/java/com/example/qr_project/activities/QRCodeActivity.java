@@ -12,14 +12,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.qr_project.R;
+import com.example.qr_project.models.DatabaseResultCallback;
+import com.example.qr_project.utils.QRCodeManager;
+import com.example.qr_project.utils.QR_Code;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -46,6 +51,24 @@ public class QRCodeActivity extends AppCompatActivity {
 
     private TextView totalScans;
 
+    private TextView qrCodeName;
+
+    private TextView qrCodeScore;
+
+    private TextView yourRankNum;
+
+    private TextView friendRankNum;
+
+    private TextView globalRankNum;
+
+    private TextView codeDescription;
+
+    private TextView hasUserScannedCode;
+
+    private TableRow RemoveQRRow;
+
+    QRCodeManager qrCodeManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,28 +77,31 @@ public class QRCodeActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         String qr_code_hash = getIntent().getStringExtra("hash");
+        qrCodeManager = new QRCodeManager(qr_code_hash);
+
         DocumentReference qrCodeRef = db.collection("qrcodes").document(qr_code_hash);
 
         totalScans = findViewById(R.id.total_scans);
+        qrCodeName = findViewById(R.id.qr_code_name);
+        qrCodeScore = findViewById(R.id.qr_code_score);
+        yourRankNum = findViewById(R.id.your_rank_num);
+        friendRankNum = findViewById(R.id.friend_rank_num);
+        globalRankNum = findViewById(R.id.global_rank_num);
+        codeDescription = findViewById(R.id.code_description);
+        hasUserScannedCode = findViewById(R.id.user_scanned_already_txt);
+        RemoveQRRow = findViewById(R.id.remove_qr_row);
+        RemoveQRRow.setVisibility(View.GONE);
 
-        // Attach a listener to the QR code document to update the number of times it was scanned
-        qrCodeRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                Log.w("MY TAG", "Listen failed.", e);
-                return;
-            }
-
-            if (snapshot != null && snapshot.exists()) {
-                // Get the users array from the QR code document
-                ArrayList<String> users = (ArrayList<String>) snapshot.get("users");
-
-                // Update the TextView for the number of times the QR code was scanned
-                totalScans.setText(String.valueOf(users.size()));
-            } else {
-                Log.d("MY TAG", "Current data: null");
-            }
-        });
+        updateQRCode();
     }
+
+    @Override
+    protected void onResume (){
+        super.onResume();
+
+        updateQRCode();
+    }
+
 
     /**
      * Called when the user clicks the back button
@@ -262,8 +288,98 @@ public class QRCodeActivity extends AppCompatActivity {
         });
     }
 
+    private void updateQRCode(){
+        qrCodeManager.getQRCode(new DatabaseResultCallback<QR_Code>() {
+            @Override
+            public void onSuccess(QR_Code result) {
+                qrCodeName.setText(result.getName());
+                qrCodeScore.setText(String.valueOf(result.getScore()));
+            }
 
-    
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error: ", e);
+            }
+        });
+
+        qrCodeManager.getGlobalRanking(new DatabaseResultCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer result) {
+                globalRankNum.setText(String.valueOf(result));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error with global rank: ", e);
+            }
+        });
+
+        qrCodeManager.getUserQRCodeRanking(new DatabaseResultCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer result) {
+                if (result == 0){
+                    yourRankNum.setText("N/A");
+                } else {
+                    yourRankNum.setText(String.valueOf(result));
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error with user rank: ", e);
+            }
+        });
+
+        qrCodeManager.getFriendsQRCodeRanking(new DatabaseResultCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer result) {
+                if (result == 0){
+                    friendRankNum.setText("N/A");
+                } else {
+                    friendRankNum.setText(String.valueOf(result));
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+
+        qrCodeManager.getTotalScans(new DatabaseResultCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer result) {
+                totalScans.setText(String.valueOf(result));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error with total scans: ", e);
+            }
+        });
+
+        qrCodeManager.hasUserScanned((new DatabaseResultCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                if (result == true){
+                    hasUserScannedCode.setText("You have already scanned this code");
+                    RemoveQRRow.setVisibility(View.VISIBLE);
+                } else {
+                    hasUserScannedCode.setText("You haven't scanned this code yet");
+                    RemoveQRRow.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error with has User scanned: ", e);
+            }
+        }));
+
+
+    }
+
+
     /*
     just a demo, not fully completed yet
     please build on

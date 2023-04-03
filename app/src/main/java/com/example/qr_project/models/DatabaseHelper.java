@@ -30,5 +30,9 @@ public interface DatabaseHelper {
                                  OnSuccessListener<Void> successListener,
                                  OnFailureListener failureListener);
 
+    void getCollection(String collectionName,
+                       OnSuccessListener<QuerySnapshot> successListener,
+                       OnFailureListener failureListener);
+
 }
 
