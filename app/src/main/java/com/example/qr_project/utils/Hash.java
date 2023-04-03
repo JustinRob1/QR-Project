@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.util.Log;
 
 import java.math.BigInteger;
@@ -30,6 +32,8 @@ public class Hash {
     private static final int EYE_COLOR = Color.BLACK;
     private static final int NOSE_COLOR = Color.RED;
     private static final int MOUTH_COLOR = Color.BLUE;
+    private static final int CHEEK_COLOR = Color.YELLOW;
+    private static final int EYEBROW_COLOR = Color.BLACK;
 
     /**
      * Creates an instance of Hash object.
@@ -159,15 +163,15 @@ public class Hash {
      */
     public static Bitmap generateFace(String hash) {
         // convert the hash into a set of parameters for the face-like image
-        int eyeSize = Math.abs(hash.hashCode()) % 50 + 50;
+        int eyeSize = Math.abs(hash.hashCode()) % 20 + 30;
         int noseSize = Math.abs(hash.hashCode() / 3) % 30 + 20;
         int mouthSize = Math.abs(hash.hashCode() / 7) % 50 + 20;
-        int eyeOffsetX = Math.abs(hash.hashCode() / 11) % 50 - 25;
-        int eyeOffsetY = Math.abs(hash.hashCode() / 13) % 50 - 25;
-        int noseOffsetX = Math.abs(hash.hashCode() / 17) % 50 - 25;
-        int noseOffsetY = Math.abs(hash.hashCode() / 19) % 50 - 25;
-        int mouthOffsetX = Math.abs(hash.hashCode() / 23) % 50 - 25;
-        int mouthOffsetY = Math.abs(hash.hashCode() / 29) % 50 - 25;
+        int eyeOffsetX = Math.abs(hash.hashCode() / 11) % 30 - 15;
+        int eyeOffsetY = Math.abs(hash.hashCode() / 13) % 30 - 15;
+        int noseOffsetX = Math.abs(hash.hashCode() / 17) % 20 - 10;
+        int noseOffsetY = Math.abs(hash.hashCode() / 19) % 20 - 10;
+        int mouthOffsetX = Math.abs(hash.hashCode() / 23) % 20 - 10;
+        int mouthOffsetY = Math.abs(hash.hashCode() / 29) % 20 + 10;
 
         // create a new bitmap for the image
         Bitmap bitmap = Bitmap.createBitmap(IMAGE_SIZE, IMAGE_SIZE, Bitmap.Config.ARGB_8888);
@@ -186,16 +190,48 @@ public class Hash {
         mouthPaint.setColor(MOUTH_COLOR);
 
         // draw the eyes
-        canvas.drawCircle(IMAGE_SIZE / 2 + eyeOffsetX - eyeSize, IMAGE_SIZE / 2 + eyeOffsetY, eyeSize, eyePaint);
-        canvas.drawCircle(IMAGE_SIZE / 2 + eyeOffsetX + eyeSize, IMAGE_SIZE / 2 + eyeOffsetY, eyeSize, eyePaint);
+        canvas.drawCircle(IMAGE_SIZE / 2 - 40 + eyeOffsetX - eyeSize / 2, IMAGE_SIZE / 2 - 20 + eyeOffsetY, eyeSize, eyePaint);
+        canvas.drawCircle(IMAGE_SIZE / 2 + 40 + eyeOffsetX - eyeSize / 2, IMAGE_SIZE / 2 - 20 + eyeOffsetY, eyeSize, eyePaint);
 
         // draw the nose
         canvas.drawCircle(IMAGE_SIZE / 2 + noseOffsetX, IMAGE_SIZE / 2 + noseOffsetY, noseSize, nosePaint);
 
         // draw the mouth
-        canvas.drawRect(IMAGE_SIZE / 2 + mouthOffsetX - mouthSize, IMAGE_SIZE / 2 + mouthOffsetY,
-                IMAGE_SIZE / 2 + mouthOffsetX + mouthSize, IMAGE_SIZE / 2 + mouthOffsetY + mouthSize / 2,
-                mouthPaint);
+        Path mouthPath = new Path();
+        mouthPath.moveTo(IMAGE_SIZE / 2 - 30 + mouthOffsetX, IMAGE_SIZE / 2 + 40 + mouthOffsetY);
+        mouthPath.quadTo(IMAGE_SIZE / 2 + 5 + mouthOffsetX, IMAGE_SIZE / 2 + 60 + mouthOffsetY, IMAGE_SIZE / 2 + 30 + mouthOffsetX, IMAGE_SIZE / 2 + 40 + mouthOffsetY);
+        mouthPath.quadTo(IMAGE_SIZE / 2 + 5 + mouthOffsetX, IMAGE_SIZE / 2 + 50 + mouthOffsetY, IMAGE_SIZE / 2 - 30 + mouthOffsetX, IMAGE_SIZE / 2 + 40 + mouthOffsetY);
+        canvas.drawPath(mouthPath, mouthPaint);
+
+        // draw the cheeks
+        Paint cheekPaint = new Paint();
+        cheekPaint.setColor(CHEEK_COLOR);
+        canvas.drawCircle(IMAGE_SIZE / 2 - 50, IMAGE_SIZE / 2, 40, cheekPaint);
+        canvas.drawCircle(IMAGE_SIZE / 2 + 50, IMAGE_SIZE / 2, 40, cheekPaint);
+
+        Paint browPaint = new Paint();
+        browPaint.setColor(EYEBROW_COLOR);
+        browPaint.setStrokeWidth(10);
+        browPaint.setStyle(Paint.Style.STROKE);
+        browPaint.setStrokeCap(Paint.Cap.ROUND);
+
+        // draw the left eyebrow
+        RectF leftBrowRect = new RectF(
+                IMAGE_SIZE / 2 - 80,
+                IMAGE_SIZE / 2 - 60 + eyeOffsetY,
+                IMAGE_SIZE / 2 - 20,
+                IMAGE_SIZE / 2 - 40 + eyeOffsetY
+        );
+        canvas.drawArc(leftBrowRect, -30, 60, false, browPaint);
+
+        // draw the right eyebrow
+        RectF rightBrowRect = new RectF(
+                IMAGE_SIZE / 2 + 20,
+                IMAGE_SIZE / 2 - 60 + eyeOffsetY,
+                IMAGE_SIZE / 2 + 80,
+                IMAGE_SIZE / 2 - 40 + eyeOffsetY
+        );
+        canvas.drawArc(rightBrowRect, -150, 60, false, browPaint);
 
         return bitmap;
     }

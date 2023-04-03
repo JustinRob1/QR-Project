@@ -37,8 +37,6 @@ public class PictureActivity extends AppCompatActivity {
     private String qrHash;
     private String userID;
     private Uri photoUri;
-    private Uri faceUri;
-    private Bitmap face;
 
     private StorageReference storageReference;
     private FirebaseFirestore db;
@@ -55,11 +53,6 @@ public class PictureActivity extends AppCompatActivity {
         Intent intent = getIntent();
         qrHash = intent.getStringExtra("qrHash");
         userID = intent.getStringExtra("userID");
-        // Get the byte array from the intent
-        byte[] byteArray = getIntent().getByteArrayExtra("face");
-
-        // Convert the byte array to a bitmap
-        face = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
         mAuth = FirebaseAuth.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -145,30 +138,12 @@ public class PictureActivity extends AppCompatActivity {
 
             // Upload the photo to storage
             photoUri = getImageUri(getApplicationContext(), imageBitmap);
-            StorageReference photoRef = storageReference.child(userID).child(qrHash);
+            StorageReference photoRef = storageReference.child(userID).child(qrHash).child("photo");
             photoRef.putFile(photoUri)
                     .addOnSuccessListener(taskSnapshot -> {
                         photoRef.getDownloadUrl()
                                 .addOnSuccessListener(uri -> {
-                                    saveImageUrlToFirestore(uri.toString(), "photo");
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                    });
-
-            // Upload the face to storage
-            faceUri = getImageUri(getApplicationContext(), face);
-            StorageReference faceRef = storageReference.child(userID).child(qrHash);
-            faceRef.putFile(faceUri)
-                    .addOnSuccessListener(taskSnapshot -> {
-                        faceRef.getDownloadUrl()
-                                .addOnSuccessListener(uri -> {
-                                    saveImageUrlToFirestore(uri.toString(), "face");
+                                    saveImageUrlToFirestore(uri.toString());
                                 })
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
@@ -185,9 +160,9 @@ public class PictureActivity extends AppCompatActivity {
         }
     }
 
-    private void saveImageUrlToFirestore(String imageUrl, String fieldName) {
+    private void saveImageUrlToFirestore(String imageUrl) {
         if (imageUrl != null) {
-            Log.d("My Tag", "saveImageUrlToFirestore() called with: imageUrl = [" + imageUrl + "]");
+            Log.d("My Tag", "Picture Activity called with: imageUrl = [" + imageUrl + "]");
         } else {
             Toast.makeText(PictureActivity.this, "Image URI is null or empty", Toast.LENGTH_SHORT).show();
             return;
@@ -203,11 +178,7 @@ public class PictureActivity extends AppCompatActivity {
                     String hash = (String) qrCode.get("hash");
                     if (Objects.equals(hash, qrHash)) {
                         // Update the photo or image of the QR code with the imageUrl
-                        if (fieldName.equals("photo")) {
-                            qrCode.put("photo", imageUrl);
-                        } else if (fieldName.equals("face")) {
-                            qrCode.put("face", imageUrl);
-                        }
+                        qrCode.put("photo", imageUrl);
 
                         // Update the document in Firestore with the modified qrcodes array
                         db.collection("users").document(userID).update("qrcodes", qrCodes)
@@ -217,14 +188,11 @@ public class PictureActivity extends AppCompatActivity {
                                 .addOnFailureListener(e -> {
                                     Toast.makeText(PictureActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
                                 });
-
                     }
                 }
             }
         });
     }
-
-
 
     private Uri getImageUri(Context context, Bitmap imageBitmap) {
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, 640, 480, true);

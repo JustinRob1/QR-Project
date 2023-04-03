@@ -153,15 +153,19 @@ public class ScanActivity extends AppCompatActivity {
                                 finish();
                             } else {
                                 addQR();
-                                Intent intent = new Intent(this, PictureActivity.class);
-                                intent.putExtra("qrHash", qrCodeHash);
-                                intent.putExtra("userID", userID);
+                                Intent faceIntent = new Intent(this, FaceActivity.class);
+                                faceIntent.putExtra("qrHash", qrCodeHash);
+                                faceIntent.putExtra("userID", userID);
                                 // Convert the bitmap to a byte array
                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                                 face.compress(Bitmap.CompressFormat.JPEG, 50, stream);
                                 byte[] byteArray = stream.toByteArray();
-                                intent.putExtra("face", byteArray);
-                                startActivity(intent);
+                                faceIntent.putExtra("face", byteArray);
+                                startActivity(faceIntent);
+                                Intent photoIntent = new Intent(this, PictureActivity.class);
+                                photoIntent.putExtra("qrHash", qrCodeHash);
+                                photoIntent.putExtra("userID", userID);
+                                startActivity(photoIntent);
                                 finish();
                             }
                         }
