@@ -256,6 +256,7 @@ public class ScanActivity extends AppCompatActivity {
                     // QR code does not exist, add a new document with the 'users' array field
                     Map<String, Object> data = new HashMap<>();
                     data.put("users", Arrays.asList(userID));
+                    data.put("comments", null);
                     qrCodeRef.set(data).addOnCompleteListener(setTask -> {
                         if (setTask.isSuccessful()) {
                             Log.d(TAG, "Added new QR code document with hash: " + qrCodeHash);

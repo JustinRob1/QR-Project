@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class QRCodeManager {
     FirestoreDBHelper dbHelper = new FirestoreDBHelper();
     String hash;
+
     UserManager userManager = UserManager.getInstance();
 
     public QRCodeManager(String hash){
@@ -222,6 +223,61 @@ public class QRCodeManager {
         });
     }
 
+    public void addComment(Map<String, Object> comment) {
+
+        Log.d(TAG, "Adding comment: " + comment);
+
+        dbHelper.appendMapToArrayField("qrcodes", QRCodeManager.this.hash, "comments", comment,
+            new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                    Log.d(TAG, "Comment added successfully");
+                }
+            },
+            new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(TAG, "Error adding comment: " + e.getMessage());
+                }
+            }
+        );
+    }
+
+    public void removeComment(Map<String, Object> comment){
+        dbHelper.removeMapFromArrayField("qrcodes", QRCodeManager.this.hash, "comments", comment, new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Log.d(TAG, "Comment successfully removed from array field!");
+            }
+        }, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.w(TAG, "Error removing comment from array field", e);
+            }
+        });
+    }
+
+    public void getAllComments(DatabaseResultCallback<List<Map<String, Object>>> callback){
+        dbHelper.getDocument("qrcodes", QRCodeManager.this.hash, new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists() && documentSnapshot != null){
+                    List<Map<String, Object>> comments = (List<Map<String, Object>>) documentSnapshot.get("comments");
+
+                    // Update the TextView for the number of times the QR code was scanned
+                    callback.onSuccess(comments);
+                } else {
+                    callback.onFailure(new Exception("QR Code doesn't exist"));
+                }
+            }
+        }, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
     public void hasUserScanned(DatabaseResultCallback<Boolean> callback) {
         dbHelper.getDocument("users", userManager.getUserID(), new OnSuccessListener<DocumentSnapshot>() {
             @Override
@@ -294,6 +350,7 @@ public class QRCodeManager {
             }
         });
     }
+
 
     private boolean processDocument(DocumentSnapshot documentSnapshot, DatabaseResultCallback<QR_Code> callback, boolean foundWithUser) {
         List<Map<String, Object>> qrCodesArray = extractQRCodeArray(documentSnapshot);
