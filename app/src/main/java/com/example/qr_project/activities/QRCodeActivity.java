@@ -479,7 +479,6 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
 
-
     public void onSeeComments(View view){
         qrRow1.setVisibility(View.GONE);
         qrRow2.setVisibility(View.GONE);
@@ -492,6 +491,7 @@ public class QRCodeActivity extends AppCompatActivity {
         seeCommentsText.setText("See Stats");
         setBottomButtonsMargin(20);
         seeCommentsRow.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 reloadActivity();

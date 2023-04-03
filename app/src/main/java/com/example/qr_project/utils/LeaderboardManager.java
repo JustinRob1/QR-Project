@@ -1,6 +1,7 @@
 package com.example.qr_project.utils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.qr_project.models.DatabaseResultCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -8,6 +9,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -22,6 +25,7 @@ public class LeaderboardManager {
     FirestoreDBHelper dbHelper = new FirestoreDBHelper();
     String hash;
     UserManager userManager = UserManager.getInstance();
+    String userID = userManager.getUserID();
 
     public LeaderboardManager(){
 
@@ -224,7 +228,6 @@ public class LeaderboardManager {
         });
     }
 
-
     public void getTopGlobalTotalScores(DatabaseResultCallback<List<Friend>> callback){
         dbHelper.getAllDocumentsOrdered("users", "totalScore", false, new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -255,4 +258,108 @@ public class LeaderboardManager {
             }
         });
     }
+
+
+    // REALTIME VARIANTS
+
+    public void getRealtimeTopGlobalQRCodes(DatabaseResultCallback<List<Map<String, Object>>> callback) {
+        dbHelper.setCollectionSnapshotListener("users", new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(error);
+                }
+
+                if (value != null && !value.isEmpty()) {
+                    List<Map<String, Object>> topQRCodes = new ArrayList<>();
+                    // add qr codes from each user to topQRCodes
+                    for (QueryDocumentSnapshot doc : value) {
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) doc.get("qrcodes");
+                        if (qrCodes != null && !qrCodes.isEmpty()) {
+                            for (Map<String, Object> qrCode : qrCodes) {
+                                topQRCodes.add(qrCode);
+                            }
+                        }
+                    }
+                    // Sort final list
+                    topQRCodes.sort((a,b) -> ( (Long) b.get("score")).compareTo(( (Long) a.get("score")) ));
+                    callback.onSuccess(topQRCodes);
+                } else {
+                    callback.onFailure(new Exception("Error with collection"));
+                }
+            }
+        });
+    }
+
+    public void getRealtimeTopUserQRCodes(DatabaseResultCallback<List<Map<String, Object>>> callback) {
+        dbHelper.setDocumentSnapshotListener("users", this.userID,new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(error);
+                }
+
+                if (value != null && value.exists()) {
+                    Map<String, Object> data = value.getData();
+                    if (data != null){
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
+                        if (qrCodes != null) {
+                            // Sort QR codes based on score
+                            qrCodes.sort((a,b) -> ( (Long) b.get("score")).compareTo(( (Long) a.get("score")) ));
+
+                            callback.onSuccess(qrCodes);
+                        }
+                    } else {
+                        callback.onFailure(new Exception("No data in given document"));
+                    }
+
+                } else {
+                    callback.onFailure(new Exception("Document does not exist"));
+                }
+            }
+        });
+    }
+
+    // TODO
+    public void getRealtimeTopFriendsQRCodes(DatabaseResultCallback<List<QR_Code>> callback) {
+
+    }
+
+    // TODO
+    public void getRealtimeTopFriendsTotalScores(DatabaseResultCallback<List<QR_Code>> callback) {
+
+    }
+
+    public void getRealtimeGlobalTotalScores(DatabaseResultCallback<List<Friend>> callback) {
+        dbHelper.setCollectionSnapshotListener("users", new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(error);
+                }
+
+                if (value != null && !value.isEmpty()) {
+                    List<Friend> topScores = new ArrayList<>();
+                    // add qr codes from each user to topQRCodes
+                    for (QueryDocumentSnapshot doc : value) {
+                        String name = (String) doc.get("username");
+                        String id = (String) doc.get("userID");
+                        int score = Math.toIntExact((Long) doc.get("totalScore"));
+
+                        Friend friend = new Friend(name, score, id);
+                        topScores.add(friend);
+
+                    }
+
+                    // Sort final list
+                    topScores.sort((a,b) -> ( Long.valueOf(b.getScore())).compareTo(Long.valueOf( a.getScore()) ));
+                    callback.onSuccess(topScores);
+
+                } else {
+                    callback.onFailure(new Exception("Error with collection"));
+                }
+            }
+        });
+    }
+
 }
