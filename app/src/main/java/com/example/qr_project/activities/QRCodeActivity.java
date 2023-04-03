@@ -32,8 +32,10 @@ import com.example.qr_project.R;
 import com.example.qr_project.models.DatabaseResultCallback;
 import com.example.qr_project.utils.Comment;
 import com.example.qr_project.utils.CommentAdapter;
+import com.example.qr_project.utils.Friend;
 import com.example.qr_project.utils.QRCodeManager;
 import com.example.qr_project.utils.QR_Code;
+import com.example.qr_project.utils.ScannersAdapter;
 import com.example.qr_project.utils.UserManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -88,6 +90,7 @@ public class QRCodeActivity extends AppCompatActivity {
     private TextView seeCommentsText;
 
     private TableRow seeCommentsRow;
+    private TableRow seeScannersRow;
 
     ArrayList<Comment> commentList;
     ArrayAdapter<Comment> commentList_adapter;
@@ -146,13 +149,14 @@ public class QRCodeActivity extends AppCompatActivity {
         QRFace = findViewById(R.id.image_face);
         commentListView = findViewById(R.id.comment_table);
         bottomButtons = findViewById(R.id.bottom_buttons);
-        setBottomButtonsMargin(80);
+        setBottomButtonsMargin(60);
 
 
         qrDetailsBorder = findViewById(R.id.qr_code_details_border);
         addCommentRow = findViewById(R.id.add_comment_row);
         addCommentRow.setVisibility(View.GONE);
         seeCommentsRow = findViewById(R.id.see_comment_row);
+        seeScannersRow = findViewById(R.id.see_scanner_row);
 
         seeCommentsRow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,6 +205,35 @@ public class QRCodeActivity extends AppCompatActivity {
         });
     }
 
+    public void onSeeScanners(){
+        qrCodeManager.getAllUsers(new DatabaseResultCallback<List<Friend>>() {
+            @Override
+            public void onSuccess(List<Friend> result) {
+                // Create the custom AlertDialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
+                View view = LayoutInflater.from(QRCodeActivity.this).inflate(R.layout.dialog_scanners_list, null);
+                ListView friendsListView = view.findViewById(R.id.friends_list_view);
+
+                // Set the adapter with the list of friends
+                ScannersAdapter friendAdapter = new ScannersAdapter(QRCodeActivity.this, result);
+                friendsListView.setAdapter(friendAdapter);
+
+                // Set the custom view for the AlertDialog and show it
+                builder.setView(view);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        });
+    }
+
+    public void getAllUsers(List<String> ids){
+
+    }
 
     /**
      * Called when the user clicks the back button

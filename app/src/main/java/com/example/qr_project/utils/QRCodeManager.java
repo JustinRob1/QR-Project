@@ -260,6 +260,57 @@ public class QRCodeManager {
         });
     }
 
+    public void getAllScanners(DatabaseResultCallback<List<String>> callback){
+        dbHelper.getDocument("qrcodes", QRCodeManager.this.hash, new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists() && documentSnapshot != null) {
+                    List<String> users = (List<String>) documentSnapshot.get("users");
+
+                    callback.onSuccess(users);
+                }
+            }
+        }, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                callback.onFailure(new Exception("QR Code doesn't exist"));
+            }
+        });
+    }
+
+    public void getAllUsers(DatabaseResultCallback<List<Friend>> callback){
+        List<Friend> friends = new ArrayList<>();
+        getAllScanners(new DatabaseResultCallback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> result) {
+                for (String id : result){
+                    dbHelper.getDocument("users", id, new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            if (documentSnapshot != null && documentSnapshot.exists()) {
+                                String username = (String) documentSnapshot.get("username");
+                                int totalScore = Math.toIntExact((Long) documentSnapshot.get("totalScore"));
+                                Friend friend = new Friend(username, totalScore, id);
+                                friends.add(friend);
+                            }
+                        }
+                    }, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "Error getting people: ", e);
+                        }
+                    });
+                }
+                callback.onSuccess(friends);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Error getting people: ", e);
+                callback.onFailure(e);
+            }
+        });
+    }
     public void getAllComments(DatabaseResultCallback<List<Map<String, Object>>> callback){
         dbHelper.getDocument("qrcodes", QRCodeManager.this.hash, new OnSuccessListener<DocumentSnapshot>() {
             @Override

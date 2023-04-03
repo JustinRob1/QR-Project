@@ -13,6 +13,7 @@ public class QR_Code {
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
     private Bitmap face; // Stores the QR code face
+
     private Bitmap photo; // Stores the photo taken
     private GeoPoint location;
 
