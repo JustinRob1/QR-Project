@@ -13,12 +13,30 @@ import android.widget.TextView;
 
 import com.example.qr_project.R;
 
+/**
+ * A utility class containing methods for creating and manipulating UI elements.
+ */
 public class UtilityFunctions {
 
-    UtilityFunctions(){
+    // Private constructor to prevent instantiation
+    private UtilityFunctions(){
 
     }
 
+    /**
+     * Creates a new TableRow with the specified data.
+     *
+     * @param context              The context to use for creating UI elements.
+     * @param name                 The name of the user.
+     * @param score                The item's score.
+     * @param rank                 The item's rank.
+     * @param hash                 The item's hash.
+     * @param rowBackgroundDrawable The background drawable for the row.
+     * @param face                 The item's face.
+     * @param arrowDrawable        The arrow drawable for the row.
+     * @param intent               The intent to be executed when the row is clicked.
+     * @return A new TableRow with the specified data.
+     */
     public static TableRow createNewRow(Context context, String name, String score, int rank, String hash, int rowBackgroundDrawable, String face, int arrowDrawable, Intent intent){
         // Create a new TableRow
 

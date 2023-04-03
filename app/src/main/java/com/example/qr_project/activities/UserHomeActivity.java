@@ -83,7 +83,29 @@ public class UserHomeActivity extends AppCompatActivity {
         userManager = UserManager.getInstance();
         userManager.setUserID(userId);
 
+        initViews();
 
+        updateFriendRanking();
+        updateGlobalRanking();
+        updateTop3Friends();
+        updateTop3QRCodes();
+        updateTotalScore();
+        updateTotalQRCodes();
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateFriendRanking();
+        updateGlobalRanking();
+        updateTop3Friends();
+        updateTop3QRCodes();
+        updateTotalScore();
+        updateTotalQRCodes();
+    }
+
+    private void initViews(){
         rankedQRCodes_list = new ArrayList<>();
         rankedQRCodes_adapter = new QR_Adapter(this, rankedQRCodes_list);
         rankedQRCodes_view = findViewById(R.id.user_top_qr_table);
@@ -113,26 +135,8 @@ public class UserHomeActivity extends AppCompatActivity {
         friendCard3Name = findViewById(R.id.friend_3_name);
         friendCard3Score = findViewById(R.id.friend_3_score);
         friendCard3Rank = findViewById(R.id.friend_3_rank);
-
-        updateFriendRanking();
-        updateGlobalRanking();
-        updateTop3Friends();
-        updateTop3QRCodes();
-        updateTotalScore();
-        updateTotalQRCodes();
     }
 
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateFriendRanking();
-        updateGlobalRanking();
-        updateTop3Friends();
-        updateTop3QRCodes();
-        updateTotalScore();
-        updateTotalQRCodes();
-    }
 
     /**
      * When the user clicks the camera button, this method will be called
