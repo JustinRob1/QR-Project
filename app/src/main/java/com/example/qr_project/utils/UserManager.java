@@ -392,6 +392,10 @@ public class UserManager {
     }
 
     public void getRealtimeTotalScore(DatabaseResultCallback<String> callback) {
+        if (this.userID == null) {
+            callback.onFailure(new Exception("userID is null"));
+            return;
+        }
         dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -412,6 +416,7 @@ public class UserManager {
             }
         });
     }
+
 
     /**
      * Adds a friend to the user's friends list in the database, given the friend's user ID.

@@ -292,6 +292,11 @@ public class LeaderboardManager {
     }
 
     public void getRealtimeTopUserQRCodes(DatabaseResultCallback<List<Map<String, Object>>> callback) {
+        if (this.userID == null) {
+            callback.onFailure(new Exception("User ID is null"));
+            return;
+        }
+
         dbHelper.setDocumentSnapshotListener("users", this.userID,new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
@@ -319,6 +324,7 @@ public class LeaderboardManager {
             }
         });
     }
+
 
     // TODO
     public void getRealtimeTopFriendsQRCodes(DatabaseResultCallback<List<QR_Code>> callback) {
