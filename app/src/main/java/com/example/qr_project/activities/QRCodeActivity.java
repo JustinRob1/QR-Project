@@ -67,6 +67,8 @@ public class QRCodeActivity extends AppCompatActivity {
 
     private TableRow RemoveQRRow;
 
+    private TextView QRFace;
+
     QRCodeManager qrCodeManager;
 
     @Override
@@ -91,6 +93,7 @@ public class QRCodeActivity extends AppCompatActivity {
         hasUserScannedCode = findViewById(R.id.user_scanned_already_txt);
         RemoveQRRow = findViewById(R.id.remove_qr_row);
         RemoveQRRow.setVisibility(View.GONE);
+        QRFace = findViewById(R.id.image_face);
 
         updateQRCode();
     }
@@ -294,6 +297,7 @@ public class QRCodeActivity extends AppCompatActivity {
             public void onSuccess(QR_Code result) {
                 qrCodeName.setText(result.getName());
                 qrCodeScore.setText(String.valueOf(result.getScore()));
+                QRFace.setText(result.getFace());
             }
 
             @Override
@@ -375,7 +379,6 @@ public class QRCodeActivity extends AppCompatActivity {
                 Log.d(TAG, "Error with has User scanned: ", e);
             }
         }));
-
 
     }
 
