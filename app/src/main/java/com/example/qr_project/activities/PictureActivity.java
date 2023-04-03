@@ -80,6 +80,7 @@ public class PictureActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // Get the QR code hash and user ID from the intent
+        Log.d("MyActivity", "onBackPressed() called");
         Intent intent = getIntent();
         String qrCodeHash = intent.getStringExtra("qrHash");
         String userID = intent.getStringExtra("userID");

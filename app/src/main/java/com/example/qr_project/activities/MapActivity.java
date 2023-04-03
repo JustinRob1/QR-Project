@@ -1,5 +1,7 @@
 package com.example.qr_project.activities;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -24,13 +26,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.qr_project.R;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -38,7 +49,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.net.PlacesClient;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +64,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private LocationManager mLocationManager;
     FirebaseFirestore db;
+
+    private PlacesClient placesClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +78,42 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         db = FirebaseFirestore.getInstance();
+
+        // Initialize Places API client
+        Places.initialize(getApplicationContext(), "AIzaSyBUux3nV7NYGBVtaRY4ZFmyppzqAm40zLU");
+        placesClient = Places.createClient(this);
+
+        // Set up autocomplete fragment container
+        AutocompleteSupportFragment autocompleteFragment = AutocompleteSupportFragment.newInstance();
+        autocompleteFragment.setPlaceFields(Arrays.asList(
+                Place.Field.ID,
+                Place.Field.NAME,
+                Place.Field.LAT_LNG
+        ));
+        autocompleteFragment.setTypeFilter(TypeFilter.ADDRESS);
+        autocompleteFragment.setLocationBias(RectangularBounds.newInstance(
+                new LatLngBounds(
+                        new LatLng(37.7749,-122.4194), // Southwest corner of San Francisco
+                        new LatLng(37.8199,-122.3548)  // Northeast corner of San Francisco
+                )
+        ));
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.autocomplete_container, autocompleteFragment)
+                .commit();
+
+        // Set up place selection listener
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                Log.i(TAG, "Place selected: " + place.getName() + ", " + place.getId() + ", " + place.getLatLng());
+                // Do something with the selected place
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Log.e(TAG, "Error occurred: " + status.getStatusMessage());
+            }
+        });
 
         CollectionReference userRef = db.collection("users");
         userRef.get().addOnCompleteListener(task -> {
@@ -131,39 +184,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-
-
-        // Initialize search bar
-        SearchView searchView = findViewById(R.id.searchView);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // Hide the keyboard after search query submitted
-                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
-
-                // Use Geocoder to get location information from search query
-                Geocoder geocoder = new Geocoder(MapActivity.this);
-                try {
-                    List<Address> addresses = geocoder.getFromLocationName(query, 1);
-                    if (!addresses.isEmpty()) {
-                        Address address = addresses.get(0);
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                    } else {
-                        Toast.makeText(MapActivity.this, "No results found for \"" + query + "\"", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
     }
 
 
