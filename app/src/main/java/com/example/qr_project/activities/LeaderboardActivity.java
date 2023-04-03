@@ -113,7 +113,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     // This is to initalize the View in leaderboard
-    // Fetching all the id
+    // Fetching all the ids from the xml files
     private void initViews(){
         leaderboard_view = findViewById(R.id.leaderboard_listview);
 
@@ -179,6 +179,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     private void userTopQRCodesListener() {
         leaderboardManager.getRealtimeTopUserQRCodes(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
+
             public void onSuccess(List<Map<String, Object>> result) {
                 userQRCodes_list.clear();
                 for (Map<String, Object> qrCode : result) {
@@ -195,12 +196,17 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     // adding QR_Code obj to the list
                     userQRCodes_list.add(new QR_Code(hash, score, name, face));
+
                 }
 
                 userQRCodes_adapter.notifyDataSetChanged();
 
             }
-
+            /**
+             * The function throws an exception if there exists an error with global's codes
+             * @param e
+             * @throws Exception
+             */
             @Override
             public void onFailure(Exception e) {
 
@@ -210,6 +216,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     private void globalTopQRCodesListener() {
         leaderboardManager.getRealtimeTopGlobalQRCodes(new DatabaseResultCallback<List<Map<String, Object>>>() {
+
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
                 for (Map<String, Object> qrCode : result) {
@@ -230,7 +237,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                 globalQRCodes_adapter.notifyDataSetChanged();
             }
-
+            /**
+             * The function throws an exception if there exists an error with friends' codes
+             * @param e
+             * @throws Exception
+             */
             @Override
             public void onFailure(Exception e) {
 
@@ -240,6 +251,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     private void globalTopTotalScoresListener() {
         leaderboardManager.getRealtimeGlobalTotalScores(new DatabaseResultCallback<List<Friend>>() {
+
             @Override
             public void onSuccess(List<Friend> result) {
                 for (Friend score : result) {
@@ -248,7 +260,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                 globalScores_adapter.notifyDataSetChanged();
             }
-
+            /**
+             * The function throws an exception if there exists an error with globals codes
+             * @param e
+             * @throws Exception
+             */
             @Override
             public void onFailure(Exception e) {
 
@@ -260,7 +276,13 @@ public class LeaderboardActivity extends AppCompatActivity {
     // Common functions
     
     /**
-     *
+     * This is the camera function
+     * This allows user to interact with the camera button on the app
+     * This allows user to open the camera right on the app
+     * @see ScanActivity
+     * @see QRCodeActivity
+     * @see MapActivity
+     * @see PictureActivity
      * @param view
      */
     public void onCameraClick(View view) {
@@ -270,7 +292,11 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
     /**
-     *
+     * This is the map function
+     * This allows user to interact with the map button on the app
+     * This allows user to open the map location right on the app
+     * @see MapActivity
+     * @see PictureActivity
      * @param view
      */
     public void onMapClick(View view) {
@@ -279,15 +305,20 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This is when the user is done with their command and actions
+     * Return finish() function
      * @param view
+     * @return finish()
      */
     public void onClickBack(View view){
         finish();
     }
 
     /**
-     *
+     * This function is to take the user back to the leaderboard scree
+     * Once the user is done with the map and camera, they can always return to the leaderboard screen
+     * If the user is already on the leaderboard screen, the app knows about it and will tell the user
+     * that "Already at leaderboard".
      * @param view
      */
     public void onLeaderboardClick(View view){
@@ -296,7 +327,9 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     // View update functions
     /**
-     *
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for UserLeaderboardView
      * @param view
      */
     public void onUserLeaderboardView(View view) {
@@ -314,7 +347,9 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
     /**
-     *
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for FriendLeaderboardView
      * @param view
      */
     public void onFriendLeaderboardView(View view){
@@ -340,7 +375,9 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
     /**
-     *
+     * This is to enable the visibility functionality on the list view of the leaderboardactivity
+     * This function sets the restriction on user's visibility of the app
+     * This is for GlobalLeaderboardView
      * @param view
      */
     public void onGlobalLeaderboardView(View view) {
@@ -365,7 +402,7 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * This filterChange functionality is to change the setting of the visibility
      * @param view
      */
     public void onFilterChange(View view) {
