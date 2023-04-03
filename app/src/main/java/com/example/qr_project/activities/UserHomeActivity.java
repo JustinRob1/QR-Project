@@ -93,6 +93,7 @@ public class UserHomeActivity extends AppCompatActivity {
         // To fix we must implement snapshot listeners
         // within the current implementation
         // and remove these updates
+
         updateFriendRanking();
 
         //updateGlobalRanking();
@@ -106,7 +107,8 @@ public class UserHomeActivity extends AppCompatActivity {
         //updateTotalScore();
         realtimeTotalScore();
 
-        updateTotalQRCodes();
+        //updateTotalQRCodes();
+        realtimeTotalQRCodes();
     }
 
 
@@ -120,7 +122,7 @@ public class UserHomeActivity extends AppCompatActivity {
         updateTop3Friends();
         //updateTop3QRCodes();
         //updateTotalScore();
-        updateTotalQRCodes();
+        //updateTotalQRCodes();
     }
 
     private void initViews(){
@@ -389,6 +391,20 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Integer result) {
                 totalQrCodes.setText("Total QR Codes: " + String.valueOf(result));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                totalQrCodes.setText("Total QR Codes: N/A");
+            }
+        });
+    }
+
+    private void realtimeTotalQRCodes() {
+        userManager.getRealtimeTotalQRCodes(new DatabaseResultCallback<String>() {
+            @Override
+            public void onSuccess(String result) {
+                totalQrCodes.setText("Total QR Codes: " + result);
             }
 
             @Override

@@ -250,7 +250,7 @@ public class UserManager {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
-                    callback.onFailure(new Exception("Listen Failed"));
+                    callback.onFailure(error);
                 }
 
                 if (value != null && value.exists()) {
@@ -266,6 +266,8 @@ public class UserManager {
                                     : qrCodes;
                             callback.onSuccess(topQRCodes);
                         }
+                    } else {
+                        callback.onFailure(new Exception("No data in given document"));
                     }
                 } else {
                     callback.onFailure(new Exception("QR codes are not in a valid list format"));
@@ -381,7 +383,7 @@ public class UserManager {
             @Override
             public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
-                    callback.onFailure(new Exception("Listen Failed"));
+                    callback.onFailure(error);
                 }
 
                 if (value != null && value.exists()) {
@@ -389,8 +391,10 @@ public class UserManager {
                     if (data != null) {
                         callback.onSuccess(String.valueOf(data.get("totalScore")));
                     } else {
-                        callback.onFailure(new Exception("Retrieval of totalScore failed"));
+                        callback.onFailure(new Exception("No data in given document"));
                     }
+                } else {
+                    callback.onFailure(new Exception("Document does not exist"));
                 }
             }
         });
@@ -523,7 +527,7 @@ public class UserManager {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
-                    callback.onFailure(new Exception("Listen Failed"));
+                    callback.onFailure(error);
                 }
 
                 if (value != null) {
@@ -540,14 +544,17 @@ public class UserManager {
                     }
 
                     rankings.sort(Comparator.comparing(x -> x.entrySet().iterator().next().getValue()));
-                    String rank;
+
                     int counter = rankings.size();
-                    for (Map<String, Integer> x : rankings) {
-                        if (x.containsKey(userID)) {
+                    for (Map<String, Integer> code : rankings) {
+                        if (code.containsKey(userID)) {
                             callback.onSuccess(String.valueOf(counter));
+                            return;
                         }
                         counter--;
                     }
+
+                    callback.onFailure(new Exception("userID not found in rank list"));
 
                 } else {
                     callback.onFailure(new Exception("Users collection is empty"));
@@ -633,6 +640,30 @@ public class UserManager {
             @Override
             public void onFailure(Exception e) {
                 callback.onFailure(e);
+            }
+        });
+    }
+
+    public void getRealtimeTotalQRCodes(DatabaseResultCallback<String> callback) {
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    callback.onFailure(error);
+                }
+
+                if (value != null && value.exists()) {
+                    Map<String, Object> data = value.getData();
+                    if (data != null) {
+                        List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
+                        int totalQRCodes = (qrCodes != null) ? qrCodes.size(): 0;
+                        callback.onSuccess(String.valueOf(totalQRCodes));
+                    } else {
+                        callback.onFailure(new Exception("No data in given document"));
+                    }
+                } else {
+                    callback.onFailure(new Exception("Document does not exist"));
+                }
             }
         });
     }
