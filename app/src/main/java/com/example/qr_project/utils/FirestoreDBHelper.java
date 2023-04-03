@@ -69,5 +69,17 @@ public class FirestoreDBHelper implements DatabaseHelper {
                 .addOnFailureListener(failureListener);
     }
 
+    @Override
+    public void getCollection(String collectionName,
+                              OnSuccessListener<QuerySnapshot> successListener,
+                              OnFailureListener failureListener) {
+        firebaseFirestore.collection(collectionName)
+                .get()
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
+    }
+
+
+
 }
 

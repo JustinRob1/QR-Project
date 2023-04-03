@@ -5,15 +5,20 @@ import android.graphics.Bitmap;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class QR_Code {
     private Hash hash; // Stores the hash
+
+    private String hash_code;
     private int score; // Stores the score of the QR code
     private String name; // Stores the QR codes name
     private String face; // Stores the QR code face
     private Bitmap photo; // Stores the photo taken
     private GeoPoint location;
+
+    private String photo_url;
+
+    private boolean scannedByUser;
 
     /**
      * Constructor for QR Code without photo and location.
@@ -28,6 +33,17 @@ public class QR_Code {
         this.photo = null;
         this.location = null;
     }
+
+    public QR_Code(int score, String name, String face, String photo, GeoPoint location, String hash_code, boolean scannedByUser){
+        this.score = score;
+        this.name = name;
+        this.face = face;
+        this.photo_url = photo;
+        this.location = location;
+        this.hash_code = hash_code;
+        this.scannedByUser = scannedByUser;
+    }
+
 
     /**
      * Constructor for QR Code with photo and location.
