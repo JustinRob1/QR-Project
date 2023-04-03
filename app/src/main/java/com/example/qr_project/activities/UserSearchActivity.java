@@ -37,7 +37,7 @@ public class UserSearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_search);
 
-        user_search_result_tbl = findViewById(R.id.user_search_result_tbl);
+
 
         Intent intent = getIntent();
 
@@ -47,6 +47,10 @@ public class UserSearchActivity extends AppCompatActivity {
             search_results = searchResults;
             fill_table();
         });
+    }
+
+    private void initViews(){
+        user_search_result_tbl = findViewById(R.id.user_search_result_tbl);
     }
 
     private void searchUsers(OnSearchResultsListener callback) {

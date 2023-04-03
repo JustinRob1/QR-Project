@@ -23,7 +23,6 @@ import com.example.qr_project.utils.LeaderboardManager;
 import com.example.qr_project.utils.QR_Code;
 import com.example.qr_project.utils.UserManager;
 import com.example.qr_project.utils.UtilityFunctions;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
@@ -31,8 +30,6 @@ public class LeaderboardActivity extends AppCompatActivity {
 
     public TextView qr_code_filter;
     public TextView ovr_score_filter;
-
-    FirebaseFirestore db;
 
     public TableLayout user_qr_leaderboard;
     public TableLayout friend_qr_leaderboard;
@@ -86,6 +83,20 @@ public class LeaderboardActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
 
+        initViews();
+
+        userManager = UserManager.getInstance();
+        leaderboardManager = new LeaderboardManager();
+
+        populateData();
+
+        String filter = intent.getStringExtra("filter");
+
+        populateInitialLeaderboard(filter);
+    }
+
+
+    private void initViews(){
         qr_code_filter = findViewById(R.id.QR_code_filter);
         ovr_score_filter =  findViewById(R.id.Overall_score_filter);
         user_qr_leaderboard = findViewById(R.id.user_qr_leaderboard_table);
@@ -101,18 +112,8 @@ public class LeaderboardActivity extends AppCompatActivity {
         btn_filter_friends = findViewById(R.id.btn_filter_friends);
         btn_filter_user = findViewById(R.id.btn_filter_you);
         leaderboardScore = findViewById(R.id.leaderboard_score);
-
-        userManager = UserManager.getInstance();
-        leaderboardManager = new LeaderboardManager();
-
-        populateData();
-
-
-        String filter = intent.getStringExtra("filter");
-
-        populateInitialLeaderboard(filter);
-
     }
+
 
     private void populateInitialLeaderboard(String filter){
         userManager.getTotalScore(new DatabaseResultCallback<Integer>() {
