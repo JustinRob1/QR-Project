@@ -109,7 +109,6 @@ public class QRCodeActivity extends AppCompatActivity {
 
 
         qr_code_hash = getIntent().getStringExtra("hash");
-        Log.d(TAG, "QRCODE HASH " + qr_code_hash);
         qrCodeManager = new QRCodeManager(qr_code_hash);
         userManager = UserManager.getInstance();
 
@@ -179,7 +178,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void getComments(){
-        qrCodeManager.getAllCommentsRealtime(new DatabaseResultCallback<List<Map<String, Object>>>() {
+        qrCodeManager.getAllComments(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
                 commentList.clear();
@@ -204,7 +203,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void onSeeScanners(View view){
-        qrCodeManager.getAllUsersRealtime(new DatabaseResultCallback<List<Friend>>() {
+        qrCodeManager.getAllUsers(new DatabaseResultCallback<List<Friend>>() {
             @Override
             public void onSuccess(List<Friend> result) {
                 // Create the custom AlertDialog
@@ -333,30 +332,64 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void seePhoto(View view) {
-        qrCodeManager.getAllUsersRealtime(new DatabaseResultCallback<List<Friend>>() {
-            @Override
-            public void onSuccess(List<Friend> result) {
-                if (result != null) {
-                    AtomicBoolean photoFound = new AtomicBoolean(false);
-                    for (Friend scanner : result) {
-                        if (photoFound.get()) {
-                            break;
+        db = FirebaseFirestore.getInstance();
+        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+        String userID = sharedPref.getString("user_id", null);
+        String qrCodeHash = getIntent().getStringExtra("hash");
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userRef = db.collection("users").document(userID);
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                if (qrCodes != null) {
+                    boolean qrCodeFound = false;
+                    for (Map<String, Object> qrCode : qrCodes) {
+                        String hash = (String) qrCode.get("hash");
+                        if (hash != null && hash.equals(qrCodeHash)) {
+                            qrCodeFound = true;
+                            String photoUrl = (String) qrCode.get("photo");
+                            if (photoUrl != null) {
+                                Log.d(TAG, "PhotoURL: " + photoUrl);
+                                // Load the photo using Picasso
+                                Picasso.get().load(photoUrl).into(new Target() {
+                                    @Override
+                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                        // Display the photo in a dialog
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
+                                        ImageView imageView = new ImageView(QRCodeActivity.this);
+                                        imageView.setImageBitmap(bitmap);
+                                        builder.setView(imageView);
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
+                                    }
+
+                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                        // Handle the error
+                                        Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                        // Show a progress bar or placeholder image
+                                    }
+                                });
+                                break;
+                            }
                         }
-                        String userID = scanner.getId();
-                        String qrCodeHash = getIntent().getStringExtra("hash");
-
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userRef = db.collection("users").document(userID);
-                        userRef.get().addOnSuccessListener(documentSnapshot -> {
-                            if (documentSnapshot.exists()) {
-                                List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
-                                if (qrCodes != null) {
-                                    for (Map<String, Object> qrCode : qrCodes) {
-
+                    }
+                    if (!qrCodeFound) {
+                        // Iterate through all users to find the first one who has scanned this QR code
+                        final boolean[] photoDisplayed = {false};
+                        db.collection("users").get().addOnSuccessListener(querySnapshot -> {
+                            for (DocumentSnapshot userDoc : querySnapshot) {
+                                List<Map<String, Object>> userQrCodes = (List<Map<String, Object>>) userDoc.get("qrcodes");
+                                if (userQrCodes != null) {
+                                    for (Map<String, Object> qrCode : userQrCodes) {
                                         String hash = (String) qrCode.get("hash");
                                         if (hash != null && hash.equals(qrCodeHash)) {
                                             String photoUrl = (String) qrCode.get("photo");
-                                            if (photoUrl != null) {
+                                            if (photoUrl != null && !photoDisplayed[0]) {
                                                 Log.d(TAG, "PhotoURL: " + photoUrl);
                                                 // Load the photo using Picasso
                                                 Picasso.get().load(photoUrl).into(new Target() {
@@ -381,28 +414,27 @@ public class QRCodeActivity extends AppCompatActivity {
                                                         // Show a progress bar or placeholder image
                                                     }
                                                 });
-                                                photoFound.set(true);
+                                                // Set the flag to true so we don't display another photo
+                                                photoDisplayed[0] = true;
+                                                // Break out of both loops once the photo is displayed
                                                 break;
                                             }
+                                        } else {
+                                            // Handle the case where no user has scanned this QR code
+                                            //Toast.makeText(getApplicationContext(), "No user has scanned this QR code", Toast.LENGTH_SHORT).show();
                                         }
+                                    }
+                                    if (photoDisplayed[0]) {
+                                        break;
                                     }
                                 }
                             }
-                        }).addOnFailureListener(e -> {
-                            // Handle the error
-                            Toast.makeText(getApplicationContext(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
                         });
                     }
                 }
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.d(TAG, "Exception with photo: ", e);
-            }
         });
     }
-
 
     public void seeLocation(View view) {
         db = FirebaseFirestore.getInstance();
@@ -440,7 +472,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     private void updateQRCode(){
-        qrCodeManager.getQRCodeRealtime(new DatabaseResultCallback<QR_Code>() {
+        qrCodeManager.getQRCode(new DatabaseResultCallback<QR_Code>() {
             @Override
             public void onSuccess(QR_Code result) {
                 qrCodeName.setText(result.getName());
@@ -454,7 +486,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getGlobalRankingRealtime(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getGlobalRanking(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 globalRankNum.setText(String.valueOf(result));
@@ -466,7 +498,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getUserQRCodeRankingRealtime(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getUserQRCodeRanking(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 if (result == 0){
@@ -482,7 +514,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getFriendsQRCodeRankingRealtime(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getFriendsQRCodeRanking(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 if (result == 0){
@@ -498,7 +530,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getTotalScansRealtime(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getTotalScans(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 totalScans.setText(String.valueOf(result));
@@ -510,7 +542,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.hasUserScannedRealtime((new DatabaseResultCallback<Boolean>() {
+        qrCodeManager.hasUserScanned((new DatabaseResultCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
                 if (result == true){
