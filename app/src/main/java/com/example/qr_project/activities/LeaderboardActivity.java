@@ -299,6 +299,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                 friendQRCodes_list.clear();
                 for (Map<String, Object> qrCode : result) {
 
+
                     // Creating QR_Code object for the adapter
                     String name = String.valueOf(qrCode.get("name"));
 
@@ -307,10 +308,12 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     String face = (String) qrCode.get("face");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                     // adding QR_Code obj to the list
-                    friendQRCodes_list.add(new QR_Code(hash, score, face, name));
+                    friendQRCodes_list.add(new QR_Code(hash, score, name, face));
+
+
                 }
 
                 friendQRCodes_adapter.notifyDataSetChanged();
