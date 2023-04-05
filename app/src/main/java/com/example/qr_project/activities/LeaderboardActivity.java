@@ -218,6 +218,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
+                globalQRCodes_list.clear();
                 for (Map<String, Object> qrCode : result) {
 
                     // Creating QR_Code object for the adapter
@@ -253,6 +254,7 @@ public class LeaderboardActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(List<Friend> result) {
+                globalScores_list.clear();
                 for (Friend score : result) {
                     globalScores_list.add(score);
                 }
@@ -272,9 +274,10 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     private void friendsTopTotalScoresListener() {
-        leaderboardManager.getTopFriendsTotalScores(new DatabaseResultCallback<List<Friend>>() {
+        leaderboardManager.getRealtimeTopFriendsTotalScores(new DatabaseResultCallback<List<Friend>>() {
             @Override
             public void onSuccess(List<Friend> result) {
+                friendScores_list.clear();
                 for (Friend score : result) {
                     friendScores_list.add(score);
                 }
@@ -290,23 +293,24 @@ public class LeaderboardActivity extends AppCompatActivity {
     }
 
     private void friendsTopQRCodesListener() {
-        leaderboardManager.getTopFriendsQRCodes(new DatabaseResultCallback<List<QR_Code>>() {
+        leaderboardManager.getRealtimeTopFriendsQRCodes(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
-            public void onSuccess(List<QR_Code> result) {
-                for (QR_Code q : result) {
+            public void onSuccess(List<Map<String, Object>> result) {
+                friendQRCodes_list.clear();
+                for (Map<String, Object> qrCode : result) {
 
                     // Creating QR_Code object for the adapter
-                    String name = String.valueOf(q.getFace());
+                    String name = String.valueOf(qrCode.get("name"));
 
                     // POTENTIAL ERROR
-                    int score = q.getScore();
+                    int score = Math.toIntExact((Long) qrCode.get("score"));
 
-                    String face = q.getName();
+                    String face = (String) qrCode.get("face");
 
-                    Hash hash = new Hash(q.getHash(), name, face, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
 
                     // adding QR_Code obj to the list
-                    friendQRCodes_list.add(new QR_Code(hash, score, name, face));
+                    friendQRCodes_list.add(new QR_Code(hash, score, face, name));
                 }
 
                 friendQRCodes_adapter.notifyDataSetChanged();

@@ -9,7 +9,6 @@ import com.example.qr_project.models.DatabaseResultCallback;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
@@ -18,11 +17,11 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -187,10 +186,6 @@ public class UserManager {
         });
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
     /**
      * Retrieves the user's QR codes from the database and returns them through the provided callback.
      *
@@ -219,39 +214,6 @@ public class UserManager {
      *
      * @param callback The callback that will receive the list of top 3 QR codes on success, or an exception on failure.
      */
-    public void getTop3QRCodesSorted(DatabaseResultCallback<List<Map<String, Object>>> callback) {
-        getDB("qrcodes", new DatabaseResultCallback<Object>() {
-            @Override
-            public void onSuccess(Object result) {
-                if (result != null && result instanceof List) {
-                    List<Map<String, Object>> qrCodesList = (List<Map<String, Object>>) result;
-
-                    // Sort the list of QR codes by score in descending order
-                    Collections.sort(qrCodesList, new Comparator<Map<String, Object>>() {
-                        @Override
-                        public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                            return ((Long) o2.get("score")).compareTo((Long) o1.get("score"));
-                        }
-                    });
-
-                    // Return the top 3 QR codes, if available
-                    List<Map<String, Object>> topQRCodes = qrCodesList.size() >= 3
-                            ? qrCodesList.subList(0, 3)
-                            : qrCodesList;
-
-                    callback.onSuccess(topQRCodes);
-                } else {
-                    callback.onFailure(new Exception("QR codes are not in a valid list format"));
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                callback.onFailure(e);
-            }
-        });
-    }
-
     public void getRealtimeTop3QRCodesSorted(DatabaseResultCallback<List<Map<String, Object>>> callback) {
         dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
             @Override
@@ -288,99 +250,82 @@ public class UserManager {
      *
      * @param callback The callback that will receive the list of friends on success, or an exception on failure.
      */
-    public void getFriends(DatabaseResultCallback<List<Map<String, Object>>> callback) {
-        getDB("friends", new DatabaseResultCallback<Object>() {
+    public void getFriendsRealtime(DatabaseResultCallback<List<Map<String, Object>>> callback) {
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(Object result) {
-                if (result instanceof List) {
-                    callback.onSuccess((List<Map<String, Object>>) result);
-                } else {
-                    callback.onFailure(new Exception("Friends list is not a valid List type."));
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
                 }
-            }
 
-            @Override
-            public void onFailure(Exception e) {
-                callback.onFailure(e);
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    Object result = documentSnapshot.get("friends");
+                    if (result instanceof List) {
+                        callback.onSuccess((List<Map<String, Object>>) result);
+                    } else {
+                        callback.onFailure(new Exception("Friends list is not a valid List type."));
+                    }
+                } else {
+                    Log.d(TAG, "No such document");
+                    callback.onFailure(new Exception("No such document"));
+                }
             }
         });
     }
+
 
     /**
      * Retrieves the user's friends list, sorts them by score in descending order, and returns the top 3 friends through the provided callback.
      *
      * @param callback The callback that will receive the list of top 3 friends on success, or an exception on failure.
      */
-    public void getTop3FriendsSorted(DatabaseResultCallback<List<Friend>> callback){
-        getDB("friends", new DatabaseResultCallback<Object>() {
+    public void getTop3FriendsSorted(DatabaseResultCallback<List<Friend>> callback) {
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(Object result) {
-                if (result instanceof List) {
-                    List<Map<String, Object>> friendsData = (List<Map<String, Object>>) result;
-                    List<Friend> friendsList = new ArrayList<>();
-                    AtomicInteger remainingFriends = new AtomicInteger(friendsData.size());
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    return;
+                }
 
-                    for (Map<String, Object> friendData : friendsData) {
-                        String userId = (String) friendData.get("userID");
-                        dbHelper.getDocument("users", userId, new OnSuccessListener<DocumentSnapshot>() {
-                            @Override
-                            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                Friend friend = new Friend((String) documentSnapshot.get("username"), Math.toIntExact((long) documentSnapshot.get("totalScore")), userId);
-                                friendsList.add(friend);
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    List<Map<String, Object>> friendsData = (List<Map<String, Object>>) documentSnapshot.get("friends");
+                    if (friendsData != null) {
+                        ConcurrentHashMap<String, Friend> friendsMap = new ConcurrentHashMap<>();
+                        AtomicInteger remainingFriends = new AtomicInteger(friendsData.size());
 
-                                if (remainingFriends.decrementAndGet() == 0) {
-                                    Collections.sort(friendsList, new Comparator<Friend>() {
-                                        @Override
-                                        public int compare(Friend f1, Friend f2) {
-                                            // Assuming the Friend class has a `getScore()` method
-                                            return Integer.compare(f2.getScore(), f1.getScore());
+                        for (Map<String, Object> friendData : friendsData) {
+                            String userId = (String) friendData.get("userID");
+                            dbHelper.setDocumentSnapshotListener("users", userId, new EventListener<DocumentSnapshot>() {
+                                @Override
+                                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                                    if (error != null) {
+                                        Log.w(TAG, "Error getting friend document", error);
+                                        return;
+                                    }
+
+                                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                                        Friend friend = new Friend((String) documentSnapshot.get("username"), Math.toIntExact((long) documentSnapshot.get("totalScore")), userId);
+                                        friendsMap.put(userId, friend);
+
+                                        if (remainingFriends.decrementAndGet() == 0) {
+                                            List<Friend> friendsList = new ArrayList<>(friendsMap.values());
+                                            friendsList.sort((f1, f2) -> Integer.compare(f2.getScore(), f1.getScore()));
+                                            List<Friend> top3Friends = friendsList.subList(0, Math.min(3, friendsList.size()));
+                                            callback.onSuccess(top3Friends);
                                         }
-                                    });
-
-                                    List<Friend> top3Friends = friendsList.subList(0, Math.min(3, friendsList.size()));
-                                    callback.onSuccess(top3Friends);
+                                    }
                                 }
-                            }
-                        }, new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                remainingFriends.decrementAndGet();
-                                Log.e(TAG, "Failed to get friend data for user_id: " + userId, e);
-                            }
-                        });
+                            });
+                        }
+                    } else {
+                        callback.onFailure(new Exception("Friends list is null."));
                     }
                 } else {
-                    callback.onFailure(new Exception("Friends list is not a valid List type."));
+                    Log.d(TAG, "No such document");
                 }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                callback.onFailure(e);
-            }
-        });
-    }
-
-    public void getTotalScore(DatabaseResultCallback<Integer> callback) {
-        getDB("totalScore", new DatabaseResultCallback<Object>() {
-            @Override
-            public void onSuccess(Object result){
-                if (result instanceof Long || result instanceof Integer){
-                    callback.onSuccess(((Number) result).intValue());
-                } else if (result instanceof String || result instanceof Object){
-                    callback.onSuccess(Integer.parseInt((String) result));
-                }
-                else {
-                    totalScore = 0;
-                    callback.onFailure(new Exception("Total score is not a valid number: " + result.getClass().getName()));
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e){
-                Log.d(TAG, "Error", e);
-                totalScore = 0;
-                callback.onFailure(e);
             }
         });
     }
@@ -417,7 +362,7 @@ public class UserManager {
      *
      * @param UserId The user ID of the friend to be added.
      */
-    public void addFriend(String UserId){
+    public void addFriendRealtime(String UserId) {
         Map<String, Object> newMapObject = new HashMap<>();
         newMapObject.put("userID", UserId);
 
@@ -435,32 +380,31 @@ public class UserManager {
                     }
                 });
 
-        // Gets friends
-        dbHelper.getDocument("users", this.userID,
-                new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error getting document", e);
-                    }
-                });
+        // Sets a snapshot listener for the user's document
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    return;
+                }
 
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            }
+        });
     }
+
 
     /**
      * Removes a friend from the user's friends list in the database, given the friend's user ID.
      *
      * @param UserId The user ID of the friend to be removed.
      */
-    public void removeFriend(String UserId){
+    public void removeFriendRealtime(String UserId) {
         Map<String, Object> mapToRemove = new HashMap<>();
         mapToRemove.put("userID", UserId);
 
@@ -478,62 +422,30 @@ public class UserManager {
                     }
                 });
 
-        // Gets friends
-        dbHelper.getDocument("users", this.userID,
-                new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error getting document", e);
-                    }
-                });
+        // Sets a snapshot listener for the user's document
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            }
+        });
     }
+
 
     /**
      * Retrieves the user's global ranking based on their total score and returns it through the provided callback.
      *
      * @param callback The callback that will receive the global ranking on success, or an exception on failure.
      */
-    public void getGlobalRanking(DatabaseResultCallback<Integer> callback){
-        dbHelper.getAllDocumentsOrdered("users", "totalScore", false, new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    int rank = 1;
-                    boolean userFound = false;
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        if (document.getId().equals(userID)) {
-                            userFound = true;
-                            break;
-                        }
-                        rank++;
-                    }
-                    if (userFound){
-                        globalRanking = rank;
-                        callback.onSuccess(rank);
-                    }
-                    else {
-                        globalRanking = 0;
-                        Log.d(TAG, "User not found", new Exception("User Not Found Error"));
-                        callback.onFailure(new Exception("User Not Found Error"));
-                    }
-                } else {
-                    Log.d(TAG, "Unsuccessful query", task.getException());
-                    globalRanking = 0;
-                    callback.onFailure(task.getException());
-                }
-            }
-        });
-    }
-
     public void getRealtimeGlobalRanking(DatabaseResultCallback<String> callback) {
         dbHelper.setCollectionSnapshotListener("users", new EventListener<QuerySnapshot>() {
             @Override
@@ -580,83 +492,72 @@ public class UserManager {
      *
      * @param callback The callback that will receive the friend ranking on success, or an exception on failure.
      */
-    public void getFriendRanking(DatabaseResultCallback<Integer> callback){
+    public void getRealtimeFriendRanking(DatabaseResultCallback<Integer> callback) {
 
-        // Gets friends
-        dbHelper.getDocument("users", this.userID,
-                new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (documentSnapshot.exists()) {
-                            friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
-                            dbHelper.getAllDocumentsOrdered("users", "totalScore", false, new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (friends == null){
-                                        callback.onSuccess(0);
-                                    }
-                                    if (task.isSuccessful()) {
-                                        int rank = 1;
-                                        boolean userFound = false;
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            if (document.getId().equals(userID)) {
-                                                userFound = true;
-                                                break;
-                                            } else if (friends != null && containsUserID(friends, document.getId())){
-                                                rank++;
-                                            }
-                                        }
-                                        if (friends != null && userFound){
-                                            callback.onSuccess(rank);
-                                        }
-                                        else {
-                                            Log.d(TAG, "User not found", new Exception("User Not Found Error"));
-                                            callback.onFailure(new Exception("User Not Found Error"));
-                                        }
-                                    } else {
-                                        Log.d(TAG, "Unsuccessful query", task.getException());
-                                        callback.onFailure(task.getException());
-                                    }
-                                }
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
+
+                    dbHelper.setCollectionSnapshotListener("users", new EventListener<QuerySnapshot>() {
+                        @Override
+                        public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                            if (error != null) {
+                                Log.w(TAG, "Error getting documents", error);
+                                return;
+                            }
+
+                            if (friends == null) {
+                                callback.onSuccess(0);
+                                return;
+                            }
+
+                            List<DocumentSnapshot> sortedDocs = querySnapshot.getDocuments();
+                            sortedDocs.sort((doc1, doc2) -> {
+                                long score1 = doc1.getLong("totalScore") != null ? doc1.getLong("totalScore") : 0;
+                                long score2 = doc2.getLong("totalScore") != null ? doc2.getLong("totalScore") : 0;
+                                return Long.compare(score2, score1);
                             });
-                        } else {
-                            Log.d(TAG, "No such document");
+
+                            int rank = 1;
+                            boolean userFound = false;
+                            for (DocumentSnapshot document : sortedDocs) {
+                                if (document.getId().equals(userID)) {
+                                    userFound = true;
+                                    break;
+                                } else if (containsUserID(friends, document.getId())) {
+                                    rank++;
+                                }
+                            }
+
+                            if (userFound) {
+                                callback.onSuccess(rank);
+                            } else {
+                                Log.d(TAG, "User not found", new Exception("User Not Found Error"));
+                                callback.onFailure(new Exception("User Not Found Error"));
+                            }
                         }
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error getting document", e);
-                    }
-                });
-
-
+                    });
+                } else {
+                    Log.d(TAG, "No such document");
+                }
+            }
+        });
     }
+
+
 
     /**
      * Retrieves the total number of QR codes owned by the user and returns it through the provided callback.
      *
      * @param callback The callback that will receive the total number of QR codes on success, or an exception on failure.
      */
-    public void getTotalQRCodes(DatabaseResultCallback<Integer> callback){
-        getQRCodes(new DatabaseResultCallback<List<Map<String, Object>>>() {
-            @Override
-            public void onSuccess(List<Map<String, Object>> result) {
-                if (result != null){
-                    callback.onSuccess(result.size());
-                } else {
-                    callback.onSuccess(0);
-                }
-
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                callback.onFailure(e);
-            }
-        });
-    }
-
     public void getRealtimeTotalQRCodes(DatabaseResultCallback<String> callback) {
         dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
             @Override
@@ -708,44 +609,27 @@ public class UserManager {
      * @param callback The callback that will receive the field value on success, or an exception on failure.
      */
     public void getDB(String field, DatabaseResultCallback<Object> callback) {
-        dbHelper.getDocument("users", this.userID,
-            new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    if (documentSnapshot.exists()) {
-                        Object value = documentSnapshot.get(field);
-                        callback.onSuccess(value);
-                    } else {
-                        Log.d(TAG, "No such document");
-                        callback.onFailure(new Exception("No such document"));
-                    }
+        dbHelper.setDocumentSnapshotListener("users", this.userID, new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
                 }
-            }, new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error getting document", e);
-                    callback.onFailure(e);
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    Object value = documentSnapshot.get(field);
+                    callback.onSuccess(value);
+                } else {
+                    Log.d(TAG, "No such document");
+                    callback.onFailure(new Exception("No such document"));
                 }
-            });
+            }
+        });
     }
 
-    /**
-     * Clears all QRCodes from account, if there are any
-     */
-    public void clearQRCodes(){
-        Map<String, Object> updates = new HashMap<>();
-        updates.put(QRCODES_FIELD, new ArrayList<>());
-        dbHelper.updateDocument(
-                USERS_COLLECTION,
-                userID,
-                updates,
-                aVoid -> {
-                    Log.d(TAG, "Deletion was successful");
-                },
-                e -> Log.d(TAG, "Error clearing QR Codes", e),
-                task -> Log.d(TAG, "Task completed")
-        );
-    }
+
 
     /**
      *

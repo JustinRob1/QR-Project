@@ -5,20 +5,23 @@ import static android.content.ContentValues.TAG;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.qr_project.models.DatabaseResultCallback;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class QRCodeManager {
@@ -31,16 +34,22 @@ public class QRCodeManager {
         this.hash = hash;
     }
 
-    public void getGlobalRanking(DatabaseResultCallback<Integer> callback) {
-        dbHelper.getAllDocuments("users", new OnCompleteListener<QuerySnapshot>() {
+    public void getGlobalRankingRealtime(DatabaseResultCallback<Integer> callback) {
+        dbHelper.setCollectionSnapshotListener("users", new EventListener<QuerySnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
+            public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting documents", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (querySnapshot != null) {
                     int rank = 1;
                     boolean found = false;
                     int highestScore = -1;
 
-                    for (QueryDocumentSnapshot document : task.getResult()) {
+                    for (QueryDocumentSnapshot document : querySnapshot) {
                         List<Map<String, Object>> qrCodesArray = (List<Map<String, Object>>) document.get("qrcodes");
 
                         if (qrCodesArray != null) {
@@ -62,7 +71,7 @@ public class QRCodeManager {
 
                     if (found) {
                         // Calculate the rank based on the score
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+                        for (QueryDocumentSnapshot document : querySnapshot) {
                             List<Map<String, Object>> qrCodesArray = (List<Map<String, Object>>) document.get("qrcodes");
 
                             if (qrCodesArray != null) {
@@ -86,11 +95,18 @@ public class QRCodeManager {
         });
     }
 
-    public void getFriendsQRCodeRanking(DatabaseResultCallback<Integer> callback) {
-        dbHelper.getDocument("users", userManager.getUserID(), new OnSuccessListener<DocumentSnapshot>() {
+
+    public void getFriendsQRCodeRankingRealtime(DatabaseResultCallback<Integer> callback) {
+        dbHelper.setDocumentSnapshotListener("users", userManager.getUserID(), new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
                     List<Map<String, Object>> friendsData = (List<Map<String, Object>>) documentSnapshot.get("friends");
                     List<String> friendsList = new ArrayList<>();
                     for (Map<String, Object> friendData : friendsData) {
@@ -103,38 +119,40 @@ public class QRCodeManager {
                     int[] highestScore = {-1};
 
                     for (String friendId : friendsList) {
-                        dbHelper.getDocument("users", friendId, new OnSuccessListener<DocumentSnapshot>() {
+                        dbHelper.setDocumentSnapshotListener("users", friendId, new EventListener<DocumentSnapshot>() {
                             @Override
-                            public void onSuccess(DocumentSnapshot friendDocumentSnapshot) {
-                                List<Map<String, Object>> qrCodesArray = (List<Map<String, Object>>) friendDocumentSnapshot.get("qrcodes");
+                            public void onEvent(@Nullable DocumentSnapshot friendDocumentSnapshot, @Nullable FirebaseFirestoreException friendError) {
+                                if (friendError != null) {
+                                    Log.w(TAG, "Error getting document", friendError);
+                                    callback.onFailure(friendError);
+                                    return;
+                                }
 
-                                if (qrCodesArray != null && !qrCodesArray.isEmpty()) {
-                                    for (Map<String, Object> code : qrCodesArray) {
-                                        int score = Math.toIntExact((Long) code.get("score"));
+                                if (friendDocumentSnapshot != null && friendDocumentSnapshot.exists()) {
+                                    List<Map<String, Object>> qrCodesArray = (List<Map<String, Object>>) friendDocumentSnapshot.get("qrcodes");
 
-                                        if (String.valueOf(code.get("hash")).equals(QRCodeManager.this.hash)) {
-                                            highestScore[0] = score;
+                                    if (qrCodesArray != null && !qrCodesArray.isEmpty()) {
+                                        for (Map<String, Object> code : qrCodesArray) {
+                                            int score = Math.toIntExact((Long) code.get("score"));
+
+                                            if (String.valueOf(code.get("hash")).equals(QRCodeManager.this.hash)) {
+                                                highestScore[0] = score;
+                                            }
+
+                                            if (score > highestScore[0]) {
+                                                rank.incrementAndGet();
+                                            }
                                         }
+                                    }
 
-                                        if (score > highestScore[0]) {
-                                            rank.incrementAndGet();
+                                    if (counter.decrementAndGet() == 0) {
+                                        if (highestScore[0] != -1) {
+                                            callback.onSuccess(rank.get());
+                                        } else {
+                                            callback.onSuccess(0);
                                         }
                                     }
                                 }
-
-                                if (counter.decrementAndGet() == 0) {
-                                    if (highestScore[0] != -1) {
-                                        callback.onSuccess(rank.get());
-                                    } else {
-                                        callback.onSuccess(0);
-                                    }
-                                }
-                            }
-                        }, new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error getting document", e);
-                                callback.onFailure(e);
                             }
                         });
                     }
@@ -142,20 +160,21 @@ public class QRCodeManager {
                     callback.onFailure(new Exception("No document"));
                 }
             }
-        }, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error getting document", e);
-                callback.onFailure(e);
-            }
         });
     }
 
-    public void getUserQRCodeRanking(DatabaseResultCallback<Integer> callback) {
-        dbHelper.getDocument("users", userManager.getUserID(), new OnSuccessListener<DocumentSnapshot>() {
+
+    public void getUserQRCodeRankingRealtime(DatabaseResultCallback<Integer> callback) {
+        dbHelper.setDocumentSnapshotListener("users", userManager.getUserID(), new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
                     List<Map<String, Object>> qrCodesArray = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
 
                     if (qrCodesArray != null && !qrCodesArray.isEmpty()) {
@@ -193,20 +212,21 @@ public class QRCodeManager {
                     callback.onFailure(new Exception("No user"));
                 }
             }
-        }, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error getting document", e);
-                callback.onFailure(e);
-            }
         });
     }
 
-    public void getTotalScans(DatabaseResultCallback<Integer> callback){
-        dbHelper.getDocument("qrcodes", QRCodeManager.this.hash, new OnSuccessListener<DocumentSnapshot>() {
+
+    public void getTotalScansRealtime(DatabaseResultCallback<Integer> callback) {
+        dbHelper.setDocumentSnapshotListener("qrcodes", QRCodeManager.this.hash, new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists() && documentSnapshot != null){
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
                     ArrayList<String> users = (ArrayList<String>) documentSnapshot.get("users");
 
                     // Update the TextView for the number of times the QR code was scanned
@@ -215,13 +235,9 @@ public class QRCodeManager {
                     callback.onFailure(new Exception("QR Code doesn't exist"));
                 }
             }
-        }, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                callback.onFailure(e);
-            }
         });
     }
+
 
     public void addComment(Map<String, Object> comment) {
 
@@ -257,27 +273,30 @@ public class QRCodeManager {
         });
     }
 
-    public void getAllScanners(DatabaseResultCallback<List<String>> callback){
-        dbHelper.getDocument("qrcodes", QRCodeManager.this.hash, new OnSuccessListener<DocumentSnapshot>() {
+    public void getAllScannersRealtime(DatabaseResultCallback<List<String>> callback) {
+        dbHelper.setDocumentSnapshotListener("qrcodes", QRCodeManager.this.hash, new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists() && documentSnapshot != null) {
-                    List<String> users = (List<String>) documentSnapshot.get("users");
-
-                    callback.onSuccess(users);
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(new Exception("QR Code doesn't exist"));
+                    return;
                 }
-            }
-        }, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                callback.onFailure(new Exception("QR Code doesn't exist"));
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    List<String> users = (List<String>) documentSnapshot.get("users");
+                    callback.onSuccess(users);
+                } else {
+                    callback.onFailure(new Exception("QR Code doesn't exist"));
+                }
             }
         });
     }
 
-    public void getAllUsers(DatabaseResultCallback<List<Friend>> callback) {
-        List<Friend> friends = new ArrayList<>();
-        getAllScanners(new DatabaseResultCallback<List<String>>() {
+
+    public void getAllUsersRealtime(DatabaseResultCallback<List<Friend>> callback) {
+        List<Friend> friends = Collections.synchronizedList(new ArrayList<>());
+        getAllScannersRealtime(new DatabaseResultCallback<List<String>>() {
             @Override
             public void onSuccess(List<String> result) {
                 if (result == null || result.isEmpty()) {
@@ -287,25 +306,20 @@ public class QRCodeManager {
 
                 AtomicInteger completedOperations = new AtomicInteger(0);
                 for (String id : result) {
-                    dbHelper.getDocument("users", id, new OnSuccessListener<DocumentSnapshot>() {
+                    dbHelper.setDocumentSnapshotListener("users", id, new EventListener<DocumentSnapshot>() {
                         @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                            if (error != null) {
+                                Log.w(TAG, "Error getting document", error);
+                                return;
+                            }
+
                             if (documentSnapshot != null && documentSnapshot.exists()) {
                                 String username = (String) documentSnapshot.get("username");
                                 int totalScore = Math.toIntExact((Long) documentSnapshot.get("totalScore"));
                                 Friend friend = new Friend(username, totalScore, id);
                                 friends.add(friend);
                             }
-
-                            // Check if all operations are completed
-                            if (completedOperations.incrementAndGet() == result.size()) {
-                                callback.onSuccess(friends);
-                            }
-                        }
-                    }, new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Error getting people: ", e);
 
                             // Check if all operations are completed
                             if (completedOperations.incrementAndGet() == result.size()) {
@@ -324,11 +338,18 @@ public class QRCodeManager {
         });
     }
 
-    public void getAllComments(DatabaseResultCallback<List<Map<String, Object>>> callback){
-        dbHelper.getDocument("qrcodes", QRCodeManager.this.hash, new OnSuccessListener<DocumentSnapshot>() {
+
+    public void getAllCommentsRealtime(DatabaseResultCallback<List<Map<String, Object>>> callback) {
+        dbHelper.setDocumentSnapshotListener("qrcodes", QRCodeManager.this.hash, new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists() && documentSnapshot != null){
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
                     List<Map<String, Object>> comments = (List<Map<String, Object>>) documentSnapshot.get("comments");
 
                     // Update the TextView for the number of times the QR code was scanned
@@ -337,19 +358,21 @@ public class QRCodeManager {
                     callback.onFailure(new Exception("QR Code doesn't exist"));
                 }
             }
-        }, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                callback.onFailure(e);
-            }
         });
     }
 
-    public void hasUserScanned(DatabaseResultCallback<Boolean> callback) {
-        dbHelper.getDocument("users", userManager.getUserID(), new OnSuccessListener<DocumentSnapshot>() {
+
+    public void hasUserScannedRealtime(DatabaseResultCallback<Boolean> callback) {
+        dbHelper.setDocumentSnapshotListener("users", userManager.getUserID(), new EventListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.exists()) {
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
                     List<Map<String, Object>> qrCodesArray = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
                     boolean qrCodeFound = false;
 
@@ -366,57 +389,52 @@ public class QRCodeManager {
                     callback.onFailure(new Exception("No document"));
                 }
             }
-        }, new OnFailureListener() {
+        });
+    }
+
+
+    public void getQRCodeRealtime(DatabaseResultCallback<QR_Code> callback) {
+        AtomicBoolean qrCodeFound = new AtomicBoolean(false);
+
+        dbHelper.setDocumentSnapshotListener("users", userManager.getUserID(), new EventListener<DocumentSnapshot>() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error getting document", e);
-                callback.onFailure(e);
+            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting document", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (documentSnapshot != null && documentSnapshot.exists()) {
+                    qrCodeFound.set(processDocument(documentSnapshot, callback, true));
+                }
+            }
+        });
+
+        dbHelper.setCollectionSnapshotListener("users", new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.w(TAG, "Error getting documents", error);
+                    callback.onFailure(error);
+                    return;
+                }
+
+                if (!qrCodeFound.get()) {
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        if (!document.getId().equals(userManager.getUserID())) {
+                            boolean qrCodeFoundInOtherDocs = processDocument(document, callback, false);
+                            if (qrCodeFoundInOtherDocs) {
+                                qrCodeFound.set(true);
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         });
     }
 
-    public void getQRCode(DatabaseResultCallback<QR_Code> callback) {
-        // First, try to get the QR code from the userManager.getUserId() document
-        dbHelper.getDocument("users", userManager.getUserID(), new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                boolean qrCodeFound = false;
-                if (documentSnapshot.exists()) {
-                    qrCodeFound = processDocument(documentSnapshot, callback, true);
-                }
-                // If the QR code is not found in the userManager.getUserId() document, check all other documents
-                if (!qrCodeFound) {
-                    dbHelper.getAllDocuments("users", new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                boolean qrCodeFoundInOtherDocs = false;
-                                for (DocumentSnapshot document : task.getResult()) {
-                                    if (!document.getId().equals(userManager.getUserID())) {
-                                        qrCodeFoundInOtherDocs = processDocument(document, callback, false);
-                                        if (qrCodeFoundInOtherDocs) {
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (!qrCodeFoundInOtherDocs) {
-                                    callback.onFailure(new Exception("No QR Code with the given hash found"));
-                                }
-                            } else {
-                                callback.onFailure(new Exception("Error getting documents", task.getException()));
-                            }
-                        }
-                    });
-                }
-            }
-        }, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error getting document", e);
-                callback.onFailure(e);
-            }
-        });
-    }
 
 
     private boolean processDocument(DocumentSnapshot documentSnapshot, DatabaseResultCallback<QR_Code> callback, boolean foundWithUser) {

@@ -1,12 +1,14 @@
 package com.example.qr_project.utils;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,8 +16,6 @@ import androidx.annotation.Nullable;
 
 import com.example.qr_project.R;
 import com.example.qr_project.activities.QRCodeActivity;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -63,6 +63,7 @@ public class QR_Adapter extends ArrayAdapter<QR_Code> {
             public void onClick(View view) {
                 Intent intent = new Intent(context, QRCodeActivity.class);
                 intent.putExtra("hash", qrCode.getHash());
+                Log.d(TAG, "BUTTON PRESSED: "+ qrCode.getHash());
                 context.startActivity(intent);
             }
         });
