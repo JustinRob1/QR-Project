@@ -343,10 +343,11 @@ public class QRCodeActivity extends AppCompatActivity {
             if (documentSnapshot.exists()) {
                 List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
                 if (qrCodes != null) {
+                    boolean qrCodeFound = false;
                     for (Map<String, Object> qrCode : qrCodes) {
-
                         String hash = (String) qrCode.get("hash");
                         if (hash != null && hash.equals(qrCodeHash)) {
+                            qrCodeFound = true;
                             String photoUrl = (String) qrCode.get("photo");
                             if (photoUrl != null) {
                                 Log.d(TAG, "PhotoURL: " + photoUrl);
@@ -377,18 +378,63 @@ public class QRCodeActivity extends AppCompatActivity {
                             }
                         }
                     }
+                    if (!qrCodeFound) {
+                        // Iterate through all users to find the first one who has scanned this QR code
+                        final boolean[] photoDisplayed = {false};
+                        db.collection("users").get().addOnSuccessListener(querySnapshot -> {
+                            for (DocumentSnapshot userDoc : querySnapshot) {
+                                List<Map<String, Object>> userQrCodes = (List<Map<String, Object>>) userDoc.get("qrcodes");
+                                if (userQrCodes != null) {
+                                    for (Map<String, Object> qrCode : userQrCodes) {
+                                        String hash = (String) qrCode.get("hash");
+                                        if (hash != null && hash.equals(qrCodeHash)) {
+                                            String photoUrl = (String) qrCode.get("photo");
+                                            if (photoUrl != null && !photoDisplayed[0]) {
+                                                Log.d(TAG, "PhotoURL: " + photoUrl);
+                                                // Load the photo using Picasso
+                                                Picasso.get().load(photoUrl).into(new Target() {
+                                                    @Override
+                                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                                        // Display the photo in a dialog
+                                                        AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
+                                                        ImageView imageView = new ImageView(QRCodeActivity.this);
+                                                        imageView.setImageBitmap(bitmap);
+                                                        builder.setView(imageView);
+                                                        AlertDialog dialog = builder.create();
+                                                        dialog.show();
+                                                    }
+
+                                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                                        // Handle the error
+                                                        Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                                        // Show a progress bar or placeholder image
+                                                    }
+                                                });
+                                                // Set the flag to true so we don't display another photo
+                                                photoDisplayed[0] = true;
+                                                // Break out of both loops once the photo is displayed
+                                                break;
+                                            }
+                                        } else {
+                                            // Handle the case where no user has scanned this QR code
+                                            //Toast.makeText(getApplicationContext(), "No user has scanned this QR code", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                    if (photoDisplayed[0]) {
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
-            } else {
-                // Handle the case where the user ID doesn't exist
-                Toast.makeText(getApplicationContext(), "User ID not found", Toast.LENGTH_SHORT).show();
             }
-        }).addOnFailureListener(e -> {
-            // Handle the error
-            Toast.makeText(getApplicationContext(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
         });
     }
-
-
 
     public void seeLocation(View view) {
         db = FirebaseFirestore.getInstance();
