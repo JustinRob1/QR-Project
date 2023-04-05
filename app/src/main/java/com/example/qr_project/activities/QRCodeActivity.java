@@ -332,75 +332,62 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void seePhoto(View view) {
-        qrCodeManager.getAllUsers(new DatabaseResultCallback<List<Friend>>() {
-            @Override
-            public void onSuccess(List<Friend> result) {
-                if (result != null) {
-                    AtomicBoolean photoFound = new AtomicBoolean(false);
-                    for (Friend scanner : result) {
-                        if (photoFound.get()) {
-                            break;
-                        }
-                        String userID = scanner.getId();
-                        String qrCodeHash = getIntent().getStringExtra("hash");
+        db = FirebaseFirestore.getInstance();
+        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
+        String userID = sharedPref.getString("user_id", null);
+        String qrCodeHash = getIntent().getStringExtra("hash");
 
-                        FirebaseFirestore db = FirebaseFirestore.getInstance();
-                        DocumentReference userRef = db.collection("users").document(userID);
-                        userRef.get().addOnSuccessListener(documentSnapshot -> {
-                            if (documentSnapshot.exists()) {
-                                List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
-                                if (qrCodes != null) {
-                                    for (Map<String, Object> qrCode : qrCodes) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userRef = db.collection("users").document(userID);
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                if (qrCodes != null) {
+                    for (Map<String, Object> qrCode : qrCodes) {
 
-                                        String hash = (String) qrCode.get("hash");
-                                        if (hash != null && hash.equals(qrCodeHash)) {
-                                            String photoUrl = (String) qrCode.get("photo");
-                                            if (photoUrl != null) {
-                                                Log.d(TAG, "PhotoURL: " + photoUrl);
-                                                // Load the photo using Picasso
-                                                Picasso.get().load(photoUrl).into(new Target() {
-                                                    @Override
-                                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                                        // Display the photo in a dialog
-                                                        AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
-                                                        ImageView imageView = new ImageView(QRCodeActivity.this);
-                                                        imageView.setImageBitmap(bitmap);
-                                                        builder.setView(imageView);
-                                                        AlertDialog dialog = builder.create();
-                                                        dialog.show();
-                                                    }
-
-                                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                                                        // Handle the error
-                                                        Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
-                                                    }
-
-                                                    @Override
-                                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                                                        // Show a progress bar or placeholder image
-                                                    }
-                                                });
-                                                photoFound.set(true);
-                                                break;
-                                            }
-                                        }
+                        String hash = (String) qrCode.get("hash");
+                        if (hash != null && hash.equals(qrCodeHash)) {
+                            String photoUrl = (String) qrCode.get("photo");
+                            if (photoUrl != null) {
+                                Log.d(TAG, "PhotoURL: " + photoUrl);
+                                // Load the photo using Picasso
+                                Picasso.get().load(photoUrl).into(new Target() {
+                                    @Override
+                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                        // Display the photo in a dialog
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
+                                        ImageView imageView = new ImageView(QRCodeActivity.this);
+                                        imageView.setImageBitmap(bitmap);
+                                        builder.setView(imageView);
+                                        AlertDialog dialog = builder.create();
+                                        dialog.show();
                                     }
-                                }
+
+                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                        // Handle the error
+                                        Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                        // Show a progress bar or placeholder image
+                                    }
+                                });
+                                break;
                             }
-                        }).addOnFailureListener(e -> {
-                            // Handle the error
-                            Toast.makeText(getApplicationContext(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
-                        });
+                        }
                     }
                 }
+            } else {
+                // Handle the case where the user ID doesn't exist
+                Toast.makeText(getApplicationContext(), "User ID not found", Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.d(TAG, "Exception with photo: ", e);
-            }
+        }).addOnFailureListener(e -> {
+            // Handle the error
+            Toast.makeText(getApplicationContext(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
         });
     }
+
 
 
     public void seeLocation(View view) {
