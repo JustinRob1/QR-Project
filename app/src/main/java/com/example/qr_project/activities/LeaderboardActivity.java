@@ -228,10 +228,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     String face = (String) qrCode.get("face");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                     // adding QR_Code obj to the list
-                    globalQRCodes_list.add(new QR_Code(hash, score, face, name));
+                    globalQRCodes_list.add(new QR_Code(hash, score, name, face));
                 }
 
                 globalQRCodes_adapter.notifyDataSetChanged();
@@ -294,7 +294,19 @@ public class LeaderboardActivity extends AppCompatActivity {
             @Override
             public void onSuccess(List<QR_Code> result) {
                 for (QR_Code q : result) {
-                    friendQRCodes_list.add(q);
+
+                    // Creating QR_Code object for the adapter
+                    String name = String.valueOf(q.getFace());
+
+                    // POTENTIAL ERROR
+                    int score = q.getScore();
+
+                    String face = q.getName();
+
+                    Hash hash = new Hash(q.getHash(), name, face, score);
+
+                    // adding QR_Code obj to the list
+                    friendQRCodes_list.add(new QR_Code(hash, score, name, face));
                 }
 
                 friendQRCodes_adapter.notifyDataSetChanged();
