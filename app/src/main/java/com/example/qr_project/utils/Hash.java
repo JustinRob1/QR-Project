@@ -31,13 +31,6 @@ public class Hash {
     private int score;
     private final static String TAG = "HASH";
 
-    private static final int IMAGE_SIZE = 256; // the size of the generated image
-    private static final int BACKGROUND_COLOR = Color.WHITE;
-    private static final int EYE_COLOR = Color.BLACK;
-    private static final int NOSE_COLOR = Color.RED;
-    private static final int MOUTH_COLOR = Color.BLUE;
-    private static final int EYEBROW_COLOR = Color.BLACK;
-
     /**
      * Creates an instance of Hash object.
      * @param qrCodeContent a String contained in the QRCode
@@ -146,7 +139,6 @@ public class Hash {
         int score = 0;
         int base;
 
-
         while (i < n){
             j = i + 1;
             k = 1;
@@ -162,200 +154,8 @@ public class Hash {
             score += Math.pow(base, k-1);
             i = j;
         }
-
         return score;
     }
-
-//    /**
-//     * Generates a face based on the hash
-//     * @return a face
-//     */
-//    public static Bitmap generateFace(String hash) {
-//        // Create a new bitmap for the image
-//        Bitmap bitmap = Bitmap.createBitmap(IMAGE_SIZE, IMAGE_SIZE, Bitmap.Config.ARGB_8888);
-//        Canvas canvas = new Canvas(bitmap);
-//
-//        // Draw the background
-//        canvas.drawColor(Color.WHITE);
-//
-//        // Define the available face shapes
-//        String[] shapes = {"circle", "square"};
-//
-//        // Determine the face shape based on the hash
-//        int shapeIndex = Math.abs(hash.hashCode()) % 2;
-//        String faceShape = shapes[shapeIndex];
-//
-//        // Generate a random face color based on the hash
-//        Random random = new Random(hash.hashCode());
-//        int faceColor = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-//        int eyeColor = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-//        int mouthColor = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-//        int noseColor = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-//        int browColor = Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
-//
-//        // Draw the face shape with the random face color and a hollow interior
-//        Paint facePaint = new Paint();
-//        facePaint.setColor(faceColor);
-//        facePaint.setStyle(Paint.Style.STROKE);
-//        facePaint.setStrokeWidth(20);
-//
-//        if (faceShape.equals("circle")) {
-//            RectF oval = new RectF(0, 0, IMAGE_SIZE, IMAGE_SIZE);
-//            canvas.drawOval(oval, facePaint);
-//        } else if (faceShape.equals("square")) {
-//            RectF square = new RectF(0, 0, IMAGE_SIZE, IMAGE_SIZE);
-//            canvas.drawRect(square, facePaint);
-//        }
-//
-//        String[] eyes = {"round", "almond", "hooded"};
-//
-//        // Determine the eye shape based on the hash
-//        int eyesIndex = Math.abs(hash.hashCode()) % 3;
-//        String eyeShape = eyes[eyesIndex];
-//
-//        // Define the eye paint with the random eye color
-//        Paint eyePaint = new Paint();
-//        eyePaint.setColor(eyeColor);
-//        eyePaint.setStyle(Paint.Style.FILL);
-//
-//        // Draw the eyes based on the selected eye shape
-//        if (eyeShape.equals("round")) {
-//            // Draw round eyes
-//            float leftEyeX = IMAGE_SIZE * 0.3f;
-//            float leftEyeY = IMAGE_SIZE * 0.4f;
-//            float leftEyeRadius = IMAGE_SIZE * 0.1f;
-//            canvas.drawCircle(leftEyeX, leftEyeY, leftEyeRadius, eyePaint);
-//
-//            float rightEyeX = IMAGE_SIZE * 0.7f;
-//            float rightEyeY = IMAGE_SIZE * 0.4f;
-//            float rightEyeRadius = IMAGE_SIZE * 0.1f;
-//            canvas.drawCircle(rightEyeX, rightEyeY, rightEyeRadius, eyePaint);
-//        } else if (eyeShape.equals("almond")) {
-//            // Draw almond eyes
-//            float leftEyeX = IMAGE_SIZE * 0.3f;
-//            float leftEyeY = IMAGE_SIZE * 0.4f;
-//            float leftEyeRadiusX = IMAGE_SIZE * 0.2f;
-//            float leftEyeRadiusY = IMAGE_SIZE * 0.1f;
-//            canvas.drawOval(leftEyeX - leftEyeRadiusX, leftEyeY - leftEyeRadiusY, leftEyeX + leftEyeRadiusX, leftEyeY + leftEyeRadiusY, eyePaint);
-//
-//            float rightEyeX = IMAGE_SIZE * 0.7f;
-//            float rightEyeY = IMAGE_SIZE * 0.4f;
-//            float rightEyeRadiusX = IMAGE_SIZE * 0.2f;
-//            float rightEyeRadiusY = IMAGE_SIZE * 0.1f;
-//            canvas.drawOval(rightEyeX - rightEyeRadiusX, rightEyeY - rightEyeRadiusY, rightEyeX + rightEyeRadiusX, rightEyeY + rightEyeRadiusY, eyePaint);
-//        } else if (eyeShape.equals("hooded")) {
-//            // Draw hooded eyes
-//            float leftEyeX = IMAGE_SIZE * 0.3f;
-//            float leftEyeY = IMAGE_SIZE * 0.4f;
-//            float leftEyeRadiusX = IMAGE_SIZE * 0.2f;
-//            float leftEyeRadiusY = IMAGE_SIZE * 0.1f;
-//            canvas.drawOval(leftEyeX - leftEyeRadiusX, leftEyeY - leftEyeRadiusY, leftEyeX + leftEyeRadiusX, leftEyeY + leftEyeRadiusY, eyePaint);
-//            canvas.drawLine(leftEyeX - leftEyeRadiusX, leftEyeY, leftEyeX + leftEyeRadiusX, leftEyeY, eyePaint);
-//
-//            float rightEyeX = IMAGE_SIZE * 0.7f;
-//            float rightEyeY = IMAGE_SIZE * 0.4f;
-//            float rightEyeRadiusX = IMAGE_SIZE * 0.2f;
-//            float rightEyeRadiusY = IMAGE_SIZE * 0.1f;
-//            canvas.drawOval(rightEyeX - rightEyeRadiusX, rightEyeY - rightEyeRadiusY, rightEyeX + rightEyeRadiusX, rightEyeY + rightEyeRadiusY, eyePaint);
-//            canvas.drawLine(leftEyeX - leftEyeRadiusX, leftEyeY, leftEyeX + leftEyeRadiusX, leftEyeY, eyePaint);
-//        }
-//
-//        String[] mouths = {"smile", "frown", "surprised"};
-//
-//        int mouthIndex = Math.abs(hash.hashCode()) % 3;
-//        String mouthShape = mouths[mouthIndex];
-//
-//        // Define the mouth paint with the random mouth color
-//        Paint mouthPaint = new Paint();
-//        mouthPaint.setColor(mouthColor);
-//        mouthPaint.setStyle(Paint.Style.FILL);
-//
-//        // Draw the mouth shape with the random mouth color
-//        if (mouthShape.equals("smile")) {
-//            Path smilePath = new Path();
-//            smilePath.moveTo(IMAGE_SIZE / 4, IMAGE_SIZE * 3 / 4);
-//            smilePath.quadTo(IMAGE_SIZE / 2, IMAGE_SIZE * 7 / 8, IMAGE_SIZE * 3 / 4, IMAGE_SIZE * 3 / 4);
-//            canvas.drawPath(smilePath, mouthPaint);
-//        } else if (mouthShape.equals("frown")) {
-//            Path frownPath = new Path();
-//            frownPath.moveTo(IMAGE_SIZE / 4, IMAGE_SIZE * 3 / 4);
-//            frownPath.quadTo(IMAGE_SIZE / 2, IMAGE_SIZE * 5 / 8, IMAGE_SIZE * 3 / 4, IMAGE_SIZE * 3 / 4);
-//            canvas.drawPath(frownPath, mouthPaint);
-//        } else if (mouthShape.equals("surprised")) {
-//            float mouthRadius = IMAGE_SIZE / 12;
-//            float mouthCenterX = IMAGE_SIZE / 2;
-//            float mouthCenterY = (float) (IMAGE_SIZE * 3 / 3.75);
-//            canvas.drawCircle(mouthCenterX, mouthCenterY, mouthRadius, mouthPaint);
-//        }
-//
-//        String[] noses = {"pointed", "button"};
-//
-//        // Determine the nose shape based on the hash
-//        int noseIndex = Math.abs(hash.hashCode()) % 2;
-//        String noseShape = noses[noseIndex];
-//
-//        // Draw the nose shape with the random nose color and a hollow interior
-//        Paint nosePaint = new Paint();
-//        nosePaint.setColor(noseColor);
-//        nosePaint.setStyle(Paint.Style.STROKE);
-//        nosePaint.setStrokeWidth(5);
-//
-//        if (noseShape.equals("pointed")) {
-//            Path path = new Path();
-//            path.moveTo(IMAGE_SIZE / 2, IMAGE_SIZE / 2);
-//            path.lineTo(IMAGE_SIZE * 3 / 8, IMAGE_SIZE * 5 / 8);
-//            path.lineTo(IMAGE_SIZE * 5 / 8, IMAGE_SIZE * 5 / 8);
-//            path.close();
-//            canvas.drawPath(path, nosePaint);
-//        } else if (noseShape.equals("button")) {
-//            canvas.drawCircle(IMAGE_SIZE / 2, IMAGE_SIZE * 5 / 8, IMAGE_SIZE / 20, nosePaint);
-//        }
-//
-//        // Define the available eyebrow shapes
-//        String[] eyebrows = {"straight", "unibrow", "slanted"};
-//
-//        // Determine the eyebrow shape based on the hash
-//        int eyebrowIndex = Math.abs(hash.hashCode()) % 3;
-//        String eyebrowShape = eyebrows[eyebrowIndex];
-//
-//        // Define the eyebrow paint with the random eye color
-//        Paint eyebrowPaint = new Paint();
-//        eyebrowPaint.setColor(browColor);
-//        eyebrowPaint.setStyle(Paint.Style.STROKE);
-//        eyebrowPaint.setStrokeWidth(10);
-//
-//        if (eyebrowShape.equals("straight")) {
-//            // Draw straight eyebrows
-//            Path straightEyebrow1 = new Path();
-//            straightEyebrow1.moveTo(IMAGE_SIZE * 0.2f, IMAGE_SIZE * 0.25f);
-//            straightEyebrow1.lineTo(IMAGE_SIZE * 0.4f, IMAGE_SIZE * 0.25f);
-//            Path straightEyebrow2 = new Path();
-//            straightEyebrow2.moveTo(IMAGE_SIZE * 0.6f, IMAGE_SIZE * 0.25f);
-//            straightEyebrow2.lineTo(IMAGE_SIZE * 0.8f, IMAGE_SIZE * 0.25f);
-//            canvas.drawPath(straightEyebrow1, eyebrowPaint);
-//            canvas.drawPath(straightEyebrow2, eyebrowPaint);
-//        } else if (eyebrowShape.equals("unibrow")) {
-//            // Draw arched eyebrows
-//            Path archedEyebrow = new Path();
-//            archedEyebrow.moveTo(IMAGE_SIZE * 0.2f, IMAGE_SIZE * 0.3f);
-//            archedEyebrow.quadTo(IMAGE_SIZE * 0.5f, IMAGE_SIZE * 0.15f, IMAGE_SIZE * 0.8f, IMAGE_SIZE * 0.3f);
-//            canvas.drawPath(archedEyebrow, eyebrowPaint);
-//        }
-//        else if (eyebrowShape.equals("slanted")) {
-//            // Draw slanted eyebrows
-//            Path slantedEyebrow1 = new Path();
-//            slantedEyebrow1.moveTo(IMAGE_SIZE * 0.1f, IMAGE_SIZE * 0.4f);
-//            slantedEyebrow1.lineTo(IMAGE_SIZE * 0.4f, IMAGE_SIZE * 0.2f);
-//            Path slantedEyebrow2 = new Path();
-//            slantedEyebrow2.moveTo(IMAGE_SIZE * 0.6f, IMAGE_SIZE * 0.2f);
-//            slantedEyebrow2.lineTo(IMAGE_SIZE * 0.9f, IMAGE_SIZE * 0.4f);
-//            canvas.drawPath(slantedEyebrow1, eyebrowPaint);
-//            canvas.drawPath(slantedEyebrow2, eyebrowPaint);
-//        }
-//
-//        return bitmap;
-//    }
-
 
     /**
      * Generates a face based on the hash
@@ -382,8 +182,6 @@ public class Hash {
         hex2Eyes.put('e', "$ $");
         hex2Eyes.put('f', "♥ ♥");
 
-
-
         // Choose ears
         Map<Character, String> hex2Ears = new HashMap<>();
         hex2Ears.put('0', "$$");      // dollar ears (high score)
@@ -402,7 +200,6 @@ public class Hash {
         hex2Ears.put('d', "==");  // rabbit ears
         hex2Ears.put('e', "__");  // devil ears
         hex2Ears.put('f', "##");  // short ears
-
 
         // Choose nose
         Map<Character, String> hex2Nose = new HashMap<>();
@@ -442,16 +239,15 @@ public class Hash {
         hex2Mouth.put('e', " X ");  // lips together mouth
         hex2Mouth.put('f', " + ");  // smirk mouth
 
-
         // Build head
         String eyes = hex2Eyes.get(hashStr.charAt(0));
         String ears = hex2Ears.get(hashStr.charAt(1));
         String nose = hex2Nose.get(hashStr.charAt(2));
         String mouth = hex2Mouth.get(hashStr.charAt(3));
         String head =
-                "  /‾‾‾‾‾\\ \n" +
-                        ears.charAt(0) + "|  " + eyes + "  |" + ears.charAt(1) + " \n" +
-                        " |   " + nose + " | \n" +
+                "  /‾‾‾‾‾\\\n" +
+                        ears.charAt(0) + "|  " + eyes + "  |" + ears.charAt(1) + "\n" +
+                        " |   " + nose + " |\n" +
                         " |  " + mouth + "  |\n" +
                         "  \\_____/ ";
 

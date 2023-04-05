@@ -695,15 +695,16 @@ public class UserManager {
      */
     public static boolean containsUserID(List<Map<String, Object>> list, String targetUserID) {
         for (Map<String, Object> map : list) {
-            if (map.containsKey("userID")) {
+            if (map != null && map.containsKey("userID")) {
                 String userID = (String) map.get("userID");
-                if (userID.equals(targetUserID)) {
+                if (userID != null && userID.equals(targetUserID)) {
                     return true;
                 }
             }
         }
         return false;
     }
+
 
     /**
      * Retrieves the value of a specified field for the current user from the database and returns it through the provided callback.
