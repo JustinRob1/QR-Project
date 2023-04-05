@@ -130,7 +130,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         AlertDialog.Builder builder = new AlertDialog.Builder(MapActivity.this);
                         View markerView = getLayoutInflater().inflate(R.layout.marker_layout, null);
                         ImageView imageView = markerView.findViewById(R.id.marker_image);
-                        TextView textView = markerView.findViewById(R.id.marker_title);
+                        TextView titleView = markerView.findViewById(R.id.marker_title);
+                        TextView scoreView = markerView.findViewById(R.id.marker_score);
                         if (photoUrl != null) {
                             // Download the photo using Picasso and convert it to a Bitmap
                             Picasso.get().load(photoUrl).into(new Target() {
@@ -153,7 +154,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             // Hide the image view if the photo is null
                             imageView.setVisibility(View.GONE);
                         }
-                        textView.setText(Objects.requireNonNull(qrCode.get("name")).toString());
+                        titleView.setText(Objects.requireNonNull(qrCode.get("name")).toString());
+                        scoreView.setText("Score: " + Objects.requireNonNull(qrCode.get("score")).toString());
                         builder.setView(markerView);
                         builder.create().show();
                     }
