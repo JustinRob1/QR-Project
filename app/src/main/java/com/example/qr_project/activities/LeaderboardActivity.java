@@ -228,10 +228,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     String face = (String) qrCode.get("face");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                     // adding QR_Code obj to the list
-                    globalQRCodes_list.add(new QR_Code(hash, score, face, name));
+                    globalQRCodes_list.add(new QR_Code(hash, score, name, face));
                 }
 
                 globalQRCodes_adapter.notifyDataSetChanged();

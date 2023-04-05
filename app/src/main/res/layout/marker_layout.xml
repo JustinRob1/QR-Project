@@ -12,6 +12,13 @@
         android:text="QR Code Name"
         android:textAppearance="?android:textAppearanceMedium"/>
 
+    <TextView
+        android:id="@+id/marker_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="QR Code Name"
+        android:textAppearance="?android:textAppearanceMedium"/>
+
     <ImageView
         android:id="@+id/marker_image"
         android:layout_width="wrap_content"
