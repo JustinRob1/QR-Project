@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.qr_project.R;
-import com.example.qr_project.activities.QRCodeActivity;
 import com.example.qr_project.activities.UserProfileActivity;
 
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class Score_Adapter extends ArrayAdapter<Friend> {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, UserProfileActivity.class);
-                intent.putExtra("UserId", score.getId());
+                intent.putExtra("userId", score.getId());
                 context.startActivity(intent);
             }
         });

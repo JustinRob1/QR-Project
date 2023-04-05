@@ -2,9 +2,6 @@ package com.example.qr_project.utils;
 
 import static android.content.ContentValues.TAG;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -278,12 +275,18 @@ public class QRCodeManager {
         });
     }
 
-    public void getAllUsers(DatabaseResultCallback<List<Friend>> callback){
+    public void getAllUsers(DatabaseResultCallback<List<Friend>> callback) {
         List<Friend> friends = new ArrayList<>();
         getAllScanners(new DatabaseResultCallback<List<String>>() {
             @Override
             public void onSuccess(List<String> result) {
-                for (String id : result){
+                if (result == null || result.isEmpty()) {
+                    callback.onSuccess(friends);
+                    return;
+                }
+
+                AtomicInteger completedOperations = new AtomicInteger(0);
+                for (String id : result) {
                     dbHelper.getDocument("users", id, new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -293,15 +296,24 @@ public class QRCodeManager {
                                 Friend friend = new Friend(username, totalScore, id);
                                 friends.add(friend);
                             }
+
+                            // Check if all operations are completed
+                            if (completedOperations.incrementAndGet() == result.size()) {
+                                callback.onSuccess(friends);
+                            }
                         }
                     }, new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.d(TAG, "Error getting people: ", e);
+
+                            // Check if all operations are completed
+                            if (completedOperations.incrementAndGet() == result.size()) {
+                                callback.onSuccess(friends);
+                            }
                         }
                     });
                 }
-                callback.onSuccess(friends);
             }
 
             @Override
@@ -311,6 +323,7 @@ public class QRCodeManager {
             }
         });
     }
+
     public void getAllComments(DatabaseResultCallback<List<Map<String, Object>>> callback){
         dbHelper.getDocument("qrcodes", QRCodeManager.this.hash, new OnSuccessListener<DocumentSnapshot>() {
             @Override

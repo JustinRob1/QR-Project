@@ -1,7 +1,5 @@
 package com.example.qr_project.activities;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -10,7 +8,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +24,6 @@ import com.example.qr_project.utils.QR_Adapter;
 import com.example.qr_project.utils.QR_Code;
 import com.example.qr_project.utils.Score_Adapter;
 import com.example.qr_project.utils.UserManager;
-import com.example.qr_project.utils.UtilityFunctions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,13 +110,6 @@ public class LeaderboardActivity extends AppCompatActivity {
         populateData(filter);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        friendsTopQRCodesListener();
-        friendsTopTotalScoresListener();
-    }
 
     // This is to initalize the View in leaderboard
     // Fetching all the ids from the xml files

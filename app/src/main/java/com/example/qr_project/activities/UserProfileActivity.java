@@ -5,7 +5,6 @@ import static android.view.View.GONE;
 import static com.example.qr_project.utils.UserManager.containsUserID;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -152,10 +151,10 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void handleUserData(UserManager manager){
-        manager.getGlobalRanking(new DatabaseResultCallback<Integer>() {
+        manager.getRealtimeGlobalRanking(new DatabaseResultCallback<String>() {
             @Override
-            public void onSuccess(Integer result) {
-                globalRankTxt.setText(String.valueOf(result));
+            public void onSuccess(String result) {
+                globalRankTxt.setText(result);
             }
 
             @Override
@@ -196,10 +195,10 @@ public class UserProfileActivity extends AppCompatActivity {
                 Log.e(TAG, "Failed to get email", e);
             }
         });
-        manager.getTotalScore(new DatabaseResultCallback<Integer>() {
+        manager.getRealtimeTotalScore(new DatabaseResultCallback<String>() {
             @Override
-            public void onSuccess(Integer result) {
-                totalScoreTxt.setText(String.valueOf(result));
+            public void onSuccess(String result) {
+                totalScoreTxt.setText(result);
             }
 
             @Override
@@ -208,10 +207,11 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
 
-        manager.getTotalQRCodes(new DatabaseResultCallback<Integer>() {
+
+        manager.getRealtimeTotalQRCodes(new DatabaseResultCallback<String>() {
             @Override
-            public void onSuccess(Integer result) {
-                totalQrCodesTxt.setText(String.valueOf(result));
+            public void onSuccess(String result) {
+                totalQrCodesTxt.setText(result);
             }
 
             @Override
@@ -220,7 +220,7 @@ public class UserProfileActivity extends AppCompatActivity {
             }
         });
 
-        manager.getTop3QRCodesSorted(new DatabaseResultCallback<List<Map<String, Object>>>() {
+        manager.getRealtimeTop3QRCodesSorted(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
                 if (!result.isEmpty()) {

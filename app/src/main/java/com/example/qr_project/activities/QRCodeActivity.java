@@ -24,7 +24,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,8 +36,6 @@ import com.example.qr_project.utils.QRCodeManager;
 import com.example.qr_project.utils.QR_Code;
 import com.example.qr_project.utils.ScannersAdapter;
 import com.example.qr_project.utils.UserManager;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,10 +44,10 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class QRCodeActivity extends AppCompatActivity {
     /**
@@ -272,6 +269,7 @@ public class QRCodeActivity extends AppCompatActivity {
      */
     public void onLeaderboardClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);
+        intent.putExtra("filter", "user");
         startActivity(intent);
     }
 
@@ -334,56 +332,76 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void seePhoto(View view) {
-        db = FirebaseFirestore.getInstance();
-        SharedPreferences sharedPref = getSharedPreferences("QR_pref", Context.MODE_PRIVATE);
-        String userID = sharedPref.getString("user_id", null);
-
-        String qrCodeHash = getIntent().getStringExtra("hash");
-
-        DocumentReference userRef = db.collection("users").document(userID);
-        userRef.get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
-                if (qrCodes != null) {
-                    for (Map<String, Object> qrCode : qrCodes) {
-                        String hash = (String) qrCode.get("hash");
-                        if (hash != null && hash.equals(qrCodeHash)) {
-                            String photoUrl = (String) qrCode.get("photo");
-                            if (photoUrl != null) {
-                                // Load the photo using Picasso
-                                Picasso.get().load(photoUrl).into(new Target() {
-                                    @Override
-                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                        // Display the photo in a dialog
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
-                                        ImageView imageView = new ImageView(QRCodeActivity.this);
-                                        imageView.setImageBitmap(bitmap);
-                                        builder.setView(imageView);
-                                        AlertDialog dialog = builder.create();
-                                        dialog.show();
-                                    }
-
-                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                                        // Handle the error
-                                        Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    @Override
-                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-                                        // Show a progress bar or placeholder image
-                                    }
-                                });
-                            }
+        qrCodeManager.getAllUsers(new DatabaseResultCallback<List<Friend>>() {
+            @Override
+            public void onSuccess(List<Friend> result) {
+                if (result != null) {
+                    AtomicBoolean photoFound = new AtomicBoolean(false);
+                    for (Friend scanner : result) {
+                        if (photoFound.get()) {
                             break;
                         }
+                        String userID = scanner.getId();
+                        String qrCodeHash = getIntent().getStringExtra("hash");
+
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        DocumentReference userRef = db.collection("users").document(userID);
+                        userRef.get().addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) documentSnapshot.get("qrcodes");
+                                if (qrCodes != null) {
+                                    for (Map<String, Object> qrCode : qrCodes) {
+
+                                        String hash = (String) qrCode.get("hash");
+                                        if (hash != null && hash.equals(qrCodeHash)) {
+                                            String photoUrl = (String) qrCode.get("photo");
+                                            if (photoUrl != null) {
+                                                Log.d(TAG, "PhotoURL: " + photoUrl);
+                                                // Load the photo using Picasso
+                                                Picasso.get().load(photoUrl).into(new Target() {
+                                                    @Override
+                                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                                        // Display the photo in a dialog
+                                                        AlertDialog.Builder builder = new AlertDialog.Builder(QRCodeActivity.this);
+                                                        ImageView imageView = new ImageView(QRCodeActivity.this);
+                                                        imageView.setImageBitmap(bitmap);
+                                                        builder.setView(imageView);
+                                                        AlertDialog dialog = builder.create();
+                                                        dialog.show();
+                                                    }
+
+                                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                                                        // Handle the error
+                                                        Toast.makeText(getApplicationContext(), "Failed to load photo", Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+                                                        // Show a progress bar or placeholder image
+                                                    }
+                                                });
+                                                photoFound.set(true);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }).addOnFailureListener(e -> {
+                            // Handle the error
+                            Toast.makeText(getApplicationContext(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
+                        });
                     }
                 }
             }
-        }).addOnFailureListener(e -> {
-            // Handle the error
-            Toast.makeText(getApplicationContext(), "Failed to retrieve data", Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.d(TAG, "Exception with photo: ", e);
+            }
         });
     }
+
 
     public void seeLocation(View view) {
         db = FirebaseFirestore.getInstance();

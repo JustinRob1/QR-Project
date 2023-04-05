@@ -1,9 +1,6 @@
 package com.example.qr_project.utils;
 
-import static android.content.ContentValues.TAG;
-
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,12 +11,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
-
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-
 import com.google.firebase.firestore.FieldValue;
-
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -270,7 +264,7 @@ public class UserManager {
                     Map<String, Object> data = value.getData();
                     if (data != null) {
                         List<Map<String, Object>> qrCodes = (List<Map<String, Object>>) data.get("qrcodes");
-                        if (qrCodes != null) {
+                        if (qrCodes != null && !qrCodes.isEmpty()) {
                             // Sort QR codes based on score
                             qrCodes.sort((a,b) -> ( (Long) b.get("score")).compareTo(( (Long) a.get("score")) ));
 
@@ -595,6 +589,36 @@ public class UserManager {
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
                             friends = (List<Map<String, Object>>) documentSnapshot.get("friends");
+                            dbHelper.getAllDocumentsOrdered("users", "totalScore", false, new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (friends == null){
+                                        callback.onSuccess(0);
+                                    }
+                                    if (task.isSuccessful()) {
+                                        int rank = 1;
+                                        boolean userFound = false;
+                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                            if (document.getId().equals(userID)) {
+                                                userFound = true;
+                                                break;
+                                            } else if (friends != null && containsUserID(friends, document.getId())){
+                                                rank++;
+                                            }
+                                        }
+                                        if (friends != null && userFound){
+                                            callback.onSuccess(rank);
+                                        }
+                                        else {
+                                            Log.d(TAG, "User not found", new Exception("User Not Found Error"));
+                                            callback.onFailure(new Exception("User Not Found Error"));
+                                        }
+                                    } else {
+                                        Log.d(TAG, "Unsuccessful query", task.getException());
+                                        callback.onFailure(task.getException());
+                                    }
+                                }
+                            });
                         } else {
                             Log.d(TAG, "No such document");
                         }
@@ -606,36 +630,7 @@ public class UserManager {
                     }
                 });
 
-        dbHelper.getAllDocumentsOrdered("users", "totalScore", false, new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (friends == null){
-                    callback.onSuccess(0);
-                }
-                if (task.isSuccessful()) {
-                    int rank = 1;
-                    boolean userFound = false;
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        if (document.getId().equals(userID)) {
-                            userFound = true;
-                            break;
-                        } else if (friends != null && containsUserID(friends, document.getId())){
-                            rank++;
-                        }
-                    }
-                    if (friends != null && userFound){
-                        callback.onSuccess(rank);
-                    }
-                    else {
-                        Log.d(TAG, "User not found", new Exception("User Not Found Error"));
-                        callback.onFailure(new Exception("User Not Found Error"));
-                    }
-                } else {
-                    Log.d(TAG, "Unsuccessful query", task.getException());
-                    callback.onFailure(task.getException());
-                }
-            }
-        });
+
     }
 
     /**
