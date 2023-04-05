@@ -201,12 +201,11 @@ public class LeaderboardActivity extends AppCompatActivity {
                     int score = Math.toIntExact((Long) qrCode.get("score"));
 
                     String face = (String) qrCode.get("face");
-                    String newFace = face.replace("n","\n");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, newFace, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                     // adding QR_Code obj to the list
-                    userQRCodes_list.add(new QR_Code(hash, score, name, newFace));
+                    userQRCodes_list.add(new QR_Code(hash, score, name, face));
 
                 }
 
@@ -239,12 +238,11 @@ public class LeaderboardActivity extends AppCompatActivity {
                     int score = Math.toIntExact((Long) qrCode.get("score"));
 
                     String face = (String) qrCode.get("face");
-                    String newFace = face.replace("n","\n");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, newFace, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
 
                     // adding QR_Code obj to the list
-                    globalQRCodes_list.add(new QR_Code(hash, score, newFace, name));
+                    globalQRCodes_list.add(new QR_Code(hash, score, face, name));
                 }
 
                 globalQRCodes_adapter.notifyDataSetChanged();

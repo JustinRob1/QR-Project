@@ -35,12 +35,8 @@ public class LandingPageActivity extends AppCompatActivity {
 
     ActivityResultLauncher<Intent> entryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultCallback<ActivityResult>() {
+            new ActivityResultCallback<>() {
                 @Override
-                /**
-                 * On the landing page, getting anc creating the unique userId for player(s)
-                 * @param result
-                 */
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == 0) {
                         Intent intent = result.getData();

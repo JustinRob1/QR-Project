@@ -47,8 +47,7 @@ public class QR_Adapter extends ArrayAdapter<QR_Code> {
 
         TextView faceView = view.findViewById(R.id.qr_code_img_1);
         String face = qrCode.getFace();
-        String newFace = face.replace("n","\n");
-        faceView.setText(newFace);
+        faceView.setText(face);
 
         TextView qrCodeNameTextView = view.findViewById(R.id.qr_code_name_1);
         TextView scoreTextView = view.findViewById(R.id.qr_code_score_1);

@@ -60,33 +60,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Places.initialize(getApplicationContext(), "AIzaSyBUux3nV7NYGBVtaRY4ZFmyppzqAm40zLU");
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
         // Set the fields to return for the autocomplete results
+        assert autocompleteFragment != null;
         autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG));
 
         // Set up a PlaceSelectionListener to handle the selected place
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onPlaceSelected(Place place) {
+            public void onPlaceSelected(@NonNull Place place) {
                 // Get the location of the selected place
                 LatLng latLng = place.getLatLng();
 
                 // Move the camera to the selected location
+                assert latLng != null;
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
             }
 
             @Override
-            public void onError(Status status) {
-                // Handle the error
+            public void onError(@NonNull Status status) {
+
             }
         });
 
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         db = FirebaseFirestore.getInstance();
 
         CollectionReference userRef = db.collection("users");
@@ -110,6 +112,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                                         .position(new LatLng(lat, lng));
                                 Marker marker = mMap.addMarker(markerOptions);
                                 // Store the qrCode object as a tag of the marker
+                                assert marker != null;
                                 marker.setTag(qrCode);
                             }
 
@@ -120,7 +123,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 // Set click listener for the marker
                 mMap.setOnMarkerClickListener(clickedMarker -> {
                     Object tag = clickedMarker.getTag();
-                    if (tag != null && tag instanceof Map) {
+                    if (tag instanceof Map) {
                         Map<String, Object> qrCode = (Map<String, Object>) tag;
                         String photoUrl = qrCode.get("photo") != null ? qrCode.get("photo").toString() : null;
                         // Show the custom view in an AlertDialog or other dialog
@@ -163,12 +166,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
     }
 
-
+    /**
+     * Called when the map is ready to be used. Sets up the GoogleMap object, sets the map type, and shows the user's current location on the map if permission is granted.
+     * Checks for extras in the Intent for latitude and longitude, and moves the camera to the QR code's location if available.
+     *
+     * @param googleMap The GoogleMap object representing the map that is ready to be used.
+     */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Set the map type to hybrid
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         // Check if the user has granted location permission
@@ -192,7 +199,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
+    /**
+     * Shows the user's current location on the map, if location permission is granted.
+     * This method adds a marker at the user's current location and moves the camera to that location
+     * with a zoom level of 15.
+     *
+     * @throws SecurityException if location permission is not granted
+     */
     private void showCurrentLocation() {
         if (mMap == null) {
             return;
@@ -220,6 +233,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Called when the result of a permission request is received.
+     *
+     * @param requestCode  The request code that was passed when requesting the permission.
+     * @param permissions  The permissions that were requested.
+     * @param grantResults The results of the permission request, indicating whether the permissions were granted or not.
+     *
+     * @see ActivityCompat.OnRequestPermissionsResultCallback
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

@@ -2,7 +2,7 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="80dp"
+    android:layout_height="55dp"
     android:layout_width="match_parent"
     android:orientation="horizontal"
     android:background="@drawable/table_row_background"
@@ -24,11 +24,12 @@
     <TextView
         android:id="@+id/qr_code_img_1"
         android:layout_width="50dp"
-        android:layout_height="80dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="5dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:textSize="8dp" />
 
     <TextView
         android:id="@+id/qr_code_name_1"

@@ -1,6 +1,5 @@
 package com.example.qr_project.activities;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.qr_project.R;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -29,8 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public class FaceActivity extends AppCompatActivity {
-
-    private static final int CAMERA_REQUEST_CODE = 1;
 
     private String qrHash;
     private String userID;
@@ -64,23 +60,26 @@ public class FaceActivity extends AppCompatActivity {
         faceUri = getImageUri(getApplicationContext(), face);
         StorageReference faceRef = storageReference.child(userID).child(qrHash).child("face");
         faceRef.putFile(faceUri)
-                .addOnSuccessListener(taskSnapshot -> {
-                    faceRef.getDownloadUrl()
-                            .addOnSuccessListener(uri -> {
-                                saveImageUrlToFirestore(uri.toString());
-                                finish(); // move finish() here
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                                finish(); // add a finish() call here as well
-                            });
-                })
+                .addOnSuccessListener(taskSnapshot -> faceRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            saveImageUrlToFirestore(uri.toString());
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }))
                 .addOnFailureListener(e -> {
                     Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                    finish(); // add a finish() call here as well
+                    finish();
                 });
     }
 
+    /**
+     * Saves an image URL to Firestore for a QR code face.
+     *
+     * @param imageUrl The URL of the image to be saved.
+     */
     private void saveImageUrlToFirestore(String imageUrl) {
         if (imageUrl != null) {
             Log.d("My Tag", "FaceActivity called with: imageUrl = [" + imageUrl + "]");
@@ -106,16 +105,20 @@ public class FaceActivity extends AppCompatActivity {
                                 .addOnSuccessListener(aVoid -> {
                                     // do nothing here, or add a success message if you'd like
                                 })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
-                                });
+                                .addOnFailureListener(e -> Toast.makeText(FaceActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show());
                     }
                 }
             }
         });
     }
 
-
+    /**
+     * Retrieves the Uri of an image from a Bitmap in the specified context, after compressing and inserting it into the media store.
+     *
+     * @param context The context in which the method is called.
+     * @param imageBitmap The Bitmap image to be converted to Uri.
+     * @return The Uri of the compressed image in the media store, or null if an error occurs.
+     */
     private Uri getImageUri(Context context, Bitmap imageBitmap) {
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, 640, 480, true);
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();

@@ -1,15 +1,6 @@
 package com.example.qr_project.utils;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.RectF;
-import android.graphics.drawable.shapes.Shape;
 import android.util.Log;
-
-import com.google.firestore.admin.v1.Index;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +8,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Contains hash from QRCode contents and score based on the hash value. Note that
@@ -115,15 +105,12 @@ public class Hash {
             while (hash.length() < 64) {
                 hash.insert(0, '0');
             }
-
             return hash.toString();
-
         }
         catch (NoSuchAlgorithmException e){
             Log.e(TAG, "Exception was thrown for incorrect algorithm: " + e);
             return "";
         }
-
     }
 
     /**
@@ -184,60 +171,60 @@ public class Hash {
 
         // Choose ears
         Map<Character, String> hex2Ears = new HashMap<>();
-        hex2Ears.put('0', "$$");      // dollar ears (high score)
-        hex2Ears.put('1', "oo");   // round ears
-        hex2Ears.put('2', "||");   // long ears
-        hex2Ears.put('3', "[]");   // bat ears
-        hex2Ears.put('4', "/\\");   // pointy ears
-        hex2Ears.put('5', "()");   // elf ears
-        hex2Ears.put('6', "!!");   // floppy ears
-        hex2Ears.put('7', "@@");   // antenna ears
-        hex2Ears.put('8', "\\/");   // wing ears
-        hex2Ears.put('9', "~~");   // cat ears
-        hex2Ears.put('a', "><");  // robot ears
-        hex2Ears.put('b', "**");  // elephant ears
-        hex2Ears.put('c', "<>");  // arrow ears
-        hex2Ears.put('d', "==");  // rabbit ears
-        hex2Ears.put('e', "__");  // devil ears
-        hex2Ears.put('f', "##");  // short ears
+        hex2Ears.put('0', "$$");
+        hex2Ears.put('1', "oo");
+        hex2Ears.put('2', "||");
+        hex2Ears.put('3', "[]");
+        hex2Ears.put('4', "/\\");
+        hex2Ears.put('5', "()");
+        hex2Ears.put('6', "!!");
+        hex2Ears.put('7', "@@");
+        hex2Ears.put('8', "\\/");
+        hex2Ears.put('9', "~~");
+        hex2Ears.put('a', "><");
+        hex2Ears.put('b', "**");
+        hex2Ears.put('c', "<>");
+        hex2Ears.put('d', "==");
+        hex2Ears.put('e', "__");
+        hex2Ears.put('f', "##");
 
         // Choose nose
         Map<Character, String> hex2Nose = new HashMap<>();
-        hex2Nose.put('0', " $ ");    // dollar nose (high score)
-        hex2Nose.put('1', " , ");   // small nose
-        hex2Nose.put('2', " | ");   // straight nose
-        hex2Nose.put('3', " /\\");   // curved nose
-        hex2Nose.put('4', " | ");    // button nose
-        hex2Nose.put('5', ". .");   // pig nose
-        hex2Nose.put('6', "\\/ ");   // flared nostrils
-        hex2Nose.put('7', "/\\_");   // hawk nose
-        hex2Nose.put('8', "\\__");  // upturned nose
-        hex2Nose.put('9', "\\\\\\");  // pointed nose
-        hex2Nose.put('a', "<=>");   // wide nose
-        hex2Nose.put('b', "(((");   // bulbous nose
-        hex2Nose.put('c', " 0 ");   // Circle nose
-        hex2Nose.put('d', "(_)");   // pudgy nose
-        hex2Nose.put('e', " V ");  // ski slope nose
-        hex2Nose.put('f', " + ");   // cleft nose
+        hex2Nose.put('0', " $ ");
+        hex2Nose.put('1', " , ");
+        hex2Nose.put('2', " | ");
+        hex2Nose.put('3', " /\\");
+        hex2Nose.put('4', " | ");
+        hex2Nose.put('5', ". .");
+        hex2Nose.put('6', "\\/ ");
+        hex2Nose.put('7', "/\\_");
+        hex2Nose.put('8', "\\__");
+        hex2Nose.put('9', "\\\\\\");
+        hex2Nose.put('a', "<=>");
+        hex2Nose.put('b', "(((");
+        hex2Nose.put('c', " 0 ");
+        hex2Nose.put('d', "(_)");
+        hex2Nose.put('e', " V ");
+        hex2Nose.put('f', " + ");
 
         // Choose mouth
         Map<Character, String> hex2Mouth = new HashMap<>();
-        hex2Mouth.put('0', "$$$");      // dollar mouth (high score)
-        hex2Mouth.put('1', " o ");   // small mouth
-        hex2Mouth.put('2', " O ");   // oval mouth
-        hex2Mouth.put('3', " ^ ");   // triangle mouth
-        hex2Mouth.put('4', " U ");   // square mouth
-        hex2Mouth.put('5', " V ");   // trapezoid mouth
-        hex2Mouth.put('6', " | ");   // vertical line mouth
-        hex2Mouth.put('7', "---");   // horizontal line mouth
-        hex2Mouth.put('8', " S ");   // smile mouth
-        hex2Mouth.put('9', " D ");   // frown mouth
-        hex2Mouth.put('a', " 3 ");  // surprised mouth
-        hex2Mouth.put('b', " P ");  // puckered mouth
-        hex2Mouth.put('c', "___");  // neutral mouth
-        hex2Mouth.put('d', " @ ");  // kissing mouth
-        hex2Mouth.put('e', " X ");  // lips together mouth
-        hex2Mouth.put('f', " + ");  // smirk mouth
+        hex2Mouth.put('0', "$$$");
+        hex2Mouth.put('1', " o ");
+        hex2Mouth.put('2', " O ");
+        hex2Mouth.put('3', " ^ ");
+        hex2Mouth.put('4', " U ");
+        hex2Mouth.put('5', " V ");
+        hex2Mouth.put('6', " | ");
+        hex2Mouth.put('7', "---");
+        hex2Mouth.put('8', " S ");
+        hex2Mouth.put('9', " D ");
+        hex2Mouth.put('a', " 3 ");
+        hex2Mouth.put('b', " P ");
+        hex2Mouth.put('c', "___");
+        hex2Mouth.put('d', " @ ");
+        hex2Mouth.put('e', " X ");
+        hex2Mouth.put('f', " + ");
 
         // Build head
         String eyes = hex2Eyes.get(hashStr.charAt(0));
@@ -254,15 +241,12 @@ public class Hash {
         return head;
     }
 
-
-
     /**
      * Generates a name for the QR Code based on the hash
      * @param hashStr the hash of the QR Code
      * @return the name of the QR Code
      */
     private static String generateName(String hashStr) {
-        // Define dictionaries for each hexadecimal
         Map<Character, String> hex0Dict = new HashMap<>();
         hex0Dict.put('0', "ethereal");
         hex0Dict.put('1', "neon");
@@ -299,7 +283,6 @@ public class Hash {
         hex1Dict.put('e', "Flu");
         hex1Dict.put('f', "Nim");
 
-        // Define dictionary for bit 2
         Map<Character, String> hex2Dict = new HashMap<>();
         hex2Dict.put('0', "Mo");
         hex2Dict.put('1', "Lyo");
@@ -318,7 +301,6 @@ public class Hash {
         hex2Dict.put('e', "Yon");
         hex2Dict.put('f', "Zyx");
 
-        // Define dictionary for bit 3
         Map<Character, String> hex3Dict = new HashMap<>();
         hex3Dict.put('0', "Omega");
         hex3Dict.put('1', "Giga");
@@ -337,7 +319,6 @@ public class Hash {
         hex3Dict.put('e', "Legendary");
         hex3Dict.put('f', "Master");
 
-        // Define dictionary for bit 4
         Map<Character, String> hex4Dict = new HashMap<>();
         hex4Dict.put('0', "Thunderous");
         hex4Dict.put('1', "Blazing");
@@ -374,8 +355,6 @@ public class Hash {
         hex5Dict.put('e', "Hydra");
         hex5Dict.put('f', "Leviathan");
 
-
-        // Lookup values in each dictionary based on corresponding hexadecimals in the hash
         Character[] hexaDecimals = new Character[6];
         for (int i = 0; i < 6; i++) {
             hexaDecimals[i] = hashStr.charAt(i);

@@ -5,11 +5,9 @@ import static android.content.ContentValues.TAG;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -17,8 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -37,8 +35,6 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +125,7 @@ public class ScanActivity extends AppCompatActivity {
 
                     String qrCodeHash = qrCode.getHash();
                     // Retrieve the user's information
-                    String userID = sharedPref.getString("user_id", null);;
+                    String userID = sharedPref.getString("user_id", null);
                     db.collection("users").document(userID).get().addOnSuccessListener(documentSnapshot -> {
                         // Check if the document exists
                         if (documentSnapshot.exists()) {
@@ -199,22 +195,14 @@ public class ScanActivity extends AppCompatActivity {
 
                             // Update the user's document in the database
                             db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d("MY TAG", "QR code added to user's document in DB");
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
-                                    });
+                                    .addOnSuccessListener(aVoid -> Log.d("MY TAG", "QR code added to user's document in DB"))
+                                    .addOnFailureListener(e -> Log.w("MY TAG", "Error adding QR code to user's document in DB", e));
                         } else {
                             // Handle location not found error
                             qrCode.setLocation(null);
                             db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
-                                    .addOnSuccessListener(aVoid -> {
-                                        Log.d("MY TAG", "QR code added to user's document in DB");
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
-                                    });
+                                    .addOnSuccessListener(aVoid -> Log.d("MY TAG", "QR code added to user's document in DB"))
+                                    .addOnFailureListener(e -> Log.w("MY TAG", "Error adding QR code to user's document in DB", e));
                             Toast.makeText(this, "Unable to retrieve location.", Toast.LENGTH_SHORT).show();
                         }
                     })
@@ -227,12 +215,8 @@ public class ScanActivity extends AppCompatActivity {
             // If permissions are not granted, request them from the user
             qrCode.setLocation(null);
             db.collection("users").document(userID).update("qrcodes", FieldValue.arrayUnion(qrCode))
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("MY TAG", "QR code added to user's document in DB");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w("MY TAG", "Error adding QR code to user's document in DB", e);
-                    });
+                    .addOnSuccessListener(aVoid -> Log.d("MY TAG", "QR code added to user's document in DB"))
+                    .addOnFailureListener(e -> Log.w("MY TAG", "Error adding QR code to user's document in DB", e));
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
         }
 
@@ -261,7 +245,7 @@ public class ScanActivity extends AppCompatActivity {
                 } else {
                     // QR code does not exist, add a new document with the 'users' array field
                     Map<String, Object> data = new HashMap<>();
-                    data.put("users", Arrays.asList(userID));
+                    data.put("users", List.of(userID));
                     data.put("comments", null);
                     qrCodeRef.set(data).addOnCompleteListener(setTask -> {
                         if (setTask.isSuccessful()) {
@@ -347,23 +331,17 @@ public class ScanActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Camera permission required");
             builder.setMessage("Please grant camera permission manually in app settings and then try to scan again");
-            builder.setPositiveButton("Go to settings", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Open app settings screen
-                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                            Uri.fromParts("package", getPackageName(), null));
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                }
+            builder.setPositiveButton("Go to settings", (dialog, which) -> {
+                // Open app settings screen
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.fromParts("package", getPackageName(), null));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Toast.makeText(ScanActivity.this, "Permission denied. Scanning canceled", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
+            builder.setNegativeButton("Cancel", (dialog, which) -> {
+                Toast.makeText(ScanActivity.this, "Permission denied. Scanning canceled", Toast.LENGTH_SHORT).show();
+                finish();
             });
             builder.show();
         }
