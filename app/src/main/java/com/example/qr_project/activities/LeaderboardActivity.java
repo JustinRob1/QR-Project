@@ -158,10 +158,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
 
     private void populateData(String filter){
-        if (filter.equals("user")) {
+        if (filter != null && filter.equals("user")) {
             onUserLeaderboardView(null);
-
-        } else if (filter.equals("friends")){
+        }
+        else if (filter.equals("friends")){
             onFriendLeaderboardView(null);
 
         } else {
@@ -202,10 +202,10 @@ public class LeaderboardActivity extends AppCompatActivity {
 
                     String face = (String) qrCode.get("face");
 
-                    Hash hash = new Hash((String) qrCode.get("hash"), name, score);
+                    Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
 
                     // adding QR_Code obj to the list
-                    userQRCodes_list.add(new QR_Code(hash, score, name));
+                    userQRCodes_list.add(new QR_Code(hash, score, name, face));
 
                 }
 
@@ -242,7 +242,7 @@ public class LeaderboardActivity extends AppCompatActivity {
                     Hash hash = new Hash((String) qrCode.get("hash"), name, score);
 
                     // adding QR_Code obj to the list
-                    globalQRCodes_list.add(new QR_Code(hash, score, name));
+                    globalQRCodes_list.add(new QR_Code(hash, score, face, name));
                 }
 
                 globalQRCodes_adapter.notifyDataSetChanged();
@@ -461,6 +461,4 @@ public class LeaderboardActivity extends AppCompatActivity {
         }
         populateData(curr_view);
     }
-
-
 }

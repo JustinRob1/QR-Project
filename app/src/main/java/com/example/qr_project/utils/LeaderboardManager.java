@@ -48,7 +48,8 @@ public class LeaderboardManager {
                                 int score = (Math.toIntExact((Long) qrCodeMap.get("score")));
                                 String hash = (String) qrCodeMap.get("hash");
                                 String face = (String) qrCodeMap.get("face");
-                                QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, name);
+                                String newFace = face.replace("n","\n");
+                                QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, newFace, name);
                                 qrCodes.add(qrCode);
                             }
                             // Sort the QR codes by score in descending order
@@ -87,7 +88,8 @@ public class LeaderboardManager {
                         int score = (Math.toIntExact((Long) code.get("score")));
                         String hash = (String) code.get("hash");
                         String face = (String) code.get("face");
-                        QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, name);
+                        String newFace = face.replace("n","\n");
+                        QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, newFace, name);
                         topUserCodes.add(qrCode);
                     }
                     // Sort the QR codes by score in descending order
@@ -138,9 +140,9 @@ public class LeaderboardManager {
                                         for (Map<String, Object> code : qrcodes) {
                                             String name = (String) code.get("name");
                                             int score = Math.toIntExact((Long) code.get("score"));
-                                            String hash = (String) code.get("hash");
                                             String face = (String) code.get("face");
-                                            QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, name);
+                                            String newFace = face.replace("n","\n");
+                                            QR_Code qrCode = new QR_Code(new Hash(hash, name, score), score, newFace, name);
                                             allQRCodes.add(qrCode);
                                         }
                                     }

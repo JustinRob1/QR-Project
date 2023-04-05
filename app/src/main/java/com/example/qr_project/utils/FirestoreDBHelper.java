@@ -1,5 +1,7 @@
 package com.example.qr_project.utils;
 
+import android.util.Log;
+
 import com.example.qr_project.models.DatabaseHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,12 +26,17 @@ public class FirestoreDBHelper implements DatabaseHelper {
     public void getDocument(String collectionName, String documentId,
                             OnSuccessListener<DocumentSnapshot> successListener,
                             OnFailureListener failureListener) {
-        firebaseFirestore.collection(collectionName)
-                .document(documentId)
-                .get()
-                .addOnSuccessListener(successListener)
-                .addOnFailureListener(failureListener);
+        if (collectionName != null && documentId != null) { // Add null checks
+            firebaseFirestore.collection(collectionName)
+                    .document(documentId)
+                    .get()
+                    .addOnSuccessListener(successListener)
+                    .addOnFailureListener(failureListener);
+        } else {
+            Log.e("FirestoreDBHelper", "Collection name or document ID is null");
+        }
     }
+
 
     /**
      * Attempts to update a document with the given updates (key value pairs to be stored in the
