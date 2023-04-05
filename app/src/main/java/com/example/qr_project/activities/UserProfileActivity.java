@@ -108,7 +108,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void decideWhichUser(){
-        userManager.getFriends(new DatabaseResultCallback<List<Map<String, Object>>>() {
+        userManager.getFriendsRealtime(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
                 for (int i = 0; i < result.size(); i++){
@@ -162,7 +162,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 Log.d(TAG, "Error finding global ranking", e);
             }
         });
-        manager.getFriendRanking(new DatabaseResultCallback<Integer>() {
+        manager.getRealtimeFriendRanking(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 friendRankTxt.setText(String.valueOf(result));
@@ -271,7 +271,7 @@ public class UserProfileActivity extends AppCompatActivity {
             addFriendBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    userManager.removeFriend(otherUserManager.getUserID());
+                    userManager.removeFriendRealtime(otherUserManager.getUserID());
                     reloadActivity();
                 }
             });
@@ -281,7 +281,7 @@ public class UserProfileActivity extends AppCompatActivity {
             addFriendBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    userManager.addFriend(otherUserManager.getUserID());
+                    userManager.addFriendRealtime(otherUserManager.getUserID());
                     reloadActivity();
                 }
             });
@@ -326,6 +326,7 @@ public class UserProfileActivity extends AppCompatActivity {
      */
     public void onLeaderboardClick(View view) {
         Intent intent = new Intent(this, LeaderboardActivity.class);
+        intent.putExtra("filter", "user");
         startActivity(intent);
     }
 

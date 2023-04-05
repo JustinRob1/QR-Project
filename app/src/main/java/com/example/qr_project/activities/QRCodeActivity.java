@@ -109,6 +109,7 @@ public class QRCodeActivity extends AppCompatActivity {
 
 
         qr_code_hash = getIntent().getStringExtra("hash");
+        Log.d(TAG, "QRCODE HASH " + qr_code_hash);
         qrCodeManager = new QRCodeManager(qr_code_hash);
         userManager = UserManager.getInstance();
 
@@ -178,7 +179,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void getComments(){
-        qrCodeManager.getAllComments(new DatabaseResultCallback<List<Map<String, Object>>>() {
+        qrCodeManager.getAllCommentsRealtime(new DatabaseResultCallback<List<Map<String, Object>>>() {
             @Override
             public void onSuccess(List<Map<String, Object>> result) {
                 commentList.clear();
@@ -203,7 +204,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void onSeeScanners(View view){
-        qrCodeManager.getAllUsers(new DatabaseResultCallback<List<Friend>>() {
+        qrCodeManager.getAllUsersRealtime(new DatabaseResultCallback<List<Friend>>() {
             @Override
             public void onSuccess(List<Friend> result) {
                 // Create the custom AlertDialog
@@ -332,7 +333,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     public void seePhoto(View view) {
-        qrCodeManager.getAllUsers(new DatabaseResultCallback<List<Friend>>() {
+        qrCodeManager.getAllUsersRealtime(new DatabaseResultCallback<List<Friend>>() {
             @Override
             public void onSuccess(List<Friend> result) {
                 if (result != null) {
@@ -439,7 +440,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
     private void updateQRCode(){
-        qrCodeManager.getQRCode(new DatabaseResultCallback<QR_Code>() {
+        qrCodeManager.getQRCodeRealtime(new DatabaseResultCallback<QR_Code>() {
             @Override
             public void onSuccess(QR_Code result) {
                 qrCodeName.setText(result.getName());
@@ -453,7 +454,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getGlobalRanking(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getGlobalRankingRealtime(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 globalRankNum.setText(String.valueOf(result));
@@ -465,7 +466,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getUserQRCodeRanking(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getUserQRCodeRankingRealtime(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 if (result == 0){
@@ -481,7 +482,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getFriendsQRCodeRanking(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getFriendsQRCodeRankingRealtime(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 if (result == 0){
@@ -497,7 +498,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.getTotalScans(new DatabaseResultCallback<Integer>() {
+        qrCodeManager.getTotalScansRealtime(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 totalScans.setText(String.valueOf(result));
@@ -509,7 +510,7 @@ public class QRCodeActivity extends AppCompatActivity {
             }
         });
 
-        qrCodeManager.hasUserScanned((new DatabaseResultCallback<Boolean>() {
+        qrCodeManager.hasUserScannedRealtime((new DatabaseResultCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
                 if (result == true){

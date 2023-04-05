@@ -1,13 +1,11 @@
 package com.example.qr_project.activities;
 
-import static android.content.ContentValues.TAG;
 import static com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -317,20 +315,6 @@ public class UserHomeActivity extends AppCompatActivity {
         });
     }
 
-    private void updateTotalScore(){
-        userManager.getTotalScore(new DatabaseResultCallback<Integer>() {
-            @Override
-            public void onSuccess(Integer result) {
-                totalScore.setText(String.valueOf(result));
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                totalScore.setText("N/A");
-            }
-        });
-    }
-
     private void realtimeTotalScore() {
         userManager.getRealtimeTotalScore(new DatabaseResultCallback<String>() {
             @Override
@@ -341,20 +325,6 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 totalScore.setText("N/A");
-            }
-        });
-    }
-
-    private void updateGlobalRanking(){
-        userManager.getGlobalRanking(new DatabaseResultCallback<Integer>() {
-            @Override
-            public void onSuccess(Integer result) {
-                globalRank.setText("Global Rank: " + String.valueOf(result));
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                globalRank.setText("N/A");
             }
         });
     }
@@ -374,7 +344,7 @@ public class UserHomeActivity extends AppCompatActivity {
     }
 
     private void updateFriendRanking(){
-        userManager.getFriendRanking(new DatabaseResultCallback<Integer>() {
+        userManager.getRealtimeFriendRanking(new DatabaseResultCallback<Integer>() {
             @Override
             public void onSuccess(Integer result) {
                 friendRank.setText("Friend Rank: " + String.valueOf(result));
@@ -383,20 +353,6 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 friendRank.setText("N/A");
-            }
-        });
-    }
-
-    private void updateTotalQRCodes(){
-        userManager.getTotalQRCodes(new DatabaseResultCallback<Integer>() {
-            @Override
-            public void onSuccess(Integer result) {
-                totalQrCodes.setText("Total QR Codes: " + String.valueOf(result));
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                totalQrCodes.setText("Total QR Codes: N/A");
             }
         });
     }
@@ -411,50 +367,6 @@ public class UserHomeActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception e) {
                 totalQrCodes.setText("Total QR Codes: N/A");
-            }
-        });
-    }
-
-    private void updateTop3QRCodes(){
-
-        userManager.getTop3QRCodesSorted(new DatabaseResultCallback<List<Map<String, Object>>>() {
-            @Override
-            public void onSuccess(List<Map<String, Object>> result) {
-                rankedQRCodes_list.clear();
-                if (!result.isEmpty()) {
-                    int rank = 1;
-                    for (Map<String, Object> qrCode : result) {
-                        if (rank > 3) break;
-
-                        // Creating QR_Code object for the adapter
-                        String name = String.valueOf(qrCode.get("name"));
-
-                        // POTENTIAL ERROR
-                        int score = qrCode.get("score") instanceof String ? Integer.parseInt((String) qrCode.get("score")) : Math.toIntExact((long) qrCode.get("score"));
-
-                        // IDENTIFIED ERROR POINT
-                        // Not all qr codes in the db have a face,
-                        // so this call will fail for the older docs in docRef
-//                        Bitmap face = (Bitmap) qrCode.get("face");
-//
-//                        Hash hash = new Hash((String) qrCode.get("hash"), name, face, score);
-
-                        // adding QR_Code obj to the list
-                        //rankedQRCodes_list.add(new QR_Code(hash, score, name, face));
-
-                        rank++;
-                    }
-
-                    // Notify adapter to update dataset
-                    rankedQRCodes_adapter.notifyDataSetChanged();
-
-                    Log.d("DOCSNAP", result.toString());
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.d(TAG, "Error getting top 3 codes: ", e);
             }
         });
     }
