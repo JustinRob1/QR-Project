@@ -12,6 +12,14 @@ QR-Project is an Android application that allows users to scan, collect, and int
 - **Map Integration:** Visualize the locations where QR codes were scanned.
 - **Profile Management:** View and manage your collection of QR codes and personal statistics.
 
+## Screenshots
+
+![Dashboard](images/dashboard.png)
+![Map](images/map.png)
+![Profile](images/profile.png)
+![QR Code Page](images/qr-code-page.png)
+![Leaderboard](images/leaderboard.png)
+
 ## Getting Started
 
 ### Prerequisites
