@@ -14,11 +14,11 @@ QR-Project is an Android application that allows users to scan, collect, and int
 
 ## Screenshots
 
-![Dashboard](images/dashboard.png)
-![Map](images/map.png)
-![Profile](images/profile.png)
-![QR Code Page](images/qr-code-page.png)
-![Leaderboard](images/leaderboard.png)
+<img src="images/dashboard.png" alt="Dashboard" width="300"/>
+<img src="images/map.png" alt="Map" width="300"/>
+<img src="images/profile.png" alt="Profile" width="300"/>
+<img src="images/qr-code-page.png" alt="QR Code Page" width="300"/>
+<img src="images/leaderboard.png" alt="Leaderboard" width="300"/>
 
 ## Getting Started
 
